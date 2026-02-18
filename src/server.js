@@ -41,6 +41,7 @@ app.use(helmet({
 const allowedOrigins = [
   'https://front-auth-eight.vercel.app',
   'http://localhost:4200',
+  'http://localhost:5173',  // React ← AGREGA ESTA LÍNEA
 ];
 
 app.use(cors({
