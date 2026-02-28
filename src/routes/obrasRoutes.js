@@ -1,53 +1,32 @@
 import express from 'express';
-import { upload } from '../config/cloudinaryConfig.js'; // ← ✅ AGREGADO
+import { upload } from '../config/cloudinaryConfig.js';
 import { 
-  listarObras,
-  obtenerObraPorId,
-  obtenerObraPorSlug,
-  buscarObras,
-  obtenerObrasPorCategoria,
-  obtenerObrasPorArtista,
-  obtenerObrasPorEtiqueta,
-  obtenerObrasDestacadas,
-  crearObra,        
-  actualizarObra 
+  listarObras, obtenerObraPorId, obtenerObraPorSlug,
+  buscarObras, obtenerObrasPorCategoria, obtenerObrasPorArtista,
+  obtenerObrasPorEtiqueta, obtenerObrasDestacadas,
+  crearObra, actualizarObra, eliminarObra
 } from '../controllers/obrasController.js';
 import { 
-  validarBusqueda,
-  validarIdObra,
-  validarIdCategoria,
-  validarIdArtista,
-  validarSlug
+  validarBusqueda, validarIdObra, validarIdCategoria,
+  validarIdArtista, validarSlug
 } from '../validators/validators.js';
+import { authenticateToken, requireRole } from '../middlewares/authMiddleware.js';  // ← NUEVO
 
 const router = express.Router();
 
-// =========================================================
-// 📚 RUTAS PÚBLICAS CON VALIDACIONES
-// =========================================================
+// ── PÚBLICAS (sin token) ──────────────────────────────────
+router.get('/',                 validarBusqueda,    listarObras);
+router.get('/destacadas',                           obtenerObrasDestacadas);
+router.get('/buscar',           validarBusqueda,    buscarObras);
+router.get('/categoria/:id',    validarIdCategoria, obtenerObrasPorCategoria);
+router.get('/artista/:id',      validarIdArtista,   obtenerObrasPorArtista);
+router.get('/etiqueta/:slug',   validarSlug,        obtenerObrasPorEtiqueta);
+router.get('/slug/:slug',       validarSlug,        obtenerObraPorSlug);
+router.get('/:id',              validarIdObra,      obtenerObraPorId);
 
-// CATÁLOGO GENERAL (con validación de query params)
-router.get('/', validarBusqueda, listarObras);
-
-// OBRAS DESTACADAS
-router.get('/destacadas', obtenerObrasDestacadas);
-
-// BÚSQUEDA (valida término de búsqueda)
-router.get('/buscar', validarBusqueda, buscarObras);
-
-// FILTROS (validan IDs y slugs)
-router.get('/categoria/:id', validarIdCategoria, obtenerObrasPorCategoria);
-router.get('/artista/:id', validarIdArtista, obtenerObrasPorArtista);
-router.get('/etiqueta/:slug', validarSlug, obtenerObrasPorEtiqueta);
-
-// DETALLE DE OBRA (valida slug e ID)
-router.get('/slug/:slug', validarSlug, obtenerObraPorSlug);
-router.get('/:id', validarIdObra, obtenerObraPorId);
-
-// =========================================================
-// 🔒 RUTAS PROTEGIDAS (CON UPLOAD DE IMAGEN)
-// =========================================================
-router.post('/', upload.single('imagen'), crearObra);        // ← ✅ MODIFICADO
-router.put('/:id', upload.single('imagen'), actualizarObra); // ← ✅ MODIFICADO
+// ── PROTEGIDAS (solo admin) ───────────────────────────────
+router.post('/',   authenticateToken, requireRole('admin'), upload.single('imagen'), crearObra);
+router.put('/:id', authenticateToken, requireRole('admin'), upload.single('imagen'), actualizarObra);
+router.delete('/:id', authenticateToken, requireRole('admin'), eliminarObra);
 
 export default router;

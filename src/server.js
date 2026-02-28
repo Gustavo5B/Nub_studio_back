@@ -1,6 +1,7 @@
 // =========================================================
 // 📦 IMPORTACIONES
 // =========================================================
+import tecnicasRoutes from "./routes/tecnicasRoutes.js";
 import express from 'express';
 import cors from 'cors';
 import cron from 'node-cron';
@@ -20,6 +21,7 @@ import { cleanupExpiredCodes, sendRecoveryCode, generateCode } from './services/
 import { cleanupExpiredSessions } from './services/sessionService.js';
 import { sanitizeInput } from './middlewares/sanitize.middleware.js';
 import { preventSQLInjection } from './middlewares/sql-injection.middleware.js';
+import statsRoutes from "./routes/statsRoutes.js";
 
 // =========================================================
 // ⚙️ CONFIGURACIÓN INICIAL
@@ -80,6 +82,8 @@ app.use('/api/categorias', categoriasRoutes);
 app.use('/api/artistas', artistasRoutes);
 app.use('/api/etiquetas', etiquetasRoutes);
 
+app.use("/api/tecnicas", tecnicasRoutes);
+app.use("/api/stats", statsRoutes);
 // =========================================================
 // 🧪 RUTA DE PRUEBA DEL SERVIDOR
 // =========================================================

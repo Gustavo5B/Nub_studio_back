@@ -1,5 +1,5 @@
 import express from 'express';
-import { login, loginWith2FA, verifyLoginCode, closeOtherSessions, checkSession } from '../controllers/authController.js'; // ← Agregar checkSession
+import { login, loginWith2FA, verifyLoginCode, closeOtherSessions, checkSession, registroArtista } from '../controllers/authController.js';
 import { register, verifyEmail, resendVerificationCode } from '../controllers/registerController.js';
 import { authenticateToken } from '../middlewares/authMiddleware.js'; // ← NUEVO IMPORT
 
@@ -9,6 +9,7 @@ const router = express.Router();
 router.post("/register", register);
 router.post("/verify-email", verifyEmail);
 router.post("/resend-code", resendVerificationCode);
+router.post("/registro-artista", registroArtista);  // ← NUEVO
 
 // Rutas de login
 router.post("/login", login);
