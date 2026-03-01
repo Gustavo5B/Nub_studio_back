@@ -16,10 +16,13 @@ export const listarArtistas = async (req, res) => {
         a.biografia, a.foto_perfil, a.correo, a.telefono,
         a.matricula, a.porcentaje_comision, a.estado,
         c.nombre AS categoria_nombre,
-        COUNT(o.id_obra) AS total_obras
+        COUNT(o.id_obra)                                                        AS total_obras,
+        COUNT(o.id_obra) FILTER (WHERE o.estado = 'aprobada' AND o.activa = TRUE) AS obras_publicadas,
+        COUNT(o.id_obra) FILTER (WHERE o.estado = 'pendiente')                  AS obras_pendientes,
+        COUNT(o.id_obra) FILTER (WHERE o.estado = 'rechazada')                  AS obras_rechazadas
       FROM artistas a
       LEFT JOIN categorias c ON a.id_categoria_principal = c.id_categoria
-      LEFT JOIN obras o ON a.id_artista = o.id_artista AND o.activa = TRUE
+      LEFT JOIN obras o ON a.id_artista = o.id_artista          -- ✅ sin filtro activa
       WHERE a.activo = TRUE AND a.eliminado = FALSE
       GROUP BY a.id_artista, c.nombre
       ORDER BY a.nombre_completo ASC
@@ -41,10 +44,13 @@ export const obtenerArtistaPorId = async (req, res) => {
 
     const resultArtista = await pool.query(`
       SELECT a.*, c.nombre AS categoria_nombre,
-        COUNT(o.id_obra) AS total_obras
+        COUNT(o.id_obra)                                                          AS total_obras,
+        COUNT(o.id_obra) FILTER (WHERE o.estado = 'aprobada' AND o.activa = TRUE) AS obras_publicadas,
+        COUNT(o.id_obra) FILTER (WHERE o.estado = 'pendiente')                    AS obras_pendientes,
+        COUNT(o.id_obra) FILTER (WHERE o.estado = 'rechazada')                    AS obras_rechazadas
       FROM artistas a
       LEFT JOIN categorias c ON a.id_categoria_principal = c.id_categoria
-      LEFT JOIN obras o ON a.id_artista = o.id_artista AND o.activa = TRUE
+      LEFT JOIN obras o ON a.id_artista = o.id_artista          -- ✅ sin filtro activa
       WHERE a.id_artista = $1 AND a.activo = TRUE AND a.eliminado = FALSE
       GROUP BY a.id_artista, c.nombre
       LIMIT 1
@@ -55,13 +61,14 @@ export const obtenerArtistaPorId = async (req, res) => {
 
     const artista = resultArtista.rows[0];
 
+    // ✅ Trae TODAS las obras (pendientes, aprobadas, rechazadas)
     const resultObras = await pool.query(`
       SELECT o.id_obra, o.titulo, o.slug, o.imagen_principal,
-        o.anio_creacion, o.estado, o.precio_base,
+        o.anio_creacion, o.estado, o.activa, o.precio_base,
         c.nombre AS categoria_nombre
       FROM obras o
       INNER JOIN categorias c ON o.id_categoria = c.id_categoria
-      WHERE o.id_artista = $1 AND o.activa = TRUE
+      WHERE o.id_artista = $1                                   -- ✅ sin filtro activa
       ORDER BY o.fecha_creacion DESC
     `, [id]);
 
@@ -75,18 +82,23 @@ export const obtenerArtistaPorId = async (req, res) => {
 // =========================================================
 // ➕ CREAR ARTISTA
 // =========================================================
+// =========================================================
+// ➕ CREAR ARTISTA
+// =========================================================
 export const crearArtista = async (req, res) => {
   try {
     const {
       nombre_completo, nombre_artistico, biografia,
-      foto_perfil, correo, telefono, matricula,
+      correo, telefono, matricula,
       id_categoria_principal, porcentaje_comision, estado
     } = req.body;
+
+    // ✅ Acepta archivo subido O url manual
+    const foto_perfil = req.file?.path || req.body.foto_perfil || null;
 
     if (!nombre_completo)
       return res.status(400).json({ success: false, message: "El nombre completo es obligatorio" });
 
-    // Verificar correo duplicado
     if (correo) {
       const exists = await pool.query(
         'SELECT id_artista FROM artistas WHERE correo = $1 AND eliminado = FALSE LIMIT 1', [correo]
@@ -107,7 +119,7 @@ export const crearArtista = async (req, res) => {
       nombre_completo,
       nombre_artistico || null,
       biografia || null,
-      foto_perfil || null,
+      foto_perfil,            // ✅ ya resuelto arriba
       correo || null,
       telefono || null,
       matricula || null,
@@ -134,9 +146,12 @@ export const actualizarArtista = async (req, res) => {
     const { id } = req.params;
     const {
       nombre_completo, nombre_artistico, biografia,
-      foto_perfil, correo, telefono, matricula,
+      correo, telefono, matricula,
       id_categoria_principal, porcentaje_comision, estado
     } = req.body;
+
+    // ✅ Acepta archivo subido O url manual
+    const foto_perfil = req.file?.path || req.body.foto_perfil || null;
 
     await pool.query(`
       UPDATE artistas SET
@@ -148,7 +163,7 @@ export const actualizarArtista = async (req, res) => {
       nombre_completo,
       nombre_artistico || null,
       biografia || null,
-      foto_perfil || null,
+      foto_perfil,            // ✅ ya resuelto arriba
       correo || null,
       telefono || null,
       matricula || null,
@@ -164,7 +179,6 @@ export const actualizarArtista = async (req, res) => {
     res.status(500).json({ success: false, message: 'Error al actualizar el artista' });
   }
 };
-
 // =========================================================
 // 🗑️ ELIMINAR ARTISTA (soft delete)
 // =========================================================
