@@ -436,3 +436,47 @@ export const eliminarObra = async (req, res) => {
     res.status(500).json({ success: false, message: 'Error al eliminar la obra' });
   }
 };
+// =========================================================
+// CAMBIAR ESTADO DE OBRA (admin only) — endpoint dedicado
+// Separado del PUT general para auditoría y seguridad
+// =========================================================
+export const cambiarEstadoObra = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { estado, motivo_rechazo } = req.body;
+    const id_admin = req.user?.id_usuario;
+
+    const estadosValidos = ["pendiente", "publicada", "rechazada", "agotada"];
+    if (!estadosValidos.includes(estado))
+      return res.status(400).json({ success: false, message: "Estado inválido" });
+
+    const activa = estado === "publicada";   // publicada → visible en marketplace
+
+    const result = await pool.query(`
+      UPDATE obras
+      SET estado = $1,
+          activa = $2,
+          fecha_actualizacion = NOW()
+      WHERE id_obra = $3 AND eliminada IS NOT TRUE
+      RETURNING id_obra, titulo, estado, activa
+    `, [estado, activa, id]);
+
+    if (result.rows.length === 0)
+      return res.status(404).json({ success: false, message: "Obra no encontrada" });
+
+    logger.info(
+      `Estado obra ${id} → "${estado}" | activa=${activa} | admin_id=${id_admin}`
+      + (motivo_rechazo ? ` | motivo="${motivo_rechazo}"` : "")
+    );
+
+    res.json({
+      success: true,
+      message: `Obra ${estado === "publicada" ? "publicada" : estado} correctamente`,
+      data: result.rows[0],
+    });
+
+  } catch (error) {
+    logger.error(`Error al cambiar estado obra: ${error.message} | ${error.stack}`);
+    res.status(500).json({ success: false, message: "Error al cambiar estado" });
+  }
+};

@@ -4,29 +4,32 @@ import {
   listarObras, obtenerObraPorId, obtenerObraPorSlug,
   buscarObras, obtenerObrasPorCategoria, obtenerObrasPorArtista,
   obtenerObrasPorEtiqueta, obtenerObrasDestacadas,
-  crearObra, actualizarObra, eliminarObra
+  crearObra, actualizarObra, eliminarObra, cambiarEstadoObra
 } from '../controllers/obrasController.js';
 import { 
   validarBusqueda, validarIdObra, validarIdCategoria,
   validarIdArtista, validarSlug
 } from '../validators/validators.js';
-import { authenticateToken, requireRole } from '../middlewares/authMiddleware.js';  // ← NUEVO
+import { authenticateToken, requireRole } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
 
 // ── PÚBLICAS (sin token) ──────────────────────────────────
-router.get('/',                 validarBusqueda,    listarObras);
-router.get('/destacadas',                           obtenerObrasDestacadas);
-router.get('/buscar',           validarBusqueda,    buscarObras);
-router.get('/categoria/:id',    validarIdCategoria, obtenerObrasPorCategoria);
-router.get('/artista/:id',      validarIdArtista,   obtenerObrasPorArtista);
-router.get('/etiqueta/:slug',   validarSlug,        obtenerObrasPorEtiqueta);
-router.get('/slug/:slug',       validarSlug,        obtenerObraPorSlug);
-router.get('/:id',              validarIdObra,      obtenerObraPorId);
+router.get('/',                validarBusqueda,    listarObras);
+router.get('/destacadas',                          obtenerObrasDestacadas);
+router.get('/buscar',          validarBusqueda,    buscarObras);
+router.get('/categoria/:id',   validarIdCategoria, obtenerObrasPorCategoria);
+router.get('/artista/:id',     validarIdArtista,   obtenerObrasPorArtista);
+router.get('/etiqueta/:slug',  validarSlug,        obtenerObrasPorEtiqueta);
+router.get('/slug/:slug',      validarSlug,        obtenerObraPorSlug);
+router.get('/:id',             validarIdObra,      obtenerObraPorId);
 
 // ── PROTEGIDAS (solo admin) ───────────────────────────────
-router.post('/',   authenticateToken, requireRole('admin'), upload.single('imagen'), crearObra);
-router.put('/:id', authenticateToken, requireRole('admin'), upload.single('imagen'), actualizarObra);
-router.delete('/:id', authenticateToken, requireRole('admin'), eliminarObra);
+router.post('/',                authenticateToken, requireRole('admin'), upload.single('imagen'), crearObra);
+router.put('/:id',              authenticateToken, requireRole('admin'), upload.single('imagen'), actualizarObra);
+router.delete('/:id',           authenticateToken, requireRole('admin'), eliminarObra);
+
+// ── REVISIÓN — endpoint dedicado, sin upload ──────────────
+router.patch('/:id/estado',     authenticateToken, requireRole('admin'), cambiarEstadoObra);
 
 export default router;
