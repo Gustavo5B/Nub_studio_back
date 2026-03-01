@@ -12,59 +12,74 @@ const secureLog = {
 // =========================================================
 // 📚 LISTAR TODAS LAS OBRAS
 // =========================================================
+// =========================================================
+// 📚 LISTAR TODAS LAS OBRAS  (fix admin view)
+// =========================================================
 export const listarObras = async (req, res) => {
   try {
     const {
       page = 1, limit = 12, categoria, artista,
       precio_min, precio_max, destacadas, ordenar = 'recientes',
-      solo_publicadas = 'true'   // ← NUEVO
+      solo_publicadas = 'true'
     } = req.query;
 
     const offset = (page - 1) * limit;
-    let whereConditions = ['o.activa = TRUE'];
+    let whereConditions = ['o.eliminada IS NOT TRUE'];  // ✅ era 'o.activa = TRUE' — bloqueaba pendientes
     let queryParams = [];
     let paramCount = 1;
 
-    // ← NUEVO: solo catálogo público filtra por publicadas
+    // Catálogo público → solo publicadas Y activas
+    // Panel admin (solo_publicadas=false) → todo lo no eliminado
     if (solo_publicadas === 'true') {
       whereConditions.push("o.estado = 'publicada'");
+      whereConditions.push("o.activa = TRUE");
     }
 
-    if (categoria) { whereConditions.push(`o.id_categoria = $${paramCount}`); queryParams.push(categoria); paramCount++; }
-    if (artista)   { whereConditions.push(`o.id_artista = $${paramCount}`);   queryParams.push(artista);   paramCount++; }
+    if (categoria)         { whereConditions.push(`o.id_categoria = $${paramCount}`); queryParams.push(categoria); paramCount++; }
+    if (artista)           { whereConditions.push(`o.id_artista = $${paramCount}`);   queryParams.push(artista);   paramCount++; }
     if (destacadas === 'true') { whereConditions.push('o.destacada = TRUE'); }
 
     if (precio_min || precio_max) {
       let precioConditions = [];
       if (precio_min) { precioConditions.push(`ot.precio_base >= $${paramCount}`); queryParams.push(precio_min); paramCount++; }
       if (precio_max) { precioConditions.push(`ot.precio_base <= $${paramCount}`); queryParams.push(precio_max); paramCount++; }
-      whereConditions.push(`EXISTS (SELECT 1 FROM obras_tamaños ot WHERE ot.id_obra = o.id_obra AND ot.activo = TRUE ${precioConditions.length > 0 ? 'AND ' + precioConditions.join(' AND ') : ''})`);
+      whereConditions.push(
+        `EXISTS (SELECT 1 FROM obras_tamaños ot WHERE ot.id_obra = o.id_obra AND ot.activo = TRUE ${precioConditions.length > 0 ? 'AND ' + precioConditions.join(' AND ') : ''})`
+      );
     }
-    const whereClause = whereConditions.join(' AND ');
-let orderBy = 'o.fecha_creacion DESC';
-switch(ordenar) {
-  case 'antiguos':    orderBy = 'o.fecha_creacion ASC'; break;
-  case 'precio_asc':  orderBy = 'precio_minimo ASC';    break;
-  case 'precio_desc': orderBy = 'precio_minimo DESC';   break;
-  case 'nombre':      orderBy = 'o.titulo ASC';         break;
-}
 
+    const whereClause = whereConditions.join(' AND ');
+
+    let orderBy = 'o.fecha_creacion DESC';
+    switch (ordenar) {
+      case 'antiguos':    orderBy = 'o.fecha_creacion ASC';  break;
+      case 'precio_asc':  orderBy = 'precio_minimo ASC NULLS LAST';  break;  // ✅ NULLS LAST — evita crash cuando no hay tamaños
+      case 'precio_desc': orderBy = 'precio_minimo DESC NULLS LAST'; break;
+      case 'nombre':      orderBy = 'o.titulo ASC';           break;
+    }
+
+    // ✅ precio_base directo de obras como fallback cuando no hay obras_tamaños
     const query = `
       SELECT
         o.id_obra, o.titulo, o.descripcion, o.slug, o.imagen_principal,
         o.anio_creacion, o.tecnica, o.destacada, o.vistas, o.fecha_creacion,
-        o.precio_base, o.estado,
+        o.precio_base, o.estado, o.activa,
         a.id_artista, a.nombre_completo AS artista_nombre, a.nombre_artistico AS artista_alias,
         c.id_categoria, c.nombre AS categoria_nombre, c.slug AS categoria_slug,
-        MIN(ot.precio_base) AS precio_minimo, MAX(ot.precio_base) AS precio_maximo,
-        (SELECT COUNT(*) FROM obras_tamaños WHERE id_obra = o.id_obra AND activo = TRUE) AS total_tamaños
+        COALESCE(MIN(ot.precio_base), o.precio_base) AS precio_minimo,
+        COALESCE(MAX(ot.precio_base), o.precio_base) AS precio_maximo,
+        COUNT(ot.id) FILTER (WHERE ot.activo = TRUE) AS total_tamaños
       FROM obras o
       INNER JOIN artistas a ON o.id_artista = a.id_artista
       INNER JOIN categorias c ON o.id_categoria = c.id_categoria
       LEFT JOIN obras_tamaños ot ON o.id_obra = ot.id_obra AND ot.activo = TRUE
       WHERE ${whereClause}
-      GROUP BY o.id_obra, a.id_artista, a.nombre_completo, a.nombre_artistico,
-               c.id_categoria, c.nombre, c.slug
+      GROUP BY
+        o.id_obra, o.titulo, o.descripcion, o.slug, o.imagen_principal,
+        o.anio_creacion, o.tecnica, o.destacada, o.vistas, o.fecha_creacion,
+        o.precio_base, o.estado, o.activa,
+        a.id_artista, a.nombre_completo, a.nombre_artistico,
+        c.id_categoria, c.nombre, c.slug
       ORDER BY ${orderBy}
       LIMIT $${paramCount} OFFSET $${paramCount + 1}
     `;
@@ -73,7 +88,8 @@ switch(ordenar) {
     const result = await pool.query(query, queryParams);
 
     const countResult = await pool.query(
-      `SELECT COUNT(DISTINCT o.id_obra) as total FROM obras o
+      `SELECT COUNT(DISTINCT o.id_obra) AS total
+       FROM obras o
        LEFT JOIN obras_tamaños ot ON o.id_obra = ot.id_obra AND ot.activo = TRUE
        WHERE ${whereClause}`,
       queryParams.slice(0, -2)
@@ -83,7 +99,12 @@ switch(ordenar) {
     res.json({
       success: true,
       data: result.rows,
-      pagination: { page: parseInt(page), limit: parseInt(limit), total, totalPages: Math.ceil(total / limit) }
+      pagination: {
+        page: parseInt(page),
+        limit: parseInt(limit),
+        total,
+        totalPages: Math.ceil(total / limit)
+      }
     });
 
   } catch (error) {
@@ -334,6 +355,9 @@ export const crearObra = async (req, res) => {
 // =========================================================
 // ✏️ ACTUALIZAR OBRA
 // =========================================================
+// =========================================================
+// ✏️ ACTUALIZAR OBRA  (fix: sincroniza campo `activa` con `estado`)
+// =========================================================
 export const actualizarObra = async (req, res) => {
   try {
     const { id } = req.params;
@@ -346,19 +370,27 @@ export const actualizarObra = async (req, res) => {
 
     const imagen_principal = req.file?.path || req.body.imagen_principal;
 
+    // ✅ FIX: activa se sincroniza automáticamente con el estado
+    // publicada → activa = TRUE  (aparece en catálogo público y Home)
+    // cualquier otro estado → activa = FALSE
+    const activa = estado === 'publicada';
+
     let query = `
       UPDATE obras SET
         titulo=$1, descripcion=$2, id_categoria=$3, id_artista=$4, id_tecnica=$5,
         anio_creacion=$6, precio_base=$7,
         dimensiones_alto=$8, dimensiones_ancho=$9, dimensiones_profundidad=$10,
-        permite_marco=$11, con_certificado=$12, destacada=$13, estado=$14
+        permite_marco=$11, con_certificado=$12, destacada=$13,
+        estado=$14, activa=$15,
+        fecha_actualizacion=NOW()
     `;
+
     const params = [
       titulo, descripcion, id_categoria, id_artista, id_tecnica || null,
       anio_creacion || null, precio_base || null,
       dimensiones_alto || null, dimensiones_ancho || null, dimensiones_profundidad || null,
       permite_marco ?? true, con_certificado ?? false, destacada || false,
-      estado || 'pendiente'
+      estado || 'pendiente', activa,
     ];
 
     if (imagen_principal) {
@@ -366,18 +398,28 @@ export const actualizarObra = async (req, res) => {
       params.push(imagen_principal);
     }
 
-    query += ` WHERE id_obra=$${params.length + 1}`;
+    query += ` WHERE id_obra=$${params.length + 1} RETURNING id_obra, titulo, estado, activa`;
     params.push(id);
 
-    await pool.query(query, params);
-    res.json({ success: true, message: 'Obra actualizada exitosamente' });
+    const result = await pool.query(query, params);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Obra no encontrada' });
+    }
+
+    secureLog.info('Obra actualizada', { 
+      id_obra: result.rows[0].id_obra, 
+      estado: result.rows[0].estado,
+      activa: result.rows[0].activa 
+    });
+
+    res.json({ success: true, message: 'Obra actualizada exitosamente', data: result.rows[0] });
 
   } catch (error) {
     secureLog.error('Error al actualizar obra', error);
     res.status(500).json({ success: false, message: 'Error al actualizar la obra' });
   }
 };
-
 // =========================================================
 // 🗑️ ELIMINAR OBRA (soft delete)
 // =========================================================

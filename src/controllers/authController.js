@@ -228,23 +228,35 @@ export const login = async (req, res) => {
     }
 
     // Login exitoso
-    const token = generateToken(user);
-    await saveActiveSession(user.id_usuario, token, req);
-    await registrarHistorialLogin(user, 'LOGIN_EXITOSO', 'Login directo');
-    secureLog.security('LOGIN_EXITOSO', user.id_usuario, { rol: user.rol });
+let artista_estado = null;
+if (user.rol === 'artista') {
+  const artistaResult = await pool.query(
+    'SELECT estado FROM artistas WHERE id_usuario = $1 LIMIT 1',
+    [user.id_usuario]
+  );
+  if (artistaResult.rows.length > 0) {
+    artista_estado = artistaResult.rows[0].estado;
+  }
+}
 
-    res.json({
-      message: "Inicio de sesión exitoso ✅",
-      access_token: token,
-      token_type: "bearer",
-      usuario: {
-        id: user.id_usuario,
-        nombre: user.nombre_completo,
-        correo: user.correo,
-        estado: user.estado,
-        rol: user.rol           // ← INCLUYE ROL
-      }
-    });
+const token = generateToken(user);
+await saveActiveSession(user.id_usuario, token, req);
+await registrarHistorialLogin(user, 'LOGIN_EXITOSO', 'Login directo');
+secureLog.security('LOGIN_EXITOSO', user.id_usuario, { rol: user.rol });
+
+res.json({
+  message: "Inicio de sesión exitoso ✅",
+  access_token: token,
+  token_type: "bearer",
+  usuario: {
+    id: user.id_usuario,
+    nombre: user.nombre_completo,
+    correo: user.correo,
+    estado: user.estado,
+    rol: user.rol,
+    artista_estado   // ← NUEVO
+  }
+});
 
   } catch (error) {
     secureLog.error('Error crítico en login', error);

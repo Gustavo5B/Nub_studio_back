@@ -13,30 +13,59 @@ export const getDashboardStats = async (req, res) => {
       obrasRecientesResult,
       visitasResult
     ] = await Promise.all([
-      pool.query(`SELECT COUNT(*) as total FROM obras WHERE activa = TRUE AND eliminada = FALSE`),
-      pool.query(`SELECT COUNT(*) as total FROM artistas WHERE activo = TRUE AND eliminado = FALSE`),
-      pool.query(`SELECT COUNT(*) as total FROM categorias WHERE activa = TRUE`),
+
+      // ✅ eliminada puede ser NULL o FALSE — usamos IS NOT TRUE
+      pool.query(`
+        SELECT COUNT(*) as total 
+        FROM obras 
+        WHERE eliminada IS NOT TRUE
+      `),
+
+      // ✅ artistas: verificar columnas reales
+      pool.query(`
+        SELECT COUNT(*) as total 
+        FROM artistas 
+        WHERE estado = 'activo'
+      `),
+
+      pool.query(`
+        SELECT COUNT(*) as total 
+        FROM categorias
+      `),
+
+      // ✅ obras por estado — sin filtrar por activa para ver todas
       pool.query(`
         SELECT estado, COUNT(*) as total 
-        FROM obras WHERE activa = TRUE AND eliminada = FALSE
+        FROM obras 
+        WHERE eliminada IS NOT TRUE
         GROUP BY estado
       `),
+
+      // ✅ obras recientes — incluye pendientes y activa=false
       pool.query(`
-        SELECT o.id_obra, o.titulo, o.imagen_principal, o.estado, o.fecha_creacion,
-          a.nombre_artistico AS artista_alias, a.nombre_completo AS artista_nombre,
+        SELECT 
+          o.id_obra, o.titulo, o.imagen_principal, 
+          o.estado, o.fecha_creacion,
+          a.nombre_artistico AS artista_alias, 
+          a.nombre_completo AS artista_nombre,
           c.nombre AS categoria_nombre
         FROM obras o
         INNER JOIN artistas a ON o.id_artista = a.id_artista
         INNER JOIN categorias c ON o.id_categoria = c.id_categoria
-        WHERE o.activa = TRUE AND o.eliminada = FALSE
+        WHERE o.eliminada IS NOT TRUE
         ORDER BY o.fecha_creacion DESC
         LIMIT 5
       `),
-      pool.query(`SELECT COALESCE(SUM(vistas),0) as total FROM obras WHERE activa = TRUE`)
+
+      pool.query(`
+        SELECT COALESCE(SUM(vistas), 0) as total 
+        FROM obras 
+        WHERE eliminada IS NOT TRUE
+      `)
     ]);
 
     const estadosMap = {};
-    obrasEstadoResult.rows.forEach(r => {
+    obrasEstadoResult.rows.forEach((r) => {
       estadosMap[r.estado] = parseInt(r.total);
     });
 

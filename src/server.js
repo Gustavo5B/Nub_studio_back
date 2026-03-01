@@ -22,6 +22,7 @@ import { cleanupExpiredSessions } from './services/sessionService.js';
 import { sanitizeInput } from './middlewares/sanitize.middleware.js';
 import { preventSQLInjection } from './middlewares/sql-injection.middleware.js';
 import statsRoutes from "./routes/statsRoutes.js";
+import artistaPortalRoutes from './routes/artistaPortalRoutes.js';
 
 // =========================================================
 // ⚙️ CONFIGURACIÓN INICIAL
@@ -81,6 +82,7 @@ app.use('/api/obras', obrasRoutes);
 app.use('/api/categorias', categoriasRoutes);
 app.use('/api/artistas', artistasRoutes);
 app.use('/api/etiquetas', etiquetasRoutes);
+app.use('/api/artista-portal', artistaPortalRoutes);
 
 app.use("/api/tecnicas", tecnicasRoutes);
 app.use("/api/stats", statsRoutes);
