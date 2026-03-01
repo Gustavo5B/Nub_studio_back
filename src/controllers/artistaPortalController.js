@@ -68,11 +68,12 @@ LEFT JOIN categorias c ON c.id_categoria = o.id_categoria
 
     const obras = result.rows;
     const stats = {
-      total: obras.length,
-      publicadas: obras.filter(o => o.estado === 'aprobada' && o.activa).length,
-      en_revision: obras.filter(o => o.estado === 'pendiente').length,
-      rechazadas: obras.filter(o => o.estado === 'rechazada').length,
-    };
+  total:      obras.length,
+  publicadas: obras.filter(o => o.estado === 'publicada').length,
+  pendientes: obras.filter(o => o.estado === 'pendiente').length,
+  rechazadas: obras.filter(o => o.estado === 'rechazada').length,
+  borradores: obras.filter(o => o.estado === 'borrador').length,
+};
 
     res.json({ obras, stats });
   } catch (error) {
