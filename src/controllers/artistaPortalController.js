@@ -192,3 +192,155 @@ export const nuevaObra = async (req, res) => {
     res.status(500).json({ message: 'Error interno del servidor', error: error.message });
   }
 };
+// GET /api/artista-portal/obra/:id
+export const getObraById = async (req, res) => {
+  try {
+    const usuarioId = req.user.id_usuario;
+    const { id }    = req.params;
+
+    const artistaRes = await pool.query(
+      'SELECT id_artista FROM artistas WHERE id_usuario = $1 AND estado = $2 LIMIT 1',
+      [usuarioId, 'activo']
+    );
+    if (artistaRes.rows.length === 0)
+      return res.status(403).json({ message: 'Artista no encontrado o inactivo' });
+
+    const { id_artista } = artistaRes.rows[0];
+
+    const result = await pool.query(`
+      SELECT o.*,
+        c.nombre AS categoria_nombre,
+        COALESCE(
+          json_agg(oe.id_etiqueta) FILTER (WHERE oe.id_etiqueta IS NOT NULL),
+          '[]'
+        ) AS etiquetas
+      FROM obras o
+      LEFT JOIN categorias c  ON c.id_categoria = o.id_categoria
+      LEFT JOIN obras_etiquetas oe ON oe.id_obra = o.id_obra
+      WHERE o.id_obra = $1 AND o.id_artista = $2
+        AND (o.eliminada IS NULL OR o.eliminada = FALSE)
+      GROUP BY o.id_obra, c.nombre
+      LIMIT 1
+    `, [id, id_artista]);
+
+    if (result.rows.length === 0)
+      return res.status(404).json({ message: 'Obra no encontrada' });
+
+    res.json(result.rows[0]);
+  } catch (error) {
+    logger.error(`Error en getObraById: ${error.message}`);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
+
+// PUT /api/artista-portal/obra/:id
+export const actualizarObraArtista = async (req, res) => {
+  try {
+    const usuarioId = req.user.id_usuario;
+    const { id }    = req.params;
+
+    const artistaRes = await pool.query(
+      'SELECT id_artista, estado FROM artistas WHERE id_usuario = $1 LIMIT 1',
+      [usuarioId]
+    );
+    if (artistaRes.rows.length === 0)
+      return res.status(403).json({ message: 'No eres un artista registrado' });
+
+    const artista = artistaRes.rows[0];
+    if (artista.estado !== 'activo')
+      return res.status(403).json({ message: 'Tu cuenta de artista aún no está aprobada' });
+
+    const { id_artista } = artista;
+
+    // Verificar que la obra pertenece al artista
+    const obraCheck = await pool.query(
+      `SELECT id_obra FROM obras
+       WHERE id_obra = $1 AND id_artista = $2
+         AND (eliminada IS NULL OR eliminada = FALSE) LIMIT 1`,
+      [id, id_artista]
+    );
+    if (obraCheck.rows.length === 0)
+      return res.status(404).json({ message: 'Obra no encontrada' });
+
+    const {
+      titulo, descripcion, id_categoria, tecnica, anio_creacion,
+      dimensiones_alto, dimensiones_ancho, dimensiones_profundidad,
+      precio_base, permite_marco, con_certificado,
+      imagen_principal: imgUrl, etiquetas: etiquetasRaw,
+    } = req.body;
+
+    // Imagen: si mandaron archivo lo subimos a Cloudinary, si no usamos la URL del body
+    let imagen_principal = imgUrl || null;
+
+    if (req.file) {
+      const { cloudinary } = await import('../config/cloudinaryConfig.js');
+      const uploadResult = await new Promise((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: 'nub_studio/obras', resource_type: 'image', quality: 'auto:good', fetch_format: 'auto' },
+          (error, result) => { if (error) reject(error); else resolve(result); }
+        );
+        stream.end(req.file.buffer);
+      });
+      imagen_principal = uploadResult.secure_url;
+    }
+
+    await pool.query(`
+      UPDATE obras SET
+        titulo                   = $1,
+        descripcion              = $2,
+        id_categoria             = $3,
+        tecnica                  = $4,
+        anio_creacion            = $5,
+        dimensiones_alto         = $6,
+        dimensiones_ancho        = $7,
+        dimensiones_profundidad  = $8,
+        precio_base              = $9,
+        permite_marco            = $10,
+        con_certificado          = $11,
+        imagen_principal         = COALESCE($12, imagen_principal),
+        estado                   = 'pendiente',
+        activa                   = FALSE,
+        visible                  = FALSE,
+        fecha_actualizacion      = NOW()
+      WHERE id_obra = $13
+    `, [
+      titulo,
+      descripcion       || null,
+      id_categoria      ? parseInt(id_categoria) : null,
+      tecnica           || null,
+      anio_creacion     ? parseInt(anio_creacion) : null,
+      dimensiones_alto        ? parseFloat(dimensiones_alto)        : null,
+      dimensiones_ancho       ? parseFloat(dimensiones_ancho)       : null,
+      dimensiones_profundidad ? parseFloat(dimensiones_profundidad) : null,
+      parseFloat(precio_base),
+      permite_marco   === 'true' || permite_marco   === true,
+      con_certificado === 'true' || con_certificado === true,
+      imagen_principal,
+      id,
+    ]);
+
+    // Actualizar etiquetas si vienen
+    if (etiquetasRaw !== undefined) {
+      let etiquetas = [];
+      try { etiquetas = typeof etiquetasRaw === 'string' ? JSON.parse(etiquetasRaw) : etiquetasRaw; } catch (_) {}
+
+      await pool.query('DELETE FROM obras_etiquetas WHERE id_obra = $1', [id]);
+
+      if (Array.isArray(etiquetas) && etiquetas.length > 0) {
+        for (const idEtiqueta of etiquetas) {
+          await pool.query(
+            'INSERT INTO obras_etiquetas (id_obra, id_etiqueta) VALUES ($1, $2) ON CONFLICT DO NOTHING',
+            [id, idEtiqueta]
+          );
+        }
+      }
+    }
+
+    logger.info(`Obra actualizada: id ${id} por artista ${id_artista}`);
+    res.json({ success: true, message: 'Obra actualizada. Quedará en revisión hasta que el admin la apruebe.' });
+
+  } catch (error) {
+    logger.error(`Error en actualizarObraArtista: ${error.message}`);
+    res.status(500).json({ message: 'Error interno del servidor', error: error.message });
+  }
+};
