@@ -1,177 +1,121 @@
 import speakeasy from "speakeasy";
 import QRCode from "qrcode";
 import { pool } from "../config/db.js";
+import logger from "../config/logger.js";
 
 // =========================================================
-// 🔒 LOGGER SEGURO
+// GENERAR SECRETO Y QR PARA TOTP
 // =========================================================
-const secureLog = {
-  info: (message, metadata = {}) => {
-    const sanitized = { ...metadata };
-    delete sanitized.token;
-    delete sanitized.secret;
-    delete sanitized.codigo;
-    
-    console.log(`ℹ️ ${message}`, Object.keys(sanitized).length > 0 ? sanitized : '');
-  },
-  
-  error: (message, error) => {
-    console.error(`❌ ${message}`, {
-      name: error.name,
-      code: error.code
-    });
-  },
-  
-  security: (action, userId, metadata = {}) => {
-    console.log(`🔐 SECURITY [${action}] User:${userId || 'unknown'}`, {
-      timestamp: new Date().toISOString(),
-      ...metadata
-    });
-  }
-};
-
-// ===============================
-// 🔹 Generar secreto y QR para TOTP
-// ===============================
 export const setupTOTP = async (req, res) => {
   try {
     const { correo } = req.body;
 
-    secureLog.info('Configurando TOTP', { correo });
-
-    if (!correo) {
+    if (!correo)
       return res.status(400).json({ message: "Correo requerido" });
-    }
 
-    // Generar secreto TOTP
     const secret = speakeasy.generateSecret({
       name: `NU-B Studio (${correo})`,
       length: 32,
     });
 
-    // Generar QR Code (imagen base64)
     const qrCodeUrl = await QRCode.toDataURL(secret.otpauth_url);
 
-    // ✅ POSTGRESQL
-    // Guardar el secreto temporalmente en BD
     await pool.query(
-      `UPDATE usuarios 
-       SET secret_2fa = $1, requiere_2fa = FALSE
-       WHERE correo = $2`,
+      `UPDATE usuarios SET secret_2fa = $1, requiere_2fa = FALSE WHERE correo = $2`,
       [secret.base32, correo]
     );
 
-    secureLog.security('TOTP_GENERADO', null, { correo });
+    logger.info(`TOTP generado: ${correo}`);
+    res.json({ message: "TOTP generado correctamente", secret: secret.base32, qrCode: qrCodeUrl });
 
-    res.json({
-      message: "TOTP generado correctamente ✅",
-      secret: secret.base32,
-      qrCode: qrCodeUrl,
-    });
   } catch (error) {
-    secureLog.error('Error en setupTOTP', error);
+    logger.error(`Error en setupTOTP: ${error.message}`);
     res.status(500).json({ message: "Error al configurar TOTP" });
   }
 };
 
-// ===============================
-// 🔹 Verificar código TOTP y activar 2FA
-// ===============================
+// =========================================================
+// VERIFICAR CODIGO TOTP Y ACTIVAR 2FA
+// =========================================================
 export const verifyTOTP = async (req, res) => {
   try {
     const { correo, token } = req.body;
 
-    secureLog.info('Verificando código TOTP', { correo });
+    if (!correo || !token)
+      return res.status(400).json({ message: "Correo y codigo requeridos" });
 
-    if (!correo || !token) {
-      return res.status(400).json({ message: "Correo y código requeridos" });
-    }
-
-    // ✅ POSTGRESQL
     const result = await pool.query(
       "SELECT id_usuario, secret_2fa FROM usuarios WHERE correo = $1 LIMIT 1",
       [correo]
     );
 
-    if (result.rows.length === 0) {
+    if (result.rows.length === 0)
       return res.status(404).json({ message: "Usuario no encontrado" });
-    }
 
     const user = result.rows[0];
-    const secret = user.secret_2fa;
 
-    // Verificar el código TOTP
     const verified = speakeasy.totp.verify({
-      secret,
+      secret: user.secret_2fa,
       encoding: "base32",
       token,
       window: 2,
     });
 
     if (verified) {
-      // ✅ POSTGRESQL - ACTUALIZAR CON MÉTODO
       await pool.query(
-        `UPDATE usuarios 
-         SET requiere_2fa = TRUE, metodo_2fa = 'TOTP'
-         WHERE correo = $1`,
+        `UPDATE usuarios SET requiere_2fa = TRUE, metodo_2fa = 'TOTP' WHERE correo = $1`,
         [correo]
       );
-
-      secureLog.security('TOTP_ACTIVADO', user.id_usuario);
-
-      res.json({ message: "TOTP verificado y activado correctamente ✅" });
+      logger.info(`TOTP activado: usuario ${user.id_usuario}`);
+      res.json({ message: "TOTP verificado y activado correctamente" });
     } else {
-      secureLog.security('TOTP_CODIGO_INCORRECTO', user.id_usuario);
-      res.status(401).json({ message: "Código TOTP incorrecto ❌" });
+      logger.warn(`TOTP codigo incorrecto: usuario ${user.id_usuario}`);
+      res.status(401).json({ message: "Codigo TOTP incorrecto" });
     }
+
   } catch (error) {
-    secureLog.error('Error en verifyTOTP', error);
+    logger.error(`Error en verifyTOTP: ${error.message}`);
     res.status(500).json({ message: "Error al verificar TOTP" });
   }
 };
 
-// ===============================
-// 🔹 Validar TOTP durante login
-// ===============================
+// =========================================================
+// VALIDAR TOTP DURANTE LOGIN
+// =========================================================
 export const validateTOTP = async (req, res) => {
   try {
     const { correo, token } = req.body;
 
-    secureLog.info('Validando TOTP durante login', { correo });
+    if (!correo || !token)
+      return res.status(400).json({ message: "Correo y codigo requeridos" });
 
-    if (!correo || !token) {
-      return res.status(400).json({ message: "Correo y código requeridos" });
-    }
-
-    // ✅ POSTGRESQL
     const result = await pool.query(
       "SELECT id_usuario, secret_2fa FROM usuarios WHERE correo = $1 LIMIT 1",
       [correo]
     );
 
-    if (result.rows.length === 0) {
+    if (result.rows.length === 0)
       return res.status(404).json({ message: "Usuario no encontrado" });
-    }
 
     const user = result.rows[0];
-    const secret = user.secret_2fa;
 
     const verified = speakeasy.totp.verify({
-      secret,
+      secret: user.secret_2fa,
       encoding: "base32",
       token,
       window: 2,
     });
 
     if (verified) {
-      secureLog.security('TOTP_VALIDACION_EXITOSA', user.id_usuario);
-      res.json({ valid: true, message: "Código válido ✅" });
+      logger.info(`TOTP validacion exitosa: usuario ${user.id_usuario}`);
+      res.json({ valid: true, message: "Codigo valido" });
     } else {
-      secureLog.security('TOTP_VALIDACION_FALLIDA', user.id_usuario);
-      res.status(401).json({ valid: false, message: "Código incorrecto ❌" });
+      logger.warn(`TOTP validacion fallida: usuario ${user.id_usuario}`);
+      res.status(401).json({ valid: false, message: "Codigo incorrecto" });
     }
+
   } catch (error) {
-    secureLog.error('Error en validateTOTP', error);
+    logger.error(`Error en validateTOTP: ${error.message}`);
     res.status(500).json({ message: "Error al validar TOTP" });
   }
 };

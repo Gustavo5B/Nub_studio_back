@@ -1,12 +1,13 @@
 // =========================================================
-// 📸 CONFIGURACIÓN DE CLOUDINARY
+// CONFIGURACION DE CLOUDINARY
 // =========================================================
 import { v2 as cloudinary } from 'cloudinary';
 import { CloudinaryStorage } from 'multer-storage-cloudinary';
 import multer from 'multer';
+import logger from './logger.js';
 
 // =========================================================
-// 🔑 CONFIGURAR CREDENCIALES
+// CONFIGURAR CREDENCIALES
 // =========================================================
 cloudinary.config({
   cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
@@ -15,31 +16,31 @@ cloudinary.config({
 });
 
 // =========================================================
-// 📁 CONFIGURAR STORAGE DE MULTER CON CLOUDINARY
+// CONFIGURAR STORAGE DE MULTER CON CLOUDINARY
 // =========================================================
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'nub-studio/obras', // Carpeta en Cloudinary
+    folder: 'nub-studio/obras',
     allowed_formats: ['jpg', 'jpeg', 'png', 'webp', 'gif'],
     transformation: [
-      { width: 1200, height: 1200, crop: 'limit' }, // Redimensionar si es muy grande
-      { quality: 'auto' } // Optimización automática
+      { width: 1200, height: 1200, crop: 'limit' },
+      { quality: 'auto' }
     ]
   }
 });
 
 // =========================================================
-// 🛡️ CONFIGURAR MULTER
+// CONFIGURAR MULTER
 // =========================================================
 const upload = multer({
   storage: storage,
   limits: {
-    fileSize: 5 * 1024 * 1024 // Máximo 5MB por imagen
+    fileSize: 5 * 1024 * 1024
   },
   fileFilter: (req, file, cb) => {
     const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'image/webp', 'image/gif'];
-    
+
     if (allowedTypes.includes(file.mimetype)) {
       cb(null, true);
     } else {
@@ -49,20 +50,20 @@ const upload = multer({
 });
 
 // =========================================================
-// 🗑️ FUNCIÓN PARA ELIMINAR IMAGEN
+// FUNCION PARA ELIMINAR IMAGEN
 // =========================================================
 export const eliminarImagen = async (publicId) => {
   try {
     const resultado = await cloudinary.uploader.destroy(publicId);
-    console.log('✅ Imagen eliminada de Cloudinary:', resultado);
+    logger.info(`Imagen eliminada de Cloudinary: ${JSON.stringify(resultado)}`);
     return resultado;
   } catch (error) {
-    console.error('❌ Error al eliminar imagen:', error);
+    logger.error(`Error al eliminar imagen: ${error.message}`);
     throw error;
   }
 };
 
 // =========================================================
-// 📤 EXPORTAR
+// EXPORTAR
 // =========================================================
 export { cloudinary, upload };

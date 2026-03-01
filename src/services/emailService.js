@@ -1,10 +1,12 @@
 import brevo from '@getbrevo/brevo';
 import crypto from 'crypto';
 import dotenv from 'dotenv';
+import logger from '../config/logger.js';
+
 dotenv.config();
 
 // =========================================================
-// ✉️ CONFIGURACIÓN DE BREVO (usando API key HTTPS, no SMTP)
+// CONFIGURACION DE BREVO
 // =========================================================
 const defaultClient = brevo.ApiClient.instance;
 const apiKey = defaultClient.authentications['api-key'];
@@ -12,99 +14,50 @@ apiKey.apiKey = process.env.BREVO_API_KEY;
 
 const apiInstance = new brevo.TransactionalEmailsApi();
 
-// ✅ VERIFICAR QUE LA API KEY ESTÉ CONFIGURADA
 if (!process.env.BREVO_API_KEY) {
-  console.error('❌ ERROR CRÍTICO: BREVO_API_KEY no está configurada en .env');
+  logger.error('ERROR CRITICO: BREVO_API_KEY no esta configurada en .env');
   throw new Error('BREVO_API_KEY no configurada');
 }
 
-console.log('✅ Brevo API configurada correctamente');
+logger.info('Brevo API configurada correctamente');
 
 // =========================================================
-// 📧 ENVIAR EMAIL DE VERIFICACIÓN DE CUENTA
+// ENVIAR EMAIL DE VERIFICACION DE CUENTA
 // =========================================================
 export const sendVerificationEmail = async (email, nombre, codigo) => {
   try {
     const sendSmtpEmail = {
-      sender: {
-        name: 'NU-B Studio',
-        email: 'gustavotubazo@gmail.com',
-      },
+      sender: { name: 'NU-B Studio', email: 'gustavotubazo@gmail.com' },
       to: [{ email, name: nombre }],
-      subject: '🔐 Verifica tu cuenta - NU-B Studio',
+      subject: 'Verifica tu cuenta - NU-B Studio',
       htmlContent: `
         <!DOCTYPE html>
         <html lang="es">
         <head>
           <meta charset="UTF-8" />
           <style>
-            body {
-              font-family: 'Segoe UI', Roboto, sans-serif;
-              background-color: #f9fafb;
-              margin: 0;
-              padding: 0;
-            }
-            .container {
-              max-width: 600px;
-              margin: 40px auto;
-              background: #ffffff;
-              border-radius: 12px;
-              overflow: hidden;
-              box-shadow: 0 6px 14px rgba(0,0,0,0.1);
-            }
-            .header {
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              padding: 40px 30px;
-              text-align: center;
-            }
-            .header h1 {
-              margin: 0;
-              font-size: 28px;
-            }
-            .content {
-              padding: 40px 30px;
-              text-align: center;
-              color: #333;
-            }
-            .code-box {
-              background: #eef2ff;
-              border: 2px solid #667eea;
-              border-radius: 10px;
-              padding: 20px;
-              margin: 25px 0;
-              font-size: 36px;
-              font-weight: bold;
-              color: #4c51bf;
-              letter-spacing: 8px;
-              font-family: 'Courier New', monospace;
-            }
-            .footer {
-              background: #f8f9fa;
-              padding: 20px;
-              text-align: center;
-              font-size: 13px;
-              color: #666;
-            }
+            body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: #f9fafb; margin: 0; padding: 0; }
+            .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 14px rgba(0,0,0,0.1); }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 30px; text-align: center; }
+            .header h1 { margin: 0; font-size: 28px; }
+            .content { padding: 40px 30px; text-align: center; color: #333; }
+            .code-box { background: #eef2ff; border: 2px solid #667eea; border-radius: 10px; padding: 20px; margin: 25px 0; font-size: 36px; font-weight: bold; color: #4c51bf; letter-spacing: 8px; font-family: 'Courier New', monospace; }
+            .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 13px; color: #666; }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <h1>¡Bienvenido, ${nombre}! 🎉</h1>
+              <h1>Bienvenido, ${nombre}!</h1>
               <p>Verifica tu cuenta para comenzar</p>
             </div>
-            
             <div class="content">
-              <h2>Tu código de verificación</h2>
-              <p>Ingresa este código en la aplicación para activar tu cuenta:</p>
-              
+              <h2>Tu codigo de verificacion</h2>
+              <p>Ingresa este codigo en la aplicacion para activar tu cuenta:</p>
               <div class="code-box">${codigo}</div>
-              
-              <p>Este código expirará en <strong>24 horas</strong>.</p>
+              <p>Este codigo expirara en <strong>24 horas</strong>.</p>
               <p style="font-size: 13px; color: #777;">Si no te registraste, ignora este mensaje.</p>
             </div>
-            
             <div class="footer">
               <p>© ${new Date().getFullYear()} NU-B Studio. Todos los derechos reservados.</p>
             </div>
@@ -115,19 +68,17 @@ export const sendVerificationEmail = async (email, nombre, codigo) => {
     };
 
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log(`✅ Email de verificación enviado (Message ID: ${result.messageId})`);
-    
+    logger.info(`Email de verificacion enviado (Message ID: ${result.messageId})`);
     return { success: true, messageId: result.messageId };
 
   } catch (error) {
-    console.error('❌ Error al enviar email de verificación');
-    console.error('Error code:', error.code || 'UNKNOWN');
-    throw new Error('Error al enviar el correo de verificación');
+    logger.error(`Error al enviar email de verificacion: ${error.message}`);
+    throw new Error('Error al enviar el correo de verificacion');
   }
 };
 
 // =========================================================
-// 🔐 GENERAR CÓDIGO DE RECUPERACIÓN
+// GENERAR CODIGO DE RECUPERACION
 // =========================================================
 export const generateCode = () => {
   const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -138,17 +89,14 @@ export const generateCode = () => {
 };
 
 // =========================================================
-// 🎉 ENVIAR CORREO DE BIENVENIDA
+// ENVIAR CORREO DE BIENVENIDA
 // =========================================================
 export const sendWelcomeEmail = async (email, nombre) => {
   try {
     const sendSmtpEmail = {
-      sender: {
-        name: 'NU-B Studio',
-        email: 'gustavotubazo@gmail.com',
-      },
+      sender: { name: 'NU-B Studio', email: 'gustavotubazo@gmail.com' },
       to: [{ email, name: nombre }],
-      subject: '🎉 ¡Bienvenido a NU-B Studio!',
+      subject: 'Bienvenido a NU-B Studio!',
       htmlContent: `
         <!DOCTYPE html>
         <html lang="es">
@@ -156,125 +104,35 @@ export const sendWelcomeEmail = async (email, nombre) => {
           <meta charset="UTF-8" />
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
           <style>
-            body {
-              font-family: 'Segoe UI', Roboto, sans-serif;
-              background-color: #f9fafb;
-              margin: 0;
-              padding: 0;
-            }
-            .container {
-              max-width: 600px;
-              margin: 40px auto;
-              background: #ffffff;
-              border-radius: 12px;
-              overflow: hidden;
-              box-shadow: 0 6px 14px rgba(0,0,0,0.1);
-            }
-            .header {
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              padding: 40px 30px;
-              text-align: center;
-            }
-            .header h1 {
-              margin: 0;
-              font-size: 28px;
-              font-weight: bold;
-            }
-            .header p {
-              margin: 10px 0 0;
-              font-size: 16px;
-              opacity: 0.95;
-            }
-            .content {
-              padding: 40px 30px;
-              color: #333;
-            }
-            .content h2 {
-              color: #667eea;
-              font-size: 22px;
-              margin-top: 0;
-            }
-            .features {
-              background: #f8f9fa;
-              border-radius: 8px;
-              padding: 25px;
-              margin: 25px 0;
-            }
-            .features h3 {
-              color: #333;
-              margin-top: 0;
-              font-size: 18px;
-            }
-            .features ul {
-              list-style: none;
-              padding: 0;
-              margin: 15px 0 0;
-            }
-            .features li {
-              padding: 10px 0;
-              padding-left: 28px;
-              position: relative;
-              color: #555;
-              line-height: 1.5;
-            }
-            .features li:before {
-              content: "✓";
-              position: absolute;
-              left: 0;
-              color: #667eea;
-              font-weight: bold;
-              font-size: 18px;
-            }
-            .button {
-              display: inline-block;
-              padding: 14px 35px;
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              text-decoration: none;
-              border-radius: 8px;
-              margin: 25px 0;
-              font-weight: bold;
-              font-size: 16px;
-              text-align: center;
-            }
-            .button-container {
-              text-align: center;
-            }
-            .footer {
-              background: #f8f9fa;
-              padding: 20px;
-              text-align: center;
-              font-size: 13px;
-              color: #666;
-              line-height: 1.6;
-            }
-            @media only screen and (max-width: 600px) {
-              .container {
-                margin: 20px;
-              }
-              .header {
-                padding: 30px 20px;
-              }
-              .content {
-                padding: 30px 20px;
-              }
-            }
+            body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: #f9fafb; margin: 0; padding: 0; }
+            .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 14px rgba(0,0,0,0.1); }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 40px 30px; text-align: center; }
+            .header h1 { margin: 0; font-size: 28px; font-weight: bold; }
+            .header p { margin: 10px 0 0; font-size: 16px; opacity: 0.95; }
+            .content { padding: 40px 30px; color: #333; }
+            .content h2 { color: #667eea; font-size: 22px; margin-top: 0; }
+            .features { background: #f8f9fa; border-radius: 8px; padding: 25px; margin: 25px 0; }
+            .features h3 { color: #333; margin-top: 0; font-size: 18px; }
+            .features ul { list-style: none; padding: 0; margin: 15px 0 0; }
+            .features li { padding: 10px 0 10px 28px; position: relative; color: #555; line-height: 1.5; }
+            .features li:before { content: "✓"; position: absolute; left: 0; color: #667eea; font-weight: bold; font-size: 18px; }
+            .button { display: inline-block; padding: 14px 35px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; text-decoration: none; border-radius: 8px; margin: 25px 0; font-weight: bold; font-size: 16px; }
+            .button-container { text-align: center; }
+            .footer { background: #f8f9fa; padding: 20px; text-align: center; font-size: 13px; color: #666; line-height: 1.6; }
+            @media only screen and (max-width: 600px) { .container { margin: 20px; } .header, .content { padding: 30px 20px; } }
           </style>
         </head>
         <body>
           <div class="container">
             <div class="header">
-              <h1>¡Bienvenido, ${nombre}! 🎉</h1>
+              <h1>Bienvenido, ${nombre}!</h1>
               <p>Tu cuenta ha sido creada exitosamente</p>
             </div>
-            
             <div class="content">
-              <h2>¡Gracias por unirte a NU-B Studio!</h2>
-              <p>Estamos emocionados de tenerte con nosotros. Tu cuenta está lista para usar y puedes comenzar a disfrutar de todas nuestras funcionalidades.</p>
-              
+              <h2>Gracias por unirte a NU-B Studio!</h2>
+              <p>Estamos emocionados de tenerte con nosotros. Tu cuenta esta lista para usar.</p>
               <div class="features">
-                <h3>¿Qué puedes hacer ahora?</h3>
+                <h3>Que puedes hacer ahora?</h3>
                 <ul>
                   <li>Completa tu perfil de usuario</li>
                   <li>Explora todas nuestras herramientas</li>
@@ -283,26 +141,14 @@ export const sendWelcomeEmail = async (email, nombre) => {
                   <li>Accede a contenido exclusivo</li>
                 </ul>
               </div>
-              
               <div class="button-container">
-                <a href="${process.env.FRONTEND_URL}/login" class="button">
-                  Iniciar Sesión Ahora
-                </a>
+                <a href="${process.env.FRONTEND_URL}/login" class="button">Iniciar Sesion Ahora</a>
               </div>
-              
-              <p style="margin-top: 30px; color: #666; font-size: 14px;">
-                Si tienes alguna pregunta o necesitas ayuda, no dudes en contactarnos. 
-                Estamos aquí para apoyarte en cada paso.
-              </p>
-              
-              <p style="margin-top: 25px;">
-                Saludos cordiales,<br>
-                <strong style="color: #667eea;">El equipo de NU-B Studio</strong>
-              </p>
+              <p style="margin-top: 30px; color: #666; font-size: 14px;">Si tienes alguna pregunta, no dudes en contactarnos.</p>
+              <p style="margin-top: 25px;">Saludos cordiales,<br><strong style="color: #667eea;">El equipo de NU-B Studio</strong></p>
             </div>
-            
             <div class="footer">
-              <p>Este es un correo automático, por favor no respondas directamente.</p>
+              <p>Este es un correo automatico, por favor no respondas directamente.</p>
               <p>© ${new Date().getFullYear()} NU-B Studio. Todos los derechos reservados.</p>
             </div>
           </div>
@@ -312,101 +158,51 @@ export const sendWelcomeEmail = async (email, nombre) => {
     };
 
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log(`✅ Email de bienvenida enviado (Message ID: ${result.messageId})`);
-    
+    logger.info(`Email de bienvenida enviado (Message ID: ${result.messageId})`);
     return { success: true, messageId: result.messageId };
 
   } catch (error) {
-    console.error('❌ Error al enviar email de bienvenida');
-    console.error('Error code:', error.code || 'UNKNOWN');
+    logger.error(`Error al enviar email de bienvenida: ${error.message}`);
     throw new Error('Error al enviar el correo de bienvenida');
   }
 };
 
 // =========================================================
-// 📧 ENVIAR CORREO DE RECUPERACIÓN DE CONTRASEÑA
+// ENVIAR CORREO DE RECUPERACION DE CONTRASENA
 // =========================================================
 export const sendRecoveryCode = async (email, code) => {
   try {
     const sendSmtpEmail = {
-      sender: {
-        name: 'NubStudio',
-        email: 'gustavotubazo@gmail.com',
-      },
+      sender: { name: 'NubStudio', email: 'gustavotubazo@gmail.com' },
       to: [{ email }],
-      subject: '🔑 Recuperación de contraseña - NU-B Studio',
+      subject: 'Recuperacion de contrasena - NU-B Studio',
       htmlContent: `
         <!DOCTYPE html>
         <html lang="es">
         <head>
           <meta charset="UTF-8" />
           <style>
-            body {
-              font-family: 'Segoe UI', Roboto, sans-serif;
-              background-color: #f9fafb;
-              margin: 0;
-              padding: 0;
-            }
-            .container {
-              max-width: 600px;
-              margin: 40px auto;
-              background: #ffffff;
-              border-radius: 12px;
-              overflow: hidden;
-              box-shadow: 0 6px 14px rgba(0,0,0,0.1);
-            }
-            .header {
-              background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-              color: white;
-              padding: 30px;
-              text-align: center;
-            }
-            .header h1 {
-              margin: 0;
-              font-size: 26px;
-            }
-            .content {
-              padding: 40px 30px;
-              text-align: center;
-              color: #333;
-            }
-            .code-box {
-              background: #eef2ff;
-              border: 2px solid #667eea;
-              border-radius: 10px;
-              padding: 20px;
-              margin: 25px 0;
-              font-size: 32px;
-              font-weight: bold;
-              color: #4c51bf;
-              letter-spacing: 4px;
-              font-family: 'Courier New', monospace;
-            }
-            .footer {
-              background: #f8f9fa;
-              padding: 15px;
-              text-align: center;
-              font-size: 13px;
-              color: #666;
-            }
+            body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: #f9fafb; margin: 0; padding: 0; }
+            .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 14px rgba(0,0,0,0.1); }
+            .header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; text-align: center; }
+            .header h1 { margin: 0; font-size: 26px; }
+            .content { padding: 40px 30px; text-align: center; color: #333; }
+            .code-box { background: #eef2ff; border: 2px solid #667eea; border-radius: 10px; padding: 20px; margin: 25px 0; font-size: 32px; font-weight: bold; color: #4c51bf; letter-spacing: 4px; font-family: 'Courier New', monospace; }
+            .footer { background: #f8f9fa; padding: 15px; text-align: center; font-size: 13px; color: #666; }
           </style>
         </head>
         <body>
           <div class="container">
-            <div class="header">
-              <h1>Recuperación de Contraseña</h1>
-            </div>
+            <div class="header"><h1>Recuperacion de Contrasena</h1></div>
             <div class="content">
               <p>Hola,</p>
-              <p>Hemos recibido una solicitud para restablecer tu contraseña.</p>
-              <p>Tu código de recuperación es:</p>
+              <p>Hemos recibido una solicitud para restablecer tu contrasena.</p>
+              <p>Tu codigo de recuperacion es:</p>
               <div class="code-box">${code}</div>
-              <p>Este código expirará en <strong>15 minutos</strong>.</p>
+              <p>Este codigo expirara en <strong>15 minutos</strong>.</p>
               <p style="font-size: 13px; color: #777;">Si no solicitaste este cambio, ignora este mensaje.</p>
             </div>
-            <div class="footer">
-              © ${new Date().getFullYear()} NU-B Studio — No respondas a este mensaje.
-            </div>
+            <div class="footer">© ${new Date().getFullYear()} NU-B Studio — No respondas a este mensaje.</div>
           </div>
         </body>
         </html>
@@ -414,141 +210,78 @@ export const sendRecoveryCode = async (email, code) => {
     };
 
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    console.log('✅ Email de recuperación enviado (Message ID:', result.messageId, ')');
-    
+    logger.info(`Email de recuperacion enviado (Message ID: ${result.messageId})`);
     return { success: true, messageId: result.messageId };
 
   } catch (error) {
-    console.error('❌ Error al enviar email de recuperación');
-    console.error('Error code:', error.code || 'UNKNOWN');
-    throw new Error('Error al enviar el código por correo');
+    logger.error(`Error al enviar email de recuperacion: ${error.message}`);
+    throw new Error('Error al enviar el codigo por correo');
   }
 };
 
 // =========================================================
-// 📧 ENVIAR CORREO DE VERIFICACIÓN (2FA) CON BREVO
+// ENVIAR CODIGO DE VERIFICACION 2FA
 // =========================================================
 export const sendGmail2FACode = async (email, code) => {
   try {
-    console.log('📧 Intentando enviar email 2FA a:', email.substring(0, 3) + '***');
-    
+    logger.info(`Enviando email 2FA a: ${email.substring(0, 3)}***`);
+
     const sendSmtpEmail = {
-      sender: {
-        name: 'NU-B Studio Seguridad',
-        email: 'gustavotubazo@gmail.com',
-      },
+      sender: { name: 'NU-B Studio Seguridad', email: 'gustavotubazo@gmail.com' },
       to: [{ email }],
-      subject: '🔐 Código de verificación (2FA) - NU-B Studio',
+      subject: 'Codigo de verificacion (2FA) - NU-B Studio',
       htmlContent: `
         <!DOCTYPE html>
         <html lang="es">
         <head>
           <meta charset="UTF-8" />
           <style>
-            body {
-              font-family: 'Segoe UI', Roboto, sans-serif;
-              background-color: #f9fafb;
-              margin: 0;
-              padding: 0;
-            }
-            .container {
-              max-width: 600px;
-              margin: 40px auto;
-              background: #ffffff;
-              border-radius: 12px;
-              overflow: hidden;
-              box-shadow: 0 6px 14px rgba(0,0,0,0.1);
-            }
-            .header {
-              background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%);
-              color: white;
-              padding: 30px;
-              text-align: center;
-            }
-            .header h1 {
-              margin: 0;
-              font-size: 26px;
-            }
-            .content {
-              padding: 40px 30px;
-              text-align: center;
-              color: #333;
-            }
-            .code-box {
-              background: #eef2ff;
-              border: 2px solid #3b82f6;
-              border-radius: 10px;
-              padding: 20px;
-              margin: 25px 0;
-              font-size: 32px;
-              font-weight: bold;
-              color: #1e3a8a;
-              letter-spacing: 4px;
-              font-family: 'Courier New', monospace;
-            }
-            .footer {
-              background: #f8f9fa;
-              padding: 15px;
-              text-align: center;
-              font-size: 13px;
-              color: #666;
-            }
+            body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: #f9fafb; margin: 0; padding: 0; }
+            .container { max-width: 600px; margin: 40px auto; background: #ffffff; border-radius: 12px; overflow: hidden; box-shadow: 0 6px 14px rgba(0,0,0,0.1); }
+            .header { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; padding: 30px; text-align: center; }
+            .header h1 { margin: 0; font-size: 26px; }
+            .content { padding: 40px 30px; text-align: center; color: #333; }
+            .code-box { background: #eef2ff; border: 2px solid #3b82f6; border-radius: 10px; padding: 20px; margin: 25px 0; font-size: 32px; font-weight: bold; color: #1e3a8a; letter-spacing: 4px; font-family: 'Courier New', monospace; }
+            .footer { background: #f8f9fa; padding: 15px; text-align: center; font-size: 13px; color: #666; }
           </style>
         </head>
         <body>
           <div class="container">
-            <div class="header">
-              <h1>Verificación de Seguridad</h1>
-            </div>
+            <div class="header"><h1>Verificacion de Seguridad</h1></div>
             <div class="content">
               <p>Hola,</p>
-              <p>Tu código de autenticación de dos factores es:</p>
+              <p>Tu codigo de autenticacion de dos factores es:</p>
               <div class="code-box">${code}</div>
-              <p>Este código expirará en <strong>10 minutos</strong>.</p>
-              <p style="font-size: 13px; color: #777;">Si no solicitaste este código, ignora este mensaje.</p>
+              <p>Este codigo expirara en <strong>10 minutos</strong>.</p>
+              <p style="font-size: 13px; color: #777;">Si no solicitaste este codigo, ignora este mensaje.</p>
             </div>
-            <div class="footer">
-              © ${new Date().getFullYear()} NU-B Studio — Seguridad de cuentas.
-            </div>
+            <div class="footer">© ${new Date().getFullYear()} NU-B Studio — Seguridad de cuentas.</div>
           </div>
         </body>
         </html>
       `,
     };
 
-    console.log('📤 Enviando email a través de Brevo API...');
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    
-    console.log('✅ Email 2FA enviado (Message ID:', result.messageId, ')');
-    
+    logger.info(`Email 2FA enviado (Message ID: ${result.messageId})`);
     return { success: true, messageId: result.messageId };
+
   } catch (error) {
-    console.error('❌ Error detallado al enviar email 2FA:');
-    console.error('Error name:', error.name);
-    console.error('Error code:', error.code);
-    console.error('Error message:', error.message);
-    
-    if (error.response) {
-      console.error('Response status:', error.response.status);
-      console.error('Response body:', JSON.stringify(error.response.body, null, 2));
-    }
-    
+    logger.error(`Error al enviar email 2FA: ${error.message}`);
     throw new Error(`Email service error: ${error.message || error.code || 'UNKNOWN'}`);
   }
 };
 
 // =========================================================
-// 🧹 LIMPIEZA AUTOMÁTICA DE CÓDIGOS EXPIRADOS
+// LIMPIEZA AUTOMATICA DE CODIGOS EXPIRADOS
 // =========================================================
 export const cleanupExpiredCodes = async () => {
   try {
-    console.log('🧹 Ejecutando limpieza de códigos expirados...');
-    // Si tienes una tabla de códigos, agregar lógica aquí
-    // Por ahora, solo un placeholder
-    console.log('✅ Limpieza completada');
+    logger.info('Ejecutando limpieza de codigos expirados...');
+    logger.info('Limpieza completada');
     return true;
   } catch (error) {
-    console.error('❌ Error en limpieza de códigos:', error);
+    logger.error(`Error en limpieza de codigos: ${error.message}`);
     return false;
   }
 };

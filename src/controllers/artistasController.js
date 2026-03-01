@@ -1,12 +1,8 @@
 import { pool } from "../config/db.js";
-
-const secureLog = {
-  info:  (msg, meta = {}) => console.log(`ℹ️ ${msg}`, Object.keys(meta).length ? meta : ''),
-  error: (msg, err)       => console.error(`❌ ${msg}`, { name: err.name, code: err.code }),
-};
+import logger from "../config/logger.js";
 
 // =========================================================
-// 📚 LISTAR TODOS LOS ARTISTAS
+// LISTAR TODOS LOS ARTISTAS
 // =========================================================
 export const listarArtistas = async (req, res) => {
   try {
@@ -22,7 +18,7 @@ export const listarArtistas = async (req, res) => {
         COUNT(o.id_obra) FILTER (WHERE o.estado = 'rechazada')                  AS obras_rechazadas
       FROM artistas a
       LEFT JOIN categorias c ON a.id_categoria_principal = c.id_categoria
-      LEFT JOIN obras o ON a.id_artista = o.id_artista          -- ✅ sin filtro activa
+      LEFT JOIN obras o ON a.id_artista = o.id_artista
       WHERE a.activo = TRUE AND a.eliminado = FALSE
       GROUP BY a.id_artista, c.nombre
       ORDER BY a.nombre_completo ASC
@@ -30,13 +26,13 @@ export const listarArtistas = async (req, res) => {
 
     res.json({ success: true, data: result.rows });
   } catch (error) {
-    secureLog.error('Error al listar artistas', error);
+    logger.error(`Error al listar artistas: ${error.message}`);
     res.status(500).json({ success: false, message: "Error al obtener los artistas" });
   }
 };
 
 // =========================================================
-// 🔍 OBTENER ARTISTA POR ID
+// OBTENER ARTISTA POR ID
 // =========================================================
 export const obtenerArtistaPorId = async (req, res) => {
   try {
@@ -50,7 +46,7 @@ export const obtenerArtistaPorId = async (req, res) => {
         COUNT(o.id_obra) FILTER (WHERE o.estado = 'rechazada')                    AS obras_rechazadas
       FROM artistas a
       LEFT JOIN categorias c ON a.id_categoria_principal = c.id_categoria
-      LEFT JOIN obras o ON a.id_artista = o.id_artista          -- ✅ sin filtro activa
+      LEFT JOIN obras o ON a.id_artista = o.id_artista
       WHERE a.id_artista = $1 AND a.activo = TRUE AND a.eliminado = FALSE
       GROUP BY a.id_artista, c.nombre
       LIMIT 1
@@ -61,29 +57,25 @@ export const obtenerArtistaPorId = async (req, res) => {
 
     const artista = resultArtista.rows[0];
 
-    // ✅ Trae TODAS las obras (pendientes, aprobadas, rechazadas)
     const resultObras = await pool.query(`
       SELECT o.id_obra, o.titulo, o.slug, o.imagen_principal,
         o.anio_creacion, o.estado, o.activa, o.precio_base,
         c.nombre AS categoria_nombre
       FROM obras o
       INNER JOIN categorias c ON o.id_categoria = c.id_categoria
-      WHERE o.id_artista = $1                                   -- ✅ sin filtro activa
+      WHERE o.id_artista = $1
       ORDER BY o.fecha_creacion DESC
     `, [id]);
 
     res.json({ success: true, data: { ...artista, obras: resultObras.rows } });
   } catch (error) {
-    secureLog.error('Error al obtener artista', error);
+    logger.error(`Error al obtener artista: ${error.message}`);
     res.status(500).json({ success: false, message: "Error al obtener el artista" });
   }
 };
 
 // =========================================================
-// ➕ CREAR ARTISTA
-// =========================================================
-// =========================================================
-// ➕ CREAR ARTISTA
+// CREAR ARTISTA
 // =========================================================
 export const crearArtista = async (req, res) => {
   try {
@@ -93,7 +85,6 @@ export const crearArtista = async (req, res) => {
       id_categoria_principal, porcentaje_comision, estado
     } = req.body;
 
-    // ✅ Acepta archivo subido O url manual
     const foto_perfil = req.file?.path || req.body.foto_perfil || null;
 
     if (!nombre_completo)
@@ -119,7 +110,7 @@ export const crearArtista = async (req, res) => {
       nombre_completo,
       nombre_artistico || null,
       biografia || null,
-      foto_perfil,            // ✅ ya resuelto arriba
+      foto_perfil,
       correo || null,
       telefono || null,
       matricula || null,
@@ -129,17 +120,17 @@ export const crearArtista = async (req, res) => {
     ]);
 
     const { id_artista } = result.rows[0];
-    secureLog.info('Artista creado', { id_artista });
+    logger.info(`Artista creado: id ${id_artista}`);
 
     res.status(201).json({ success: true, message: 'Artista creado exitosamente', data: { id_artista } });
   } catch (error) {
-    secureLog.error('Error al crear artista', error);
+    logger.error(`Error al crear artista: ${error.message}`);
     res.status(500).json({ success: false, message: 'Error al crear el artista' });
   }
 };
 
 // =========================================================
-// ✏️ ACTUALIZAR ARTISTA
+// ACTUALIZAR ARTISTA
 // =========================================================
 export const actualizarArtista = async (req, res) => {
   try {
@@ -150,7 +141,6 @@ export const actualizarArtista = async (req, res) => {
       id_categoria_principal, porcentaje_comision, estado
     } = req.body;
 
-    // ✅ Acepta archivo subido O url manual
     const foto_perfil = req.file?.path || req.body.foto_perfil || null;
 
     await pool.query(`
@@ -163,7 +153,7 @@ export const actualizarArtista = async (req, res) => {
       nombre_completo,
       nombre_artistico || null,
       biografia || null,
-      foto_perfil,            // ✅ ya resuelto arriba
+      foto_perfil,
       correo || null,
       telefono || null,
       matricula || null,
@@ -175,12 +165,13 @@ export const actualizarArtista = async (req, res) => {
 
     res.json({ success: true, message: 'Artista actualizado exitosamente' });
   } catch (error) {
-    secureLog.error('Error al actualizar artista', error);
+    logger.error(`Error al actualizar artista: ${error.message}`);
     res.status(500).json({ success: false, message: 'Error al actualizar el artista' });
   }
 };
+
 // =========================================================
-// 🗑️ ELIMINAR ARTISTA (soft delete)
+// ELIMINAR ARTISTA (soft delete)
 // =========================================================
 export const eliminarArtista = async (req, res) => {
   try {
@@ -193,7 +184,7 @@ export const eliminarArtista = async (req, res) => {
 
     res.json({ success: true, message: 'Artista eliminado correctamente' });
   } catch (error) {
-    secureLog.error('Error al eliminar artista', error);
+    logger.error(`Error al eliminar artista: ${error.message}`);
     res.status(500).json({ success: false, message: 'Error al eliminar el artista' });
   }
 };

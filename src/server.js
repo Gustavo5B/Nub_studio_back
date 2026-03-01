@@ -23,15 +23,16 @@ import { sanitizeInput } from './middlewares/sanitize.middleware.js';
 import { preventSQLInjection } from './middlewares/sql-injection.middleware.js';
 import statsRoutes from "./routes/statsRoutes.js";
 import artistaPortalRoutes from './routes/artistaPortalRoutes.js';
+import logger from './config/logger.js';
 
 // =========================================================
-// ⚙️ CONFIGURACIÓN INICIAL
+// CONFIGURACION INICIAL
 // =========================================================
 dotenv.config();
 const app = express();
 
 // =========================================================
-// 🛡️ HELMET - HEADERS DE SEGURIDAD
+// HELMET - HEADERS DE SEGURIDAD
 // =========================================================
 app.use(helmet({
   contentSecurityPolicy: false,
@@ -39,12 +40,12 @@ app.use(helmet({
 }));
 
 // =========================================================
-// 🌐 CONFIGURACIÓN DE CORS
+// CONFIGURACION DE CORS
 // =========================================================
 const allowedOrigins = [
   'https://front-auth-eight.vercel.app',
   'http://localhost:4200',
-  'http://localhost:5173',  // React ← AGREGA ESTA LÍNEA
+  'http://localhost:5173',
 ];
 
 app.use(cors({
@@ -53,7 +54,7 @@ app.use(cors({
     if (allowedOrigins.includes(origin)) {
       return callback(null, true);
     } else {
-      console.warn(`🚫 Bloqueado por CORS: ${origin}`);
+      logger.warn(`Bloqueado por CORS: ${origin}`);
       return callback(new Error('Origen no permitido por CORS'), false);
     }
   },
@@ -63,14 +64,14 @@ app.use(cors({
 }));
 
 // =========================================================
-// 🧩 MIDDLEWARES
+// MIDDLEWARES
 // =========================================================
 app.use(express.json({ limit: '10mb' }));
 app.use(sanitizeInput);
 app.use(preventSQLInjection);
 
 // =========================================================
-// 🚀 RUTAS PRINCIPALES
+// RUTAS PRINCIPALES
 // =========================================================
 app.use('/api/auth', authRoutes);
 app.use('/api/recovery', recoveryRoutes);
@@ -83,16 +84,16 @@ app.use('/api/categorias', categoriasRoutes);
 app.use('/api/artistas', artistasRoutes);
 app.use('/api/etiquetas', etiquetasRoutes);
 app.use('/api/artista-portal', artistaPortalRoutes);
-
 app.use("/api/tecnicas", tecnicasRoutes);
 app.use("/api/stats", statsRoutes);
+
 // =========================================================
-// 🧪 RUTA DE PRUEBA DEL SERVIDOR
+// RUTA DE PRUEBA DEL SERVIDOR
 // =========================================================
 app.get('/', (req, res) => {
   res.json({
-    message: '✅ Backend AUTH activo y corriendo correctamente.',
-    database: 'PostgreSQL', // ✅ CAMBIADO
+    message: 'Backend AUTH activo y corriendo correctamente.',
+    database: 'PostgreSQL',
     cors: allowedOrigins,
     security: {
       xss: 'enabled',
@@ -106,22 +107,22 @@ app.get('/', (req, res) => {
 });
 
 // =========================================================
-// 🧪 RUTA DE PRUEBA DE EMAIL (BREVO)
+// RUTA DE PRUEBA DE EMAIL (BREVO)
 // =========================================================
 app.get('/api/test-email', async (req, res) => {
   try {
     const testEmail = 'tucorreo@gmail.com';
     const code = generateCode();
 
-    console.log(`📧 Probando envío de correo a ${testEmail}...`);
+    logger.info(`Probando envio de correo a ${testEmail}...`);
     await sendRecoveryCode(testEmail, code);
 
     res.json({
-      message: `✅ Correo de prueba enviado correctamente a ${testEmail}`,
+      message: `Correo de prueba enviado correctamente a ${testEmail}`,
       code,
     });
   } catch (error) {
-    console.error('❌ Error al enviar el correo de prueba:', error);
+    logger.error(`Error al enviar el correo de prueba: ${error.message}`);
     res.status(500).json({
       message: 'Error al enviar correo de prueba',
       error: error.message,
@@ -130,45 +131,45 @@ app.get('/api/test-email', async (req, res) => {
 });
 
 // =========================================================
-// 🕒 CRON JOB: Limpieza automática cada hora
+// CRON JOB: Limpieza automatica cada hora
 // =========================================================
 cron.schedule('0 * * * *', async () => {
-  console.log('🧹 Ejecutando limpieza de códigos expirados...');
+  logger.info('Ejecutando limpieza de codigos expirados...');
   try {
     await cleanupExpiredCodes();
-    console.log('✅ Limpieza completada.');
+    logger.info('Limpieza completada.');
   } catch (err) {
-    console.error('❌ Error en limpieza automática:', err.message);
+    logger.error(`Error en limpieza automatica: ${err.message}`);
   }
 });
 
 // =========================================================
-// 🕒 CRON JOB: Limpieza de sesiones antiguas cada día
+// CRON JOB: Limpieza de sesiones antiguas cada dia
 // =========================================================
 cron.schedule('0 0 * * *', async () => {
-  console.log('🧹 Ejecutando limpieza de sesiones antiguas...');
+  logger.info('Ejecutando limpieza de sesiones antiguas...');
   try {
     await cleanupExpiredSessions();
-    console.log('✅ Limpieza de sesiones completada.');
+    logger.info('Limpieza de sesiones completada.');
   } catch (err) {
-    console.error('❌ Error en limpieza de sesiones:', err.message);
+    logger.error(`Error en limpieza de sesiones: ${err.message}`);
   }
 });
 
 // =========================================================
-// 🚀 INICIO DEL SERVIDOR
+// INICIO DEL SERVIDOR
 // =========================================================
 const PORT = process.env.PORT || 4000;
 
 app.listen(PORT, async () => {
-  console.log(`✅ Servidor corriendo en el puerto ${PORT}`);
-  console.log(`🌐 CORS habilitado para:`, allowedOrigins);
-  console.log(`🛡️ Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet`);
+  logger.info(`Servidor corriendo en el puerto ${PORT}`);
+  logger.info(`CORS habilitado para: ${allowedOrigins.join(', ')}`);
+  logger.info('Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet');
 
   try {
     await testConnection();
-    console.log('🟢 Conexión PostgreSQL verificada correctamente.'); // ✅ CAMBIADO
+    logger.info('Conexion PostgreSQL verificada correctamente.');
   } catch (error) {
-    console.error('❌ Error en la conexión PostgreSQL:', error.message); // ✅ CAMBIADO
+    logger.error(`Error en la conexion PostgreSQL: ${error.message}`);
   }
 });

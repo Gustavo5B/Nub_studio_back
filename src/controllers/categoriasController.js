@@ -1,97 +1,54 @@
 import { pool } from "../config/db.js";
+import logger from "../config/logger.js";
 
 // =========================================================
-// 🔒 LOGGER SEGURO
-// =========================================================
-const secureLog = {
-  info: (message, metadata = {}) => {
-    console.log(`ℹ️ ${message}`, Object.keys(metadata).length > 0 ? metadata : '');
-  },
-  
-  error: (message, error) => {
-    console.error(`❌ ${message}`, {
-      name: error.name,
-      code: error.code
-    });
-  }
-};
-
-// =========================================================
-// 📚 LISTAR TODAS LAS CATEGORÍAS
+// LISTAR TODAS LAS CATEGORIAS
 // =========================================================
 export const listarCategorias = async (req, res) => {
   try {
-    const query = `
+    const result = await pool.query(`
       SELECT 
-        c.id_categoria,
-        c.nombre,
-        c.descripcion,
-        c.slug,
-        c.icono,
+        c.id_categoria, c.nombre, c.descripcion,
+        c.slug, c.icono,
         COUNT(o.id_obra) AS total_obras
       FROM categorias c
       LEFT JOIN obras o ON c.id_categoria = o.id_categoria AND o.activa = TRUE
       WHERE c.activa = TRUE
       GROUP BY c.id_categoria
       ORDER BY c.nombre ASC
-    `;
+    `);
 
-    const result = await pool.query(query);
-    const categorias = result.rows;
-
-    secureLog.info('Categorías listadas', { total: categorias.length });
-
-    res.json({
-      success: true,
-      data: categorias
-    });
+    logger.info(`Categorias listadas: ${result.rows.length}`);
+    res.json({ success: true, data: result.rows });
 
   } catch (error) {
-    secureLog.error('Error al listar categorías', error);
-    res.status(500).json({ 
-      success: false,
-      message: "Error al obtener las categorías" 
-    });
+    logger.error(`Error al listar categorias: ${error.message}`);
+    res.status(500).json({ success: false, message: "Error al obtener las categorias" });
   }
 };
 
 // =========================================================
-// 🔍 OBTENER DETALLE DE UNA CATEGORÍA
+// OBTENER DETALLE DE UNA CATEGORIA
 // =========================================================
 export const obtenerCategoriaPorId = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // 1️⃣ INFORMACIÓN DE LA CATEGORÍA
-    const queryCat = `
-      SELECT 
-        c.*,
-        COUNT(o.id_obra) AS total_obras
+    const resultCat = await pool.query(`
+      SELECT c.*, COUNT(o.id_obra) AS total_obras
       FROM categorias c
       LEFT JOIN obras o ON c.id_categoria = o.id_categoria AND o.activa = TRUE
       WHERE c.id_categoria = $1 AND c.activa = TRUE
       GROUP BY c.id_categoria
       LIMIT 1
-    `;
+    `, [id]);
 
-    const resultCat = await pool.query(queryCat, [id]);
+    if (resultCat.rows.length === 0)
+      return res.status(404).json({ success: false, message: "Categoria no encontrada" });
 
-    if (resultCat.rows.length === 0) {
-      return res.status(404).json({ 
-        success: false,
-        message: "Categoría no encontrada" 
-      });
-    }
-
-    const categoria = resultCat.rows[0];
-
-    // 2️⃣ OBRAS DE ESTA CATEGORÍA (primeras 12)
-    const queryObras = `
+    const resultObras = await pool.query(`
       SELECT 
-        o.id_obra,
-        o.titulo,
-        o.slug,
-        o.imagen_principal,
+        o.id_obra, o.titulo, o.slug, o.imagen_principal,
         a.nombre_artistico AS artista_alias,
         MIN(ot.precio_base) AS precio_minimo
       FROM obras o
@@ -101,30 +58,18 @@ export const obtenerCategoriaPorId = async (req, res) => {
       GROUP BY o.id_obra, a.nombre_artistico
       ORDER BY o.fecha_creacion DESC
       LIMIT 12
-    `;
+    `, [id]);
 
-    const resultObras = await pool.query(queryObras, [id]);
-    const obras = resultObras.rows;
-
-    res.json({
-      success: true,
-      data: {
-        ...categoria,
-        obras
-      }
-    });
+    res.json({ success: true, data: { ...resultCat.rows[0], obras: resultObras.rows } });
 
   } catch (error) {
-    secureLog.error('Error al obtener categoría', error);
-    res.status(500).json({ 
-      success: false,
-      message: "Error al obtener la categoría" 
-    });
+    logger.error(`Error al obtener categoria: ${error.message}`);
+    res.status(500).json({ success: false, message: "Error al obtener la categoria" });
   }
 };
 
 // =========================================================
-// 🔍 OBTENER CATEGORÍA POR SLUG
+// OBTENER CATEGORIA POR SLUG
 // =========================================================
 export const obtenerCategoriaPorSlug = async (req, res) => {
   try {
@@ -135,21 +80,14 @@ export const obtenerCategoriaPorSlug = async (req, res) => {
       [slug]
     );
 
-    if (result.rows.length === 0) {
-      return res.status(404).json({ 
-        success: false,
-        message: "Categoría no encontrada" 
-      });
-    }
+    if (result.rows.length === 0)
+      return res.status(404).json({ success: false, message: "Categoria no encontrada" });
 
     req.params.id = result.rows[0].id_categoria;
     return obtenerCategoriaPorId(req, res);
 
   } catch (error) {
-    secureLog.error('Error al obtener categoría por slug', error);
-    res.status(500).json({ 
-      success: false,
-      message: "Error al obtener la categoría" 
-    });
+    logger.error(`Error al obtener categoria por slug: ${error.message}`);
+    res.status(500).json({ success: false, message: "Error al obtener la categoria" });
   }
 };

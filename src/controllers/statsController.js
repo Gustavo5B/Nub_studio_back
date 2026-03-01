@@ -1,7 +1,8 @@
 import { pool } from "../config/db.js";
+import logger from "../config/logger.js";
 
 // =========================================================
-// 📊 ESTADÍSTICAS PARA EL DASHBOARD ADMIN
+// ESTADISTICAS PARA EL DASHBOARD ADMIN
 // =========================================================
 export const getDashboardStats = async (req, res) => {
   try {
@@ -14,14 +15,12 @@ export const getDashboardStats = async (req, res) => {
       visitasResult
     ] = await Promise.all([
 
-      // ✅ eliminada puede ser NULL o FALSE — usamos IS NOT TRUE
       pool.query(`
         SELECT COUNT(*) as total 
         FROM obras 
         WHERE eliminada IS NOT TRUE
       `),
 
-      // ✅ artistas: verificar columnas reales
       pool.query(`
         SELECT COUNT(*) as total 
         FROM artistas 
@@ -33,7 +32,6 @@ export const getDashboardStats = async (req, res) => {
         FROM categorias
       `),
 
-      // ✅ obras por estado — sin filtrar por activa para ver todas
       pool.query(`
         SELECT estado, COUNT(*) as total 
         FROM obras 
@@ -41,7 +39,6 @@ export const getDashboardStats = async (req, res) => {
         GROUP BY estado
       `),
 
-      // ✅ obras recientes — incluye pendientes y activa=false
       pool.query(`
         SELECT 
           o.id_obra, o.titulo, o.imagen_principal, 
@@ -88,7 +85,7 @@ export const getDashboardStats = async (req, res) => {
     });
 
   } catch (error) {
-    console.error('Error al obtener estadísticas:', error);
-    res.status(500).json({ success: false, message: 'Error al obtener estadísticas' });
+    logger.error(`Error al obtener estadisticas: ${error.message}`);
+    res.status(500).json({ success: false, message: 'Error al obtener estadisticas' });
   }
 };

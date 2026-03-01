@@ -5,11 +5,12 @@ import { pool } from "../config/db.js";
 import { generateCode, sendRecoveryCode, sendWelcomeEmail } from "../services/emailService.js";
 import { saveActiveSession, revokeOtherSessions } from '../services/sessionService.js';
 import crypto from 'crypto';
+import logger from '../config/logger.js';
 
 dotenv.config();
 
 // =========================================================
-// 🔒 HELPERS
+// HELPERS
 // =========================================================
 const maskEmail = (email) => {
   if (!email) return 'correo oculto';
@@ -25,32 +26,15 @@ const maskEmail = (email) => {
   return `${maskedLocal}@${maskedDomain}`;
 };
 
-const secureLog = {
-  info: (message, metadata = {}) => {
-    const sanitized = { ...metadata };
-    delete sanitized.contrasena; delete sanitized.password;
-    delete sanitized.codigo; delete sanitized.token; delete sanitized.secret;
-    console.log(`ℹ️ ${message}`, Object.keys(sanitized).length > 0 ? sanitized : '');
-  },
-  error: (message, error) => {
-    console.error(`❌ ${message}`, { name: error.name, code: error.code });
-  },
-  security: (action, userId, metadata = {}) => {
-    console.log(`🔐 SECURITY [${action}] User:${userId || 'unknown'}`, {
-      timestamp: new Date().toISOString(), ...metadata
-    });
-  }
-};
-
 // =========================================================
-// 🔑 GENERAR TOKEN — incluye rol
+// GENERAR TOKEN
 // =========================================================
 const generateToken = (user) => {
   return jwt.sign(
     {
       sub: user.id_usuario.toString(),
       jti: crypto.randomUUID(),
-      rol: user.rol || 'cliente'   // ← INCLUYE ROL
+      rol: user.rol || 'cliente'
     },
     process.env.JWT_SECRET,
     {
@@ -75,34 +59,34 @@ const registrarHistorialLogin = async (usuario, tipo, razon = null) => {
       [usuario?.id_usuario || null, usuario?.correo || 'desconocido', tipo, razon]
     );
   } catch (error) {
-    secureLog.error('Error al registrar historial', error);
+    logger.error(`Error al registrar historial: ${error.message}`);
   }
 };
 
 // =========================================================
-// 📝 REGISTRO
+// REGISTRO
 // =========================================================
 export const register = async (req, res) => {
   const { nombre, correo, contrasena } = req.body;
   try {
-    secureLog.info('Intento de registro', { email: maskEmail(correo) });
+    logger.info(`Intento de registro: ${maskEmail(correo)}`);
 
     if (!nombre || !correo || !contrasena)
       return res.status(400).json({ message: "Todos los campos son obligatorios" });
 
     if (contrasena.length < 8)
-      return res.status(400).json({ message: "La contraseña debe tener al menos 8 caracteres" });
+      return res.status(400).json({ message: "La contrasena debe tener al menos 8 caracteres" });
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(correo))
-      return res.status(400).json({ message: "El formato del correo no es válido" });
+      return res.status(400).json({ message: "El formato del correo no es valido" });
 
     const existingUser = await pool.query(
       "SELECT id_usuario FROM usuarios WHERE correo = $1 LIMIT 1", [correo]
     );
     if (existingUser.rows.length > 0) {
-      secureLog.security('REGISTRO_DUPLICADO', null, { email: maskEmail(correo) });
-      return res.status(400).json({ message: "El correo ya está registrado." });
+      logger.warn(`Registro duplicado: ${maskEmail(correo)}`);
+      return res.status(400).json({ message: "El correo ya esta registrado." });
     }
 
     const hash = await bcrypt.hash(contrasena, 12);
@@ -112,47 +96,46 @@ export const register = async (req, res) => {
     );
 
     const newUserId = result.rows[0].id_usuario;
-    secureLog.security('REGISTRO_EXITOSO', newUserId);
+    logger.info(`Registro exitoso: usuario ${newUserId}`);
 
     sendWelcomeEmail(correo, nombre)
-      .then(() => secureLog.info('Email de bienvenida enviado', { userId: newUserId }))
-      .catch((emailError) => secureLog.error('Error enviando email', emailError));
+      .then(() => logger.info(`Email de bienvenida enviado: usuario ${newUserId}`))
+      .catch((emailError) => logger.error(`Error enviando email: ${emailError.message}`));
 
     res.status(201).json({
-      message: "Usuario registrado exitosamente ✅",
+      message: "Usuario registrado exitosamente",
       user: { id: newUserId, nombre, correo, rol: "cliente" }
     });
 
   } catch (error) {
-    secureLog.error('Error en registro', error);
+    logger.error(`Error en registro: ${error.message}`);
     if (error.code === '23505')
-      return res.status(400).json({ message: "El correo ya está registrado." });
+      return res.status(400).json({ message: "El correo ya esta registrado." });
     res.status(500).json({ message: "Error al registrar usuario." });
   }
 };
 
 // =========================================================
-// 🔐 LOGIN
+// LOGIN
 // =========================================================
 export const login = async (req, res) => {
   try {
     const { correo, contrasena } = req.body;
-    secureLog.info('Intento de login', { email: maskEmail(correo) });
+    logger.info(`Intento de login: ${maskEmail(correo)}`);
 
     if (!correo || !contrasena)
-      return res.status(400).json({ message: "Correo y contraseña son obligatorios." });
+      return res.status(400).json({ message: "Correo y contrasena son obligatorios." });
 
     const result = await pool.query(
       "SELECT * FROM usuarios WHERE correo = $1 LIMIT 1", [correo]
     );
     if (result.rows.length === 0) {
-      secureLog.security('LOGIN_USUARIO_NO_ENCONTRADO', null, { email: maskEmail(correo) });
+      logger.warn(`Login fallido - usuario no encontrado: ${maskEmail(correo)}`);
       return res.status(404).json({ message: "Usuario no encontrado." });
     }
 
     const user = result.rows[0];
 
-    // Bloqueo
     if (user.bloqueado_hasta) {
       const ahora = new Date();
       const desbloqueo = new Date(user.bloqueado_hasta);
@@ -161,7 +144,7 @@ export const login = async (req, res) => {
         await registrarHistorialLogin(user, 'BLOQUEO', 'Intento durante bloqueo');
         return res.status(403).json({
           blocked: true,
-          message: `🔒 Cuenta bloqueada. Intenta de nuevo en ${minutosRestantes} minuto${minutosRestantes > 1 ? 's' : ''}.`,
+          message: `Cuenta bloqueada. Intenta de nuevo en ${minutosRestantes} minuto${minutosRestantes > 1 ? 's' : ''}.`,
           minutesRemaining: minutosRestantes,
           unlockTime: desbloqueo.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })
         });
@@ -175,7 +158,6 @@ export const login = async (req, res) => {
       }
     }
 
-    // Contraseña
     const match = await bcrypt.compare(contrasena, user.contraseña_hash);
     if (!match) {
       const nuevoIntentos = (user.intentos_fallidos || 0) + 1;
@@ -188,7 +170,7 @@ export const login = async (req, res) => {
         await registrarHistorialLogin(user, 'BLOQUEO', `Bloqueado por ${tiempoBloqueo} minutos`);
         return res.status(403).json({
           blocked: true,
-          message: `🔒 Cuenta bloqueada por ${tiempoBloqueo} minutos.`,
+          message: `Cuenta bloqueada por ${tiempoBloqueo} minutos.`,
           minutesBlocked: tiempoBloqueo
         });
       } else {
@@ -196,82 +178,78 @@ export const login = async (req, res) => {
         await registrarHistorialLogin(user, 'LOGIN_FALLIDO', `Intento ${nuevoIntentos}/3`);
         const intentosRestantes = 3 - nuevoIntentos;
         return res.status(401).json({
-          message: `❌ Contraseña incorrecta. Te ${intentosRestantes === 1 ? 'queda' : 'quedan'} ${intentosRestantes} intento${intentosRestantes > 1 ? 's' : ''}.`,
+          message: `Contrasena incorrecta. Te ${intentosRestantes === 1 ? 'queda' : 'quedan'} ${intentosRestantes} intento${intentosRestantes > 1 ? 's' : ''}.`,
           attemptsRemaining: intentosRestantes
         });
       }
     }
 
-    // Reset intentos
     if (user.intentos_fallidos > 0)
       await pool.query('UPDATE usuarios SET intentos_fallidos = 0 WHERE id_usuario = $1', [user.id_usuario]);
 
-    // Estado
     if (user.estado !== "activo") {
       if (user.estado === "pendiente")
-        return res.status(403).json({ message: "Cuenta pendiente de verificación. Revisa tu correo 📧", requiresVerification: true, correo: user.correo });
+        return res.status(403).json({ message: "Cuenta pendiente de verificacion. Revisa tu correo", requiresVerification: true, correo: user.correo });
       return res.status(403).json({ message: "Cuenta inactiva o suspendida." });
     }
 
-    // 2FA
     if (user.requiere_2fa) {
       if (user.metodo_2fa === 'TOTP') {
         await registrarHistorialLogin(user, 'LOGIN_EXITOSO', '2FA TOTP requerido');
-        return res.json({ message: "Ingresa el código de tu aplicación autenticadora 📱", requires2FA: true, metodo_2fa: "TOTP", correo: user.correo });
+        return res.json({ message: "Ingresa el codigo de tu aplicacion autenticadora", requires2FA: true, metodo_2fa: "TOTP", correo: user.correo });
       } else if (user.metodo_2fa === 'GMAIL') {
         const code = generateCode();
         await pool.query('UPDATE usuarios SET secret_2fa=$1 WHERE id_usuario=$2', [code, user.id_usuario]);
         await sendRecoveryCode(user.correo, code);
         await registrarHistorialLogin(user, 'LOGIN_EXITOSO', '2FA Gmail enviado');
-        return res.json({ message: "Se envió un código de acceso a tu correo 📧", requires2FA: true, metodo_2fa: "GMAIL", correo: user.correo });
+        return res.json({ message: "Se envio un codigo de acceso a tu correo", requires2FA: true, metodo_2fa: "GMAIL", correo: user.correo });
       }
     }
 
-    // Login exitoso
-let artista_estado = null;
-if (user.rol === 'artista') {
-  const artistaResult = await pool.query(
-    'SELECT estado FROM artistas WHERE id_usuario = $1 LIMIT 1',
-    [user.id_usuario]
-  );
-  if (artistaResult.rows.length > 0) {
-    artista_estado = artistaResult.rows[0].estado;
-  }
-}
+    let artista_estado = null;
+    if (user.rol === 'artista') {
+      const artistaResult = await pool.query(
+        'SELECT estado FROM artistas WHERE id_usuario = $1 LIMIT 1',
+        [user.id_usuario]
+      );
+      if (artistaResult.rows.length > 0) {
+        artista_estado = artistaResult.rows[0].estado;
+      }
+    }
 
-const token = generateToken(user);
-await saveActiveSession(user.id_usuario, token, req);
-await registrarHistorialLogin(user, 'LOGIN_EXITOSO', 'Login directo');
-secureLog.security('LOGIN_EXITOSO', user.id_usuario, { rol: user.rol });
+    const token = generateToken(user);
+    await saveActiveSession(user.id_usuario, token, req);
+    await registrarHistorialLogin(user, 'LOGIN_EXITOSO', 'Login directo');
+    logger.info(`Login exitoso: usuario ${user.id_usuario} rol ${user.rol}`);
 
-res.json({
-  message: "Inicio de sesión exitoso ✅",
-  access_token: token,
-  token_type: "bearer",
-  usuario: {
-    id: user.id_usuario,
-    nombre: user.nombre_completo,
-    correo: user.correo,
-    estado: user.estado,
-    rol: user.rol,
-    artista_estado   // ← NUEVO
-  }
-});
+    res.json({
+      message: "Inicio de sesion exitoso",
+      access_token: token,
+      token_type: "bearer",
+      usuario: {
+        id: user.id_usuario,
+        nombre: user.nombre_completo,
+        correo: user.correo,
+        estado: user.estado,
+        rol: user.rol,
+        artista_estado
+      }
+    });
 
   } catch (error) {
-    secureLog.error('Error crítico en login', error);
+    logger.error(`Error critico en login: ${error.message}`);
     res.status(500).json({ message: "Error interno del servidor." });
   }
 };
 
 // =========================================================
-// ⭐ LOGIN CON 2FA TOTP
+// LOGIN CON 2FA TOTP
 // =========================================================
 export const loginWith2FA = async (req, res) => {
   try {
     const { correo, codigo2fa } = req.body;
     if (!correo || !codigo2fa)
-      return res.status(400).json({ message: "Correo y código son obligatorios" });
+      return res.status(400).json({ message: "Correo y codigo son obligatorios" });
 
     const result = await pool.query("SELECT * FROM usuarios WHERE correo = $1 LIMIT 1", [correo]);
     if (result.rows.length === 0)
@@ -282,8 +260,8 @@ export const loginWith2FA = async (req, res) => {
     const verified = speakeasy.totp.verify({ secret: user.secret_2fa, encoding: "base32", token: codigo2fa, window: 2 });
 
     if (!verified) {
-      secureLog.security('2FA_TOTP_INCORRECTO', user.id_usuario);
-      return res.status(401).json({ message: "Código 2FA incorrecto ❌" });
+      logger.warn(`2FA TOTP incorrecto: usuario ${user.id_usuario}`);
+      return res.status(401).json({ message: "Codigo 2FA incorrecto" });
     }
 
     if (user.intentos_fallidos > 0)
@@ -294,7 +272,7 @@ export const loginWith2FA = async (req, res) => {
     await registrarHistorialLogin(user, 'LOGIN_EXITOSO', 'Login con 2FA TOTP');
 
     res.json({
-      message: "Inicio de sesión exitoso ✅",
+      message: "Inicio de sesion exitoso",
       access_token: token,
       token_type: "bearer",
       usuario: {
@@ -302,23 +280,23 @@ export const loginWith2FA = async (req, res) => {
         nombre: user.nombre_completo,
         correo: user.correo,
         estado: user.estado,
-        rol: user.rol           // ← INCLUYE ROL
+        rol: user.rol
       }
     });
   } catch (error) {
-    secureLog.error('Error en loginWith2FA', error);
+    logger.error(`Error en loginWith2FA: ${error.message}`);
     res.status(500).json({ message: "Error interno del servidor." });
   }
 };
 
 // =========================================================
-// ✅ VERIFICAR CÓDIGO GMAIL 2FA
+// VERIFICAR CODIGO GMAIL 2FA
 // =========================================================
 export const verifyLoginCode = async (req, res) => {
   try {
     const { correo, codigo } = req.body;
     if (!correo || !codigo)
-      return res.status(400).json({ message: "Correo y código son obligatorios" });
+      return res.status(400).json({ message: "Correo y codigo son obligatorios" });
 
     const result = await pool.query(
       "SELECT * FROM usuarios WHERE correo = $1 AND requiere_2fa = TRUE LIMIT 1", [correo]
@@ -328,8 +306,8 @@ export const verifyLoginCode = async (req, res) => {
 
     const user = result.rows[0];
     if (!user.secret_2fa || user.secret_2fa !== codigo) {
-      secureLog.security('CODIGO_GMAIL_INVALIDO', user.id_usuario);
-      return res.status(401).json({ message: "Código inválido ❌" });
+      logger.warn(`Codigo Gmail invalido: usuario ${user.id_usuario}`);
+      return res.status(401).json({ message: "Codigo invalido" });
     }
 
     await pool.query("UPDATE usuarios SET secret_2fa = NULL WHERE id_usuario = $1", [user.id_usuario]);
@@ -341,7 +319,7 @@ export const verifyLoginCode = async (req, res) => {
     await registrarHistorialLogin(user, 'LOGIN_EXITOSO', 'Login con Gmail 2FA');
 
     res.json({
-      message: "✅ Verificación exitosa. Sesión iniciada.",
+      message: "Verificacion exitosa. Sesion iniciada.",
       access_token: token,
       token_type: "bearer",
       usuario: {
@@ -349,48 +327,49 @@ export const verifyLoginCode = async (req, res) => {
         nombre: user.nombre_completo,
         correo: user.correo,
         estado: user.estado,
-        rol: user.rol           // ← INCLUYE ROL
+        rol: user.rol
       }
     });
   } catch (error) {
-    secureLog.error('Error en verifyLoginCode', error);
+    logger.error(`Error en verifyLoginCode: ${error.message}`);
     res.status(500).json({ message: "Error interno del servidor" });
   }
 };
 
 // =========================================================
-// 🔥 REVOCAR OTRAS SESIONES
+// REVOCAR OTRAS SESIONES
 // =========================================================
 export const closeOtherSessions = async (req, res) => {
   try {
     const userId = req.user.id_usuario;
     const currentToken = req.headers.authorization?.split(' ')[1];
     if (!currentToken)
-      return res.status(400).json({ message: "No se encontró token actual" });
+      return res.status(400).json({ message: "No se encontro token actual" });
 
     const sessionsRevoked = await revokeOtherSessions(userId, currentToken);
-    secureLog.security('SESIONES_REVOCADAS', userId, { cantidad: sessionsRevoked });
+    logger.info(`Sesiones revocadas: usuario ${userId}, cantidad ${sessionsRevoked}`);
 
-    res.json({ message: `✅ Se cerraron ${sessionsRevoked} sesión(es) en otros dispositivos`, sessionsRevoked });
+    res.json({ message: `Se cerraron ${sessionsRevoked} sesion(es) en otros dispositivos`, sessionsRevoked });
   } catch (error) {
-    secureLog.error('Error al revocar sesiones', error);
+    logger.error(`Error al revocar sesiones: ${error.message}`);
     res.status(500).json({ message: "Error al cerrar otras sesiones" });
   }
 };
 
 // =========================================================
-// ✅ VERIFICAR SESIÓN
+// VERIFICAR SESION
 // =========================================================
 export const checkSession = async (req, res) => {
   try {
-    res.json({ valid: true, message: "Sesión válida", rol: req.user.rol });
+    res.json({ valid: true, message: "Sesion valida", rol: req.user.rol });
   } catch (error) {
-    secureLog.error('Error al verificar sesión', error);
-    res.status(500).json({ message: "Error al verificar sesión" });
+    logger.error(`Error al verificar sesion: ${error.message}`);
+    res.status(500).json({ message: "Error al verificar sesion" });
   }
 };
+
 // =========================================================
-// 🎨 REGISTRO DE ARTISTA
+// REGISTRO DE ARTISTA
 // =========================================================
 export const registroArtista = async (req, res) => {
   try {
@@ -400,22 +379,20 @@ export const registroArtista = async (req, res) => {
       return res.status(400).json({ message: "Faltan campos obligatorios" });
 
     if (contrasena.length < 8)
-      return res.status(400).json({ message: "La contraseña debe tener al menos 8 caracteres" });
+      return res.status(400).json({ message: "La contrasena debe tener al menos 8 caracteres" });
 
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(correo))
-      return res.status(400).json({ message: "El formato del correo no es válido" });
+      return res.status(400).json({ message: "El formato del correo no es valido" });
 
-    // Verificar duplicado
     const existeUsuario = await pool.query(
       "SELECT id_usuario FROM usuarios WHERE correo = $1 LIMIT 1", [correo]
     );
     if (existeUsuario.rows.length > 0)
-      return res.status(400).json({ message: "El correo ya está registrado" });
+      return res.status(400).json({ message: "El correo ya esta registrado" });
 
     const hash = await bcrypt.hash(contrasena, 12);
 
-    // Crear usuario con rol artista
     const resUsuario = await pool.query(
       `INSERT INTO usuarios (nombre_completo, correo, contraseña_hash, rol, estado, activo)
        VALUES ($1, $2, $3, 'artista', 'activo', TRUE)
@@ -424,24 +401,23 @@ export const registroArtista = async (req, res) => {
     );
     const id_usuario = resUsuario.rows[0].id_usuario;
 
-    // Crear artista vinculado al usuario
     await pool.query(
       `INSERT INTO artistas (id_usuario, nombre_completo, nombre_artistico, correo, telefono, biografia, id_categoria_principal, estado, activo, eliminado)
        VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', TRUE, FALSE)`,
       [id_usuario, nombre_completo, nombre_artistico || null, correo, telefono || null, biografia, id_categoria_principal]
     );
 
-    secureLog.security('REGISTRO_ARTISTA', id_usuario, { email: maskEmail(correo) });
+    logger.info(`Registro de artista: usuario ${id_usuario} ${maskEmail(correo)}`);
 
     res.status(201).json({
       success: true,
-      message: "Solicitud enviada. El equipo de Nu-B Studio revisará tu perfil."
+      message: "Solicitud enviada. El equipo de Nu-B Studio revisara tu perfil."
     });
 
   } catch (error) {
-    secureLog.error('Error en registro de artista', error);
+    logger.error(`Error en registro de artista: ${error.message}`);
     if (error.code === '23505')
-      return res.status(400).json({ message: "El correo ya está registrado" });
+      return res.status(400).json({ message: "El correo ya esta registrado" });
     res.status(500).json({ message: "Error al procesar la solicitud" });
   }
 };

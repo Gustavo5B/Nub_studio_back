@@ -1,19 +1,8 @@
 import { pool } from "../config/db.js";
-
-const secureLog = {
-  info: (message, metadata = {}) => {
-    console.log(`ℹ️ ${message}`, Object.keys(metadata).length > 0 ? metadata : '');
-  },
-  error: (message, error) => {
-    console.error(`❌ ${message}`, { name: error.name, code: error.code });
-  }
-};
+import logger from "../config/logger.js";
 
 // =========================================================
-// 📚 LISTAR TODAS LAS OBRAS
-// =========================================================
-// =========================================================
-// 📚 LISTAR TODAS LAS OBRAS  (fix admin view)
+// LISTAR TODAS LAS OBRAS
 // =========================================================
 export const listarObras = async (req, res) => {
   try {
@@ -24,19 +13,17 @@ export const listarObras = async (req, res) => {
     } = req.query;
 
     const offset = (page - 1) * limit;
-    let whereConditions = ['o.eliminada IS NOT TRUE'];  // ✅ era 'o.activa = TRUE' — bloqueaba pendientes
+    let whereConditions = ['o.eliminada IS NOT TRUE'];
     let queryParams = [];
     let paramCount = 1;
 
-    // Catálogo público → solo publicadas Y activas
-    // Panel admin (solo_publicadas=false) → todo lo no eliminado
     if (solo_publicadas === 'true') {
       whereConditions.push("o.estado = 'publicada'");
       whereConditions.push("o.activa = TRUE");
     }
 
-    if (categoria)         { whereConditions.push(`o.id_categoria = $${paramCount}`); queryParams.push(categoria); paramCount++; }
-    if (artista)           { whereConditions.push(`o.id_artista = $${paramCount}`);   queryParams.push(artista);   paramCount++; }
+    if (categoria)             { whereConditions.push(`o.id_categoria = $${paramCount}`); queryParams.push(categoria); paramCount++; }
+    if (artista)               { whereConditions.push(`o.id_artista = $${paramCount}`);   queryParams.push(artista);   paramCount++; }
     if (destacadas === 'true') { whereConditions.push('o.destacada = TRUE'); }
 
     if (precio_min || precio_max) {
@@ -52,13 +39,12 @@ export const listarObras = async (req, res) => {
 
     let orderBy = 'o.fecha_creacion DESC';
     switch (ordenar) {
-      case 'antiguos':    orderBy = 'o.fecha_creacion ASC';  break;
-      case 'precio_asc':  orderBy = 'precio_minimo ASC NULLS LAST';  break;  // ✅ NULLS LAST — evita crash cuando no hay tamaños
-      case 'precio_desc': orderBy = 'precio_minimo DESC NULLS LAST'; break;
-      case 'nombre':      orderBy = 'o.titulo ASC';           break;
+      case 'antiguos':    orderBy = 'o.fecha_creacion ASC';           break;
+      case 'precio_asc':  orderBy = 'precio_minimo ASC NULLS LAST';   break;
+      case 'precio_desc': orderBy = 'precio_minimo DESC NULLS LAST';  break;
+      case 'nombre':      orderBy = 'o.titulo ASC';                   break;
     }
 
-    // ✅ precio_base directo de obras como fallback cuando no hay obras_tamaños
     const query = `
       SELECT
         o.id_obra, o.titulo, o.descripcion, o.slug, o.imagen_principal,
@@ -108,13 +94,13 @@ export const listarObras = async (req, res) => {
     });
 
   } catch (error) {
-    secureLog.error('Error al listar obras', error);
+    logger.error(`Error al listar obras: ${error.message}`);
     res.status(500).json({ success: false, message: "Error al obtener las obras" });
   }
 };
 
 // =========================================================
-// 🔍 DETALLE COMPLETO DE UNA OBRA
+// DETALLE COMPLETO DE UNA OBRA
 // =========================================================
 export const obtenerObraPorId = async (req, res) => {
   try {
@@ -130,9 +116,8 @@ export const obtenerObraPorId = async (req, res) => {
       WHERE o.id_obra = $1 AND o.activa = TRUE LIMIT 1
     `, [id]);
 
-    if (resultObra.rows.length === 0) {
+    if (resultObra.rows.length === 0)
       return res.status(404).json({ success: false, message: "Obra no encontrada" });
-    }
 
     const obra = resultObra.rows[0];
 
@@ -159,11 +144,13 @@ export const obtenerObraPorId = async (req, res) => {
       tamaño.marcos = resultMarcos.rows;
     }
 
-    const resultImagenes  = await pool.query(
-      `SELECT id_imagen, url_imagen, orden, es_principal FROM imagenes_obras WHERE id_obra = $1 AND activa = TRUE ORDER BY es_principal DESC, orden ASC`, [id]
+    const resultImagenes = await pool.query(
+      `SELECT id_imagen, url_imagen, orden, es_principal FROM imagenes_obras WHERE id_obra = $1 AND activa = TRUE ORDER BY es_principal DESC, orden ASC`,
+      [id]
     );
     const resultEtiquetas = await pool.query(
-      `SELECT e.id_etiqueta, e.nombre, e.slug FROM obras_etiquetas oe INNER JOIN etiquetas e ON oe.id_etiqueta = e.id_etiqueta WHERE oe.id_obra = $1 AND e.activa = TRUE`, [id]
+      `SELECT e.id_etiqueta, e.nombre, e.slug FROM obras_etiquetas oe INNER JOIN etiquetas e ON oe.id_etiqueta = e.id_etiqueta WHERE oe.id_obra = $1 AND e.activa = TRUE`,
+      [id]
     );
     const resultRelacionadas = await pool.query(`
       SELECT o.id_obra, o.titulo, o.slug, o.imagen_principal,
@@ -188,34 +175,36 @@ export const obtenerObraPorId = async (req, res) => {
     });
 
   } catch (error) {
-    secureLog.error('Error al obtener detalle de obra', error);
+    logger.error(`Error al obtener detalle de obra: ${error.message}`);
     res.status(500).json({ success: false, message: "Error al obtener el detalle de la obra" });
   }
 };
 
 // =========================================================
-// 🔍 OBTENER OBRA POR SLUG
+// OBTENER OBRA POR SLUG
 // =========================================================
 export const obtenerObraPorSlug = async (req, res) => {
   try {
     const { slug } = req.params;
     const result = await pool.query('SELECT id_obra FROM obras WHERE slug = $1 AND activa = TRUE LIMIT 1', [slug]);
-    if (result.rows.length === 0) return res.status(404).json({ success: false, message: "Obra no encontrada" });
+    if (result.rows.length === 0)
+      return res.status(404).json({ success: false, message: "Obra no encontrada" });
     req.params.id = result.rows[0].id_obra;
     return obtenerObraPorId(req, res);
   } catch (error) {
-    secureLog.error('Error al obtener obra por slug', error);
+    logger.error(`Error al obtener obra por slug: ${error.message}`);
     res.status(500).json({ success: false, message: "Error al obtener la obra" });
   }
 };
 
 // =========================================================
-// 🔎 BÚSQUEDA POR PALABRA CLAVE
+// BUSQUEDA POR PALABRA CLAVE
 // =========================================================
 export const buscarObras = async (req, res) => {
   try {
     const { q, page = 1, limit = 12 } = req.query;
-    if (!q || q.trim().length < 2) return res.status(400).json({ success: false, message: "La búsqueda debe tener al menos 2 caracteres" });
+    if (!q || q.trim().length < 2)
+      return res.status(400).json({ success: false, message: "La busqueda debe tener al menos 2 caracteres" });
 
     const offset = (page - 1) * limit;
     const searchTerm = `%${q}%`;
@@ -242,16 +231,21 @@ export const buscarObras = async (req, res) => {
     `, [searchTerm]);
 
     const total = parseInt(countResult.rows[0].total);
-    res.json({ success: true, data: result.rows, search: { query: q, total }, pagination: { page: parseInt(page), limit: parseInt(limit), total, totalPages: Math.ceil(total / limit) } });
+    res.json({
+      success: true,
+      data: result.rows,
+      search: { query: q, total },
+      pagination: { page: parseInt(page), limit: parseInt(limit), total, totalPages: Math.ceil(total / limit) }
+    });
 
   } catch (error) {
-    secureLog.error('Error en búsqueda', error);
+    logger.error(`Error en busqueda: ${error.message}`);
     res.status(500).json({ success: false, message: "Error al buscar obras" });
   }
 };
 
 // =========================================================
-// 🏷️ FILTROS RÁPIDOS
+// FILTROS RAPIDOS
 // =========================================================
 export const obtenerObrasPorCategoria = async (req, res) => { req.query.categoria = req.params.id; return listarObras(req, res); };
 export const obtenerObrasPorArtista   = async (req, res) => { req.query.artista   = req.params.id; return listarObras(req, res); };
@@ -263,13 +257,19 @@ export const obtenerObrasPorEtiqueta = async (req, res) => {
     const { page = 1, limit = 12 } = req.query;
     const offset = (page - 1) * limit;
 
-    const resultEtiqueta = await pool.query('SELECT id_etiqueta, nombre FROM etiquetas WHERE slug = $1 AND activa = TRUE', [slug]);
-    if (resultEtiqueta.rows.length === 0) return res.status(404).json({ success: false, message: "Etiqueta no encontrada" });
+    const resultEtiqueta = await pool.query(
+      'SELECT id_etiqueta, nombre FROM etiquetas WHERE slug = $1 AND activa = TRUE',
+      [slug]
+    );
+    if (resultEtiqueta.rows.length === 0)
+      return res.status(404).json({ success: false, message: "Etiqueta no encontrada" });
 
     const etiqueta = resultEtiqueta.rows[0];
+
     const result = await pool.query(`
       SELECT o.id_obra, o.titulo, o.slug, o.imagen_principal, o.precio_base,
-        a.nombre_artistico AS artista_alias, c.nombre AS categoria_nombre, MIN(ot.precio_base) AS precio_minimo
+        a.nombre_artistico AS artista_alias, c.nombre AS categoria_nombre,
+        MIN(ot.precio_base) AS precio_minimo
       FROM obras o
       INNER JOIN obras_etiquetas oe ON o.id_obra = oe.id_obra
       INNER JOIN artistas a ON o.id_artista = a.id_artista
@@ -286,15 +286,21 @@ export const obtenerObrasPorEtiqueta = async (req, res) => {
     );
     const total = parseInt(countResult.rows[0].total);
 
-    res.json({ success: true, etiqueta: etiqueta.nombre, data: result.rows, pagination: { page: parseInt(page), limit: parseInt(limit), total, totalPages: Math.ceil(total / limit) } });
+    res.json({
+      success: true,
+      etiqueta: etiqueta.nombre,
+      data: result.rows,
+      pagination: { page: parseInt(page), limit: parseInt(limit), total, totalPages: Math.ceil(total / limit) }
+    });
+
   } catch (error) {
-    secureLog.error('Error al filtrar por etiqueta', error);
+    logger.error(`Error al filtrar por etiqueta: ${error.message}`);
     res.status(500).json({ success: false, message: "Error al filtrar obras por etiqueta" });
   }
 };
 
 // =========================================================
-// ➕ CREAR OBRA
+// CREAR OBRA
 // =========================================================
 export const crearObra = async (req, res) => {
   try {
@@ -308,9 +314,8 @@ export const crearObra = async (req, res) => {
 
     const id_usuario = req.user?.id_usuario || 1;
 
-    if (!titulo || !descripcion || !id_categoria || !id_artista) {
-      return res.status(400).json({ success: false, message: 'Título, descripción, categoría y artista son obligatorios' });
-    }
+    if (!titulo || !descripcion || !id_categoria || !id_artista)
+      return res.status(400).json({ success: false, message: 'Titulo, descripcion, categoria y artista son obligatorios' });
 
     const imagen_principal = req.file?.path || req.body.imagen_principal || null;
 
@@ -342,21 +347,18 @@ export const crearObra = async (req, res) => {
     ]);
 
     const { id_obra } = result.rows[0];
-    secureLog.info('Obra creada', { id_obra, slug });
+    logger.info(`Obra creada: id ${id_obra} slug ${slug}`);
 
     res.status(201).json({ success: true, message: 'Obra creada exitosamente', data: { id_obra, slug, imagen_principal } });
 
   } catch (error) {
-    secureLog.error('Error al crear obra', error);
+    logger.error(`Error al crear obra: ${error.message}`);
     res.status(500).json({ success: false, message: 'Error al crear la obra' });
   }
 };
 
 // =========================================================
-// ✏️ ACTUALIZAR OBRA
-// =========================================================
-// =========================================================
-// ✏️ ACTUALIZAR OBRA  (fix: sincroniza campo `activa` con `estado`)
+// ACTUALIZAR OBRA
 // =========================================================
 export const actualizarObra = async (req, res) => {
   try {
@@ -370,9 +372,7 @@ export const actualizarObra = async (req, res) => {
 
     const imagen_principal = req.file?.path || req.body.imagen_principal;
 
-    // ✅ FIX: activa se sincroniza automáticamente con el estado
-    // publicada → activa = TRUE  (aparece en catálogo público y Home)
-    // cualquier otro estado → activa = FALSE
+    // publicada → activa = TRUE, cualquier otro estado → activa = FALSE
     const activa = estado === 'publicada';
 
     let query = `
@@ -403,25 +403,20 @@ export const actualizarObra = async (req, res) => {
 
     const result = await pool.query(query, params);
 
-    if (result.rows.length === 0) {
+    if (result.rows.length === 0)
       return res.status(404).json({ success: false, message: 'Obra no encontrada' });
-    }
 
-    secureLog.info('Obra actualizada', { 
-      id_obra: result.rows[0].id_obra, 
-      estado: result.rows[0].estado,
-      activa: result.rows[0].activa 
-    });
-
+    logger.info(`Obra actualizada: id ${result.rows[0].id_obra} estado ${result.rows[0].estado} activa ${result.rows[0].activa}`);
     res.json({ success: true, message: 'Obra actualizada exitosamente', data: result.rows[0] });
 
   } catch (error) {
-    secureLog.error('Error al actualizar obra', error);
+    logger.error(`Error al actualizar obra: ${error.message}`);
     res.status(500).json({ success: false, message: 'Error al actualizar la obra' });
   }
 };
+
 // =========================================================
-// 🗑️ ELIMINAR OBRA (soft delete)
+// ELIMINAR OBRA (soft delete)
 // =========================================================
 export const eliminarObra = async (req, res) => {
   try {
@@ -437,7 +432,7 @@ export const eliminarObra = async (req, res) => {
     res.json({ success: true, message: 'Obra eliminada correctamente' });
 
   } catch (error) {
-    secureLog.error('Error al eliminar obra', error);
+    logger.error(`Error al eliminar obra: ${error.message}`);
     res.status(500).json({ success: false, message: 'Error al eliminar la obra' });
   }
 };

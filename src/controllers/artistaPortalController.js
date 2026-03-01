@@ -1,10 +1,10 @@
-// back_auth_mysql/src/controllers/artistaPortalController.js
 import { pool } from '../config/db.js';
+import logger from '../config/logger.js';
 
 // GET /api/artista-portal/mi-perfil
 export const getMiPerfil = async (req, res) => {
   try {
-    const usuarioId = req.user.id_usuario; // ✅ CORRECTO
+    const usuarioId = req.user.id_usuario;
 
     const result = await pool.query(
       `SELECT
@@ -27,7 +27,7 @@ export const getMiPerfil = async (req, res) => {
 
     res.json(result.rows[0]);
   } catch (error) {
-    console.error('Error en getMiPerfil:', error);
+    logger.error(`Error en getMiPerfil: ${error.message}`);
     res.status(500).json({ message: 'Error interno del servidor' });
   }
 };
@@ -35,7 +35,7 @@ export const getMiPerfil = async (req, res) => {
 // GET /api/artista-portal/mis-obras
 export const getMisObras = async (req, res) => {
   try {
-    const usuarioId = req.user.id_usuario; // ✅ CORRECTO
+    const usuarioId = req.user.id_usuario;
 
     const artistaRes = await pool.query(
       'SELECT id_artista FROM artistas WHERE id_usuario = $1',
@@ -59,7 +59,7 @@ export const getMisObras = async (req, res) => {
         o.permite_marco, o.con_certificado,
         c.nombre AS categoria
       FROM obras o
-LEFT JOIN categorias c ON c.id_categoria = o.id_categoria
+      LEFT JOIN categorias c ON c.id_categoria = o.id_categoria
       WHERE o.id_artista = $1
         AND (o.eliminada IS NULL OR o.eliminada = false)
       ORDER BY o.fecha_creacion DESC`,
@@ -68,16 +68,16 @@ LEFT JOIN categorias c ON c.id_categoria = o.id_categoria
 
     const obras = result.rows;
     const stats = {
-  total:      obras.length,
-  publicadas: obras.filter(o => o.estado === 'publicada').length,
-  pendientes: obras.filter(o => o.estado === 'pendiente').length,
-  rechazadas: obras.filter(o => o.estado === 'rechazada').length,
-  borradores: obras.filter(o => o.estado === 'borrador').length,
-};
+      total:      obras.length,
+      publicadas: obras.filter(o => o.estado === 'publicada').length,
+      pendientes: obras.filter(o => o.estado === 'pendiente').length,
+      rechazadas: obras.filter(o => o.estado === 'rechazada').length,
+      borradores: obras.filter(o => o.estado === 'borrador').length,
+    };
 
     res.json({ obras, stats });
   } catch (error) {
-    console.error('Error en getMisObras:', error);
+    logger.error(`Error en getMisObras: ${error.message}`);
     res.status(500).json({ message: 'Error interno del servidor' });
   }
 };
@@ -85,7 +85,7 @@ LEFT JOIN categorias c ON c.id_categoria = o.id_categoria
 // POST /api/artista-portal/nueva-obra
 export const nuevaObra = async (req, res) => {
   try {
-    const usuarioId = req.user.id_usuario; // ✅ CORRECTO
+    const usuarioId = req.user.id_usuario;
 
     const artistaRes = await pool.query(
       'SELECT id_artista, estado FROM artistas WHERE id_usuario = $1',
@@ -98,7 +98,7 @@ export const nuevaObra = async (req, res) => {
 
     const artista = artistaRes.rows[0];
     if (artista.estado !== 'activo') {
-      return res.status(403).json({ message: 'Tu cuenta de artista aún no está aprobada' });
+      return res.status(403).json({ message: 'Tu cuenta de artista aun no esta aprobada' });
     }
 
     const idArtista = artista.id_artista;
@@ -181,13 +181,14 @@ export const nuevaObra = async (req, res) => {
       }
     }
 
+    logger.info(`Nueva obra creada: ${obraCreada.titulo} (id: ${obraCreada.id_obra})`);
     res.status(201).json({
-      message: 'Obra enviada. Quedará en revisión hasta que el admin la apruebe.',
+      message: 'Obra enviada. Quedara en revision hasta que el admin la apruebe.',
       obra: obraCreada,
     });
 
   } catch (error) {
-    console.error('Error en nuevaObra:', error);
+    logger.error(`Error en nuevaObra: ${error.message}`);
     res.status(500).json({ message: 'Error interno del servidor', error: error.message });
   }
 };
