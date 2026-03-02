@@ -1,8 +1,9 @@
 import express from 'express';
 import multer  from 'multer';
 import {
-  getMiPerfil, getMisObras, nuevaObra,
-  getObraById, actualizarObraArtista,   // ← nuevas
+  getMiPerfil, actualizarMiPerfil,   // ← perfil
+  getMisObras, nuevaObra,
+  getObraById, actualizarObraArtista,
 } from '../controllers/artistaPortalController.js';
 import { authenticateToken, requireRole } from '../middlewares/authMiddleware.js';
 
@@ -17,12 +18,14 @@ const upload = multer({
   },
 });
 
-router.get('/mi-perfil',  authenticateToken, requireRole('artista'), getMiPerfil);
-router.get('/mis-obras',  authenticateToken, requireRole('artista'), getMisObras);
-router.post('/nueva-obra',authenticateToken, requireRole('artista'), upload.single('imagen'), nuevaObra);
+// ── Perfil ───────────────────────────────────────────────────
+router.get('/mi-perfil',   authenticateToken, requireRole('artista'), getMiPerfil);
+router.put('/mi-perfil',   authenticateToken, requireRole('artista'), upload.single('foto'), actualizarMiPerfil);
 
-// ── Editar obra ──────────────────────────────────────────────
-router.get('/obra/:id',   authenticateToken, requireRole('artista'), getObraById);
-router.put('/obra/:id',   authenticateToken, requireRole('artista'), upload.single('imagen'), actualizarObraArtista);
+// ── Obras ────────────────────────────────────────────────────
+router.get('/mis-obras',   authenticateToken, requireRole('artista'), getMisObras);
+router.post('/nueva-obra', authenticateToken, requireRole('artista'), upload.single('imagen'), nuevaObra);
+router.get('/obra/:id',    authenticateToken, requireRole('artista'), getObraById);
+router.put('/obra/:id',    authenticateToken, requireRole('artista'), upload.single('imagen'), actualizarObraArtista);
 
 export default router;

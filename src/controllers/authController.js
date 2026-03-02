@@ -27,6 +27,32 @@ const maskEmail = (email) => {
 };
 
 // =========================================================
+// GENERAR MATRÍCULA AUTOMÁTICA
+// Formato: NUB-{AÑO}-{SECUENCIAL 4 dígitos}  ej: NUB-2026-0003
+// =========================================================
+const generarMatricula = async () => {
+  const anio = new Date().getFullYear();
+
+  // Contar artistas no eliminados para obtener el secuencial
+  const countResult = await pool.query(
+    `SELECT COUNT(*) FROM artistas WHERE eliminado = FALSE`
+  );
+  const secuencial = parseInt(countResult.rows[0].count) + 1;
+  let matricula = `NUB-${anio}-${String(secuencial).padStart(4, '0')}`;
+
+  // Protección contra colisiones (muy improbable pero seguro)
+  const existe = await pool.query(
+    `SELECT id_artista FROM artistas WHERE matricula = $1 LIMIT 1`, [matricula]
+  );
+  if (existe.rows.length > 0) {
+    const sufijo = String(Math.floor(Math.random() * 90) + 10);
+    matricula = `NUB-${anio}-${String(secuencial).padStart(4, '0')}-${sufijo}`;
+  }
+
+  return matricula;
+};
+
+// =========================================================
 // GENERAR TOKEN
 // =========================================================
 const generateToken = (user) => {
@@ -370,6 +396,8 @@ export const checkSession = async (req, res) => {
 
 // =========================================================
 // REGISTRO DE ARTISTA
+// ✅ CAMBIO: genera matrícula automática (NUB-{AÑO}-{XXXX})
+//    antes del INSERT en artistas
 // =========================================================
 export const registroArtista = async (req, res) => {
   try {
@@ -401,13 +429,16 @@ export const registroArtista = async (req, res) => {
     );
     const id_usuario = resUsuario.rows[0].id_usuario;
 
+    // ✅ Generar matrícula automática
+    const matricula = await generarMatricula();
+
     await pool.query(
-      `INSERT INTO artistas (id_usuario, nombre_completo, nombre_artistico, correo, telefono, biografia, id_categoria_principal, estado, activo, eliminado)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', TRUE, FALSE)`,
-      [id_usuario, nombre_completo, nombre_artistico || null, correo, telefono || null, biografia, id_categoria_principal]
+      `INSERT INTO artistas (id_usuario, nombre_completo, nombre_artistico, correo, telefono, biografia, id_categoria_principal, estado, activo, eliminado, matricula)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', TRUE, FALSE, $8)`,
+      [id_usuario, nombre_completo, nombre_artistico || null, correo, telefono || null, biografia, id_categoria_principal, matricula]
     );
 
-    logger.info(`Registro de artista: usuario ${id_usuario} ${maskEmail(correo)}`);
+    logger.info(`Registro de artista: usuario ${id_usuario} ${maskEmail(correo)} matrícula ${matricula}`);
 
     res.status(201).json({
       success: true,
@@ -415,7 +446,7 @@ export const registroArtista = async (req, res) => {
     });
 
   } catch (error) {
-    logger.error(`Error en registro de artista: ${error.message}`);
+    logger.error(`Error en registro de artista: ${error.message} | ${error.stack}`);
     if (error.code === '23505')
       return res.status(400).json({ message: "El correo ya esta registrado" });
     res.status(500).json({ message: "Error al procesar la solicitud" });
