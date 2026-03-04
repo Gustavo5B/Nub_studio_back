@@ -1,49 +1,55 @@
+import crypto from 'crypto';
 import { pool } from "../config/db.js";
 import logger from "../config/logger.js";
+import {
+  sendArtistaAprobadoEmail,
+  sendArtistaRechazadoEmail,
+  sendActivacionCuentaEmail,
+} from '../services/emailService.js';
 
 // ─────────────────────────────────────────────────────────────
-// 🔖 Genera matrícula única: NUB-{AÑO}-{0001}
+// HELPERS
 // ─────────────────────────────────────────────────────────────
+
 const generarMatricula = async () => {
   const anio = new Date().getFullYear();
-
-  const res = await pool.query(
-    `SELECT COUNT(*) AS total FROM artistas WHERE eliminado = FALSE`
-  );
-
+  const res  = await pool.query(`SELECT COUNT(*) AS total FROM artistas WHERE eliminado = FALSE`);
   const secuencial = parseInt(res.rows[0].total) + 1;
   const numero     = String(secuencial).padStart(4, '0');
   const matricula  = `NUB-${anio}-${numero}`;
 
-  // Verificar que no exista ya (protección ante colisiones)
   const existe = await pool.query(
-    'SELECT id_artista FROM artistas WHERE matricula = $1 LIMIT 1',
-    [matricula]
+    'SELECT id_artista FROM artistas WHERE matricula = $1 LIMIT 1', [matricula]
   );
-
   if (existe.rows.length > 0) {
     const sufijo = String(Math.floor(Math.random() * 99) + 1).padStart(2, '0');
     return `NUB-${anio}-${numero}-${sufijo}`;
   }
-
   return matricula;
 };
 
+// Token de activación con 48 horas de vigencia
+const generarTokenActivacion = () => ({
+  token:      crypto.randomBytes(32).toString('hex'),
+  expiracion: new Date(Date.now() + 48 * 60 * 60 * 1000),
+});
+
 // =========================================================
-// LISTAR TODOS LOS ARTISTAS — igual que el original
+// LISTAR TODOS LOS ARTISTAS
+// GET /api/artistas
 // =========================================================
 export const listarArtistas = async (req, res) => {
   try {
     const result = await pool.query(`
-      SELECT 
+      SELECT
         a.id_artista, a.nombre_completo, a.nombre_artistico,
         a.biografia, a.foto_perfil, a.correo, a.telefono,
         a.matricula, a.porcentaje_comision, a.estado,
         c.nombre AS categoria_nombre,
-        COUNT(o.id_obra)                                                        AS total_obras,
+        COUNT(o.id_obra)                                                          AS total_obras,
         COUNT(o.id_obra) FILTER (WHERE o.estado = 'aprobada' AND o.activa = TRUE) AS obras_publicadas,
-        COUNT(o.id_obra) FILTER (WHERE o.estado = 'pendiente')                  AS obras_pendientes,
-        COUNT(o.id_obra) FILTER (WHERE o.estado = 'rechazada')                  AS obras_rechazadas
+        COUNT(o.id_obra) FILTER (WHERE o.estado = 'pendiente')                    AS obras_pendientes,
+        COUNT(o.id_obra) FILTER (WHERE o.estado = 'rechazada')                    AS obras_rechazadas
       FROM artistas a
       LEFT JOIN categorias c ON a.id_categoria_principal = c.id_categoria
       LEFT JOIN obras o ON a.id_artista = o.id_artista
@@ -60,7 +66,8 @@ export const listarArtistas = async (req, res) => {
 };
 
 // =========================================================
-// OBTENER ARTISTA POR ID — igual que el original
+// OBTENER ARTISTA POR ID
+// GET /api/artistas/:id
 // =========================================================
 export const obtenerArtistaPorId = async (req, res) => {
   try {
@@ -103,42 +110,76 @@ export const obtenerArtistaPorId = async (req, res) => {
 };
 
 // =========================================================
-// CREAR ARTISTA — matrícula autogenerada ✅
+// CREAR ARTISTA — admin crea un artista
+// POST /api/artistas
+//
+// Flujo de acceso:
+//   Con correo  → crea usuario sin contraseña + token
+//                 → email "Crea tu contraseña" (48h)
+//                 → artista activa en /activar-cuenta?token=xxx
+//   Sin correo  → solo crea artista, sin acceso al portal
 // =========================================================
 export const crearArtista = async (req, res) => {
   try {
     const {
       nombre_completo, nombre_artistico, biografia,
       correo, telefono,
-      id_categoria_principal, porcentaje_comision, estado
+      id_categoria_principal, porcentaje_comision, estado,
     } = req.body;
-    // NO se lee `matricula` del body — se genera internamente
 
     const foto_perfil = req.file?.path || req.body.foto_perfil || null;
 
     if (!nombre_completo)
       return res.status(400).json({ success: false, message: "El nombre completo es obligatorio" });
 
+    // ── Verificar correo único ──────────────────────────────
     if (correo) {
-      const exists = await pool.query(
+      const existeArtista = await pool.query(
         'SELECT id_artista FROM artistas WHERE correo = $1 AND eliminado = FALSE LIMIT 1', [correo]
       );
-      if (exists.rows.length > 0)
+      if (existeArtista.rows.length > 0)
         return res.status(400).json({ success: false, message: "Ya existe un artista con ese correo" });
+
+      const existeUsuario = await pool.query(
+        'SELECT id_usuario FROM usuarios WHERE correo = $1 LIMIT 1', [correo]
+      );
+      if (existeUsuario.rows.length > 0)
+        return res.status(400).json({ success: false, message: "El correo ya está registrado en el sistema" });
     }
 
-    // ✅ Matrícula autogenerada
+    // ── Crear usuario sin contraseña (si tiene correo) ──────
+    let id_usuario       = null;
+    let tokenActivacion  = null;
+
+    if (correo) {
+      const { token, expiracion } = generarTokenActivacion();
+      tokenActivacion = token;
+
+      const resUsuario = await pool.query(
+        `INSERT INTO usuarios
+           (nombre_completo, correo, contraseña_hash, rol, estado, activo,
+            verificado, token_verificacion, token_expiracion)
+         VALUES ($1, $2, NULL, 'artista', 'pendiente', TRUE, FALSE, $3, $4)
+         RETURNING id_usuario`,
+        [nombre_completo, correo, token, expiracion]
+      );
+      id_usuario = resUsuario.rows[0].id_usuario;
+    }
+
+    // ── Generar matrícula ───────────────────────────────────
     const matricula = await generarMatricula();
 
+    // ── Insertar artista ────────────────────────────────────
     const result = await pool.query(`
       INSERT INTO artistas (
-        nombre_completo, nombre_artistico, biografia,
+        id_usuario, nombre_completo, nombre_artistico, biografia,
         foto_perfil, correo, telefono, matricula,
         id_categoria_principal, porcentaje_comision, estado,
         activo, eliminado
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10, TRUE, FALSE)
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11, TRUE, FALSE)
       RETURNING id_artista, matricula
     `, [
+      id_usuario,
       nombre_completo,
       nombre_artistico       || null,
       biografia              || null,
@@ -148,25 +189,38 @@ export const crearArtista = async (req, res) => {
       matricula,
       id_categoria_principal || null,
       porcentaje_comision    || 15,
-      estado                 || 'pendiente'
+      estado                 || 'pendiente',
     ]);
 
     const { id_artista, matricula: mat } = result.rows[0];
-    logger.info(`Artista creado: id ${id_artista} matricula ${mat}`);
+    logger.info(`Artista creado: id ${id_artista} mat ${mat}${id_usuario ? ' usuario=' + id_usuario : ''}`);
+
+    // ── Email de activación (fire and forget) ───────────────
+    if (correo && tokenActivacion) {
+      sendActivacionCuentaEmail(correo, nombre_completo, tokenActivacion).catch(err =>
+        logger.error(`Error email activación artista ${id_artista}: ${err.message}`)
+      );
+    }
 
     res.status(201).json({
       success: true,
-      message: 'Artista creado exitosamente',
-      data:    { id_artista, matricula: mat }
+      message: correo
+        ? "Artista creado. Se envió un email para que configure su contraseña."
+        : "Artista creado sin acceso al portal (sin correo).",
+      data: { id_artista, matricula: mat, correo: correo || null },
     });
+
   } catch (error) {
     logger.error(`Error al crear artista: ${error.message} | ${error.stack}`);
+    if (error.code === '23505')
+      return res.status(400).json({ success: false, message: "El correo ya está registrado" });
     res.status(500).json({ success: false, message: 'Error al crear el artista' });
   }
 };
 
 // =========================================================
-// ACTUALIZAR ARTISTA — matrícula no se puede cambiar ✅
+// ACTUALIZAR ARTISTA
+// PUT /api/artistas/:id
 // =========================================================
 export const actualizarArtista = async (req, res) => {
   try {
@@ -174,18 +228,23 @@ export const actualizarArtista = async (req, res) => {
     const {
       nombre_completo, nombre_artistico, biografia,
       correo, telefono,
-      id_categoria_principal, porcentaje_comision, estado
+      id_categoria_principal, porcentaje_comision, estado,
     } = req.body;
-    // NO se lee `matricula` — se ignora aunque venga en el body
 
     const foto_perfil = req.file?.path || req.body.foto_perfil || null;
 
     await pool.query(`
       UPDATE artistas SET
-        nombre_completo=$1, nombre_artistico=$2, biografia=$3,
-        foto_perfil=COALESCE($4, foto_perfil), correo=$5, telefono=$6,
-        id_categoria_principal=$7, porcentaje_comision=$8, estado=$9
-      WHERE id_artista=$10 AND eliminado=FALSE
+        nombre_completo        = $1,
+        nombre_artistico       = $2,
+        biografia              = $3,
+        foto_perfil            = COALESCE($4, foto_perfil),
+        correo                 = $5,
+        telefono               = $6,
+        id_categoria_principal = $7,
+        porcentaje_comision    = $8,
+        estado                 = $9
+      WHERE id_artista = $10 AND eliminado = FALSE
     `, [
       nombre_completo,
       nombre_artistico       || null,
@@ -196,7 +255,7 @@ export const actualizarArtista = async (req, res) => {
       id_categoria_principal || null,
       porcentaje_comision    || 15,
       estado                 || 'pendiente',
-      id
+      id,
     ]);
 
     logger.info(`Artista actualizado: id ${id}`);
@@ -208,20 +267,131 @@ export const actualizarArtista = async (req, res) => {
 };
 
 // =========================================================
-// ELIMINAR ARTISTA (soft delete) — igual que el original
+// ELIMINAR ARTISTA — soft delete
+// DELETE /api/artistas/:id
 // =========================================================
 export const eliminarArtista = async (req, res) => {
   try {
     const { id } = req.params;
 
     await pool.query(`
-      UPDATE artistas SET eliminado=TRUE, activo=FALSE
-      WHERE id_artista=$1
+      UPDATE artistas SET eliminado = TRUE, activo = FALSE
+      WHERE id_artista = $1
     `, [id]);
 
     res.json({ success: true, message: 'Artista eliminado correctamente' });
   } catch (error) {
     logger.error(`Error al eliminar artista: ${error.message} | ${error.stack}`);
     res.status(500).json({ success: false, message: 'Error al eliminar el artista' });
+  }
+};
+
+// =========================================================
+// CAMBIAR ESTADO DE ARTISTA — admin only
+// PATCH /api/artistas/:id/estado
+//
+// estado = 'activo':
+//   Caso A — artista sin contraseña (creado por admin)
+//     → regenera token → email "Crea tu contraseña"
+//   Caso B — artista con contraseña (registro público aprobado)
+//     → email "Fuiste aprobado, ya puedes ingresar"
+//
+// estado = 'rechazado':
+//   → email con motivo opcional
+//
+// otros estados (inactivo, suspendido, pendiente):
+//   → solo actualiza DB, sin email
+// =========================================================
+export const cambiarEstadoArtista = async (req, res) => {
+  try {
+    const { id }             = req.params;
+    const { estado, motivo } = req.body;
+    const id_admin           = req.user?.id_usuario;
+
+    const estadosValidos = ["pendiente", "activo", "inactivo", "rechazado", "suspendido"];
+    if (!estadosValidos.includes(estado))
+      return res.status(400).json({ success: false, message: "Estado inválido" });
+
+    // ── Obtener artista + usuario vinculado ─────────────────
+    const artResult = await pool.query(`
+      SELECT
+        a.id_artista,
+        a.nombre_completo   AS artista_nombre,
+        a.nombre_artistico,
+        a.correo            AS artista_correo,
+        u.id_usuario,
+        u.correo            AS usuario_correo,
+        u.nombre_completo   AS usuario_nombre,
+        u.contraseña_hash,
+        u.verificado
+      FROM artistas a
+      LEFT JOIN usuarios u ON u.id_usuario = a.id_usuario
+      WHERE a.id_artista = $1 AND a.eliminado = FALSE
+      LIMIT 1
+    `, [id]);
+
+    if (artResult.rows.length === 0)
+      return res.status(404).json({ success: false, message: "Artista no encontrado" });
+
+    const artista = artResult.rows[0];
+
+    // ── Actualizar artistas ─────────────────────────────────
+    await pool.query(`
+      UPDATE artistas
+      SET estado = $1, activo = $2
+      WHERE id_artista = $3 AND eliminado = FALSE
+    `, [estado, estado === 'activo', id]);
+
+    logger.info(
+      `Estado artista ${id} → "${estado}" | admin=${id_admin}`
+      + (motivo ? ` | motivo="${motivo}"` : '')
+    );
+
+    // ── Responder inmediatamente ────────────────────────────
+    res.json({
+      success: true,
+      message: `Artista ${estado === 'activo' ? 'aprobado' : estado} correctamente`,
+      data: { id_artista: id, estado, activo: estado === 'activo' },
+    });
+
+    // ── Emails asincrónicos ─────────────────────────────────
+    const correoDestino = artista.usuario_correo || artista.artista_correo;
+    const nombreDestino = artista.usuario_nombre || artista.nombre_artistico || artista.artista_nombre;
+
+    if (!correoDestino) return;
+
+    if (estado === 'activo') {
+
+      if (artista.id_usuario && !artista.contraseña_hash) {
+        // Caso A: sin contraseña — regenerar token y enviar link
+        const { token, expiracion } = generarTokenActivacion();
+
+        await pool.query(`
+          UPDATE usuarios
+          SET token_verificacion = $1, token_expiracion = $2
+          WHERE id_usuario = $3
+        `, [token, expiracion, artista.id_usuario]);
+
+        sendActivacionCuentaEmail(correoDestino, nombreDestino, token).catch(err =>
+          logger.error(`Error email activación artista ${id}: ${err.message}`)
+        );
+
+      } else {
+        // Caso B: registro público — ya tiene contraseña, solo notificar
+        sendArtistaAprobadoEmail(correoDestino, nombreDestino).catch(err =>
+          logger.error(`Error email aprobación artista ${id}: ${err.message}`)
+        );
+      }
+
+    } else if (estado === 'rechazado') {
+      sendArtistaRechazadoEmail(correoDestino, nombreDestino, motivo || null).catch(err =>
+        logger.error(`Error email rechazo artista ${id}: ${err.message}`)
+      );
+    }
+
+  } catch (error) {
+    logger.error(`Error al cambiar estado artista: ${error.message} | ${error.stack}`);
+    if (!res.headersSent)
+      res.status(500).json({ success: false, message: "Error al cambiar estado" });
   }
 };

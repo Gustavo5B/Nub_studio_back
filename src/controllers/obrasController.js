@@ -1,5 +1,6 @@
 import { pool } from "../config/db.js";
 import logger from "../config/logger.js";
+import { sendObraAprobadaEmail, sendObraRechazadaEmail } from '../services/emailService.js';
 
 // =========================================================
 // LISTAR TODAS LAS OBRAS
@@ -371,8 +372,6 @@ export const actualizarObra = async (req, res) => {
     } = req.body;
 
     const imagen_principal = req.file?.path || req.body.imagen_principal;
-
-    // publicada → activa = TRUE, cualquier otro estado → activa = FALSE
     const activa = estado === 'publicada';
 
     let query = `
@@ -436,6 +435,7 @@ export const eliminarObra = async (req, res) => {
     res.status(500).json({ success: false, message: 'Error al eliminar la obra' });
   }
 };
+
 // =========================================================
 // CAMBIAR ESTADO DE OBRA (admin only) — endpoint dedicado
 // Separado del PUT general para auditoría y seguridad
@@ -450,7 +450,7 @@ export const cambiarEstadoObra = async (req, res) => {
     if (!estadosValidos.includes(estado))
       return res.status(400).json({ success: false, message: "Estado inválido" });
 
-    const activa = estado === "publicada";   // publicada → visible en marketplace
+    const activa = estado === "publicada";
 
     const result = await pool.query(`
       UPDATE obras
@@ -458,22 +458,46 @@ export const cambiarEstadoObra = async (req, res) => {
           activa = $2,
           fecha_actualizacion = NOW()
       WHERE id_obra = $3 AND eliminada IS NOT TRUE
-      RETURNING id_obra, titulo, estado, activa
+      RETURNING id_obra, titulo, estado, activa, id_artista
     `, [estado, activa, id]);
 
     if (result.rows.length === 0)
       return res.status(404).json({ success: false, message: "Obra no encontrada" });
+
+    const obra = result.rows[0];
 
     logger.info(
       `Estado obra ${id} → "${estado}" | activa=${activa} | admin_id=${id_admin}`
       + (motivo_rechazo ? ` | motivo="${motivo_rechazo}"` : "")
     );
 
+    // Responder al admin de inmediato
     res.json({
       success: true,
       message: `Obra ${estado === "publicada" ? "publicada" : estado} correctamente`,
-      data: result.rows[0],
+      data: obra,
     });
+
+    // Email en background — fire and forget
+    if (estado === "publicada" || estado === "rechazada") {
+      pool.query(
+        `SELECT correo, nombre_completo, nombre_artistico
+         FROM artistas WHERE id_artista = $1 LIMIT 1`,
+        [obra.id_artista]
+      ).then(async artistaResult => {
+        if (artistaResult.rows.length === 0) return;
+        const { correo, nombre_completo, nombre_artistico } = artistaResult.rows[0];
+        if (!correo) return;
+        const nombre = nombre_artistico || nombre_completo;
+        if (estado === "publicada") {
+          await sendObraAprobadaEmail(correo, nombre, obra.titulo);
+        } else {
+          await sendObraRechazadaEmail(correo, nombre, obra.titulo, motivo_rechazo || null);
+        }
+      }).catch(err => {
+        logger.error(`Error enviando email notificación obra ${id}: ${err.message}`);
+      });
+    }
 
   } catch (error) {
     logger.error(`Error al cambiar estado obra: ${error.message} | ${error.stack}`);
