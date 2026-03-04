@@ -24,6 +24,7 @@ import { preventSQLInjection } from './middlewares/sql-injection.middleware.js';
 import statsRoutes from "./routes/statsRoutes.js";
 import artistaPortalRoutes from './routes/artistaPortalRoutes.js';
 import logger from './config/logger.js';
+import adminRoutes from './routes/adminRoutes.js';
 
 // =========================================================
 // CONFIGURACION INICIAL
@@ -86,6 +87,7 @@ app.use('/api/etiquetas', etiquetasRoutes);
 app.use('/api/artista-portal', artistaPortalRoutes);
 app.use("/api/tecnicas", tecnicasRoutes);
 app.use("/api/stats", statsRoutes);
+app.use("/api/admin", adminRoutes);
 
 // =========================================================
 // RUTA DE PRUEBA DEL SERVIDOR
