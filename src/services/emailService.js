@@ -1,7 +1,7 @@
-import brevo from '@getbrevo/brevo';
-import crypto from 'crypto';
-import dotenv from 'dotenv';
-import logger from '../config/logger.js';
+import brevo from "@getbrevo/brevo";
+import crypto from "crypto";
+import dotenv from "dotenv";
+import logger from "../config/logger.js";
 
 dotenv.config();
 
@@ -9,19 +9,19 @@ dotenv.config();
 // CONFIGURACION DE BREVO
 // =========================================================
 const defaultClient = brevo.ApiClient.instance;
-const apiKey = defaultClient.authentications['api-key'];
+const apiKey = defaultClient.authentications["api-key"];
 apiKey.apiKey = process.env.BREVO_API_KEY;
 
 const apiInstance = new brevo.TransactionalEmailsApi();
 
 if (!process.env.BREVO_API_KEY) {
-  logger.error('ERROR CRITICO: BREVO_API_KEY no esta configurada en .env');
-  throw new Error('BREVO_API_KEY no configurada');
+  logger.error("ERROR CRITICO: BREVO_API_KEY no esta configurada en .env");
+  throw new Error("BREVO_API_KEY no configurada");
 }
 
-logger.info('Brevo API configurada correctamente');
+logger.info("Brevo API configurada correctamente");
 
-const SENDER = { name: 'NU-B Studio', email: 'gustavotubazo@gmail.com' };
+const SENDER = { name: "NU-B Studio", email: "gustavotubazo@gmail.com" };
 
 // =========================================================
 // ENVIAR EMAIL DE VERIFICACION DE CUENTA
@@ -31,7 +31,7 @@ export const sendVerificationEmail = async (email, nombre, codigo) => {
     const sendSmtpEmail = {
       sender: SENDER,
       to: [{ email, name: nombre }],
-      subject: 'Verifica tu cuenta - NU-B Studio',
+      subject: "Verifica tu cuenta - NU-B Studio",
       htmlContent: `
         <!DOCTYPE html>
         <html lang="es">
@@ -69,11 +69,13 @@ export const sendVerificationEmail = async (email, nombre, codigo) => {
       `,
     };
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    logger.info(`Email de verificacion enviado (Message ID: ${result.messageId})`);
+    logger.info(
+      `Email de verificacion enviado (Message ID: ${result.messageId})`,
+    );
     return { success: true, messageId: result.messageId };
   } catch (error) {
     logger.error(`Error al enviar email de verificacion: ${error.message}`);
-    throw new Error('Error al enviar el correo de verificacion');
+    throw new Error("Error al enviar el correo de verificacion");
   }
 };
 
@@ -81,11 +83,12 @@ export const sendVerificationEmail = async (email, nombre, codigo) => {
 // GENERAR CODIGO DE RECUPERACION
 // =========================================================
 export const generateCode = () => {
-  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
-  const bytes = crypto.randomBytes(8);
-  let code = '';
-  for (let i = 0; i < 8; i++) code += chars[bytes[i] % chars.length];
-  return `${code.slice(0, 4)}-${code.slice(4)}`;
+  const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"; // sin O,0,I,1 para evitar confusiones
+  let code = "";
+  for (let i = 0; i < 6; i++) {
+    code += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return code; // ejemplo: "VM32V8"
 };
 
 // =========================================================
@@ -96,7 +99,7 @@ export const sendWelcomeEmail = async (email, nombre) => {
     const sendSmtpEmail = {
       sender: SENDER,
       to: [{ email, name: nombre }],
-      subject: 'Bienvenido a NU-B Studio!',
+      subject: "Bienvenido a NU-B Studio!",
       htmlContent: `
         <!DOCTYPE html>
         <html lang="es">
@@ -156,11 +159,13 @@ export const sendWelcomeEmail = async (email, nombre) => {
       `,
     };
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    logger.info(`Email de bienvenida enviado (Message ID: ${result.messageId})`);
+    logger.info(
+      `Email de bienvenida enviado (Message ID: ${result.messageId})`,
+    );
     return { success: true, messageId: result.messageId };
   } catch (error) {
     logger.error(`Error al enviar email de bienvenida: ${error.message}`);
-    throw new Error('Error al enviar el correo de bienvenida');
+    throw new Error("Error al enviar el correo de bienvenida");
   }
 };
 
@@ -172,7 +177,7 @@ export const sendRecoveryCode = async (email, code) => {
     const sendSmtpEmail = {
       sender: SENDER,
       to: [{ email }],
-      subject: 'Recuperacion de contrasena - NU-B Studio',
+      subject: "Recuperacion de contraseña - NU-B Studio",
       htmlContent: `
         <!DOCTYPE html>
         <html lang="es">
@@ -190,10 +195,10 @@ export const sendRecoveryCode = async (email, code) => {
         </head>
         <body>
           <div class="container">
-            <div class="header"><h1>Recuperacion de Contrasena</h1></div>
+            <div class="header"><h1>Recuperacion de Contraseña</h1></div>
             <div class="content">
               <p>Hola,</p>
-              <p>Hemos recibido una solicitud para restablecer tu contrasena.</p>
+              <p>Hemos recibido una solicitud para restablecer tu contraseña.</p>
               <p>Tu codigo de recuperacion es:</p>
               <div class="code-box">${code}</div>
               <p>Este codigo expirara en <strong>15 minutos</strong>.</p>
@@ -206,11 +211,13 @@ export const sendRecoveryCode = async (email, code) => {
       `,
     };
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    logger.info(`Email de recuperacion enviado (Message ID: ${result.messageId})`);
+    logger.info(
+      `Email de recuperacion enviado (Message ID: ${result.messageId})`,
+    );
     return { success: true, messageId: result.messageId };
   } catch (error) {
     logger.error(`Error al enviar email de recuperacion: ${error.message}`);
-    throw new Error('Error al enviar el codigo por correo');
+    throw new Error("Error al enviar el codigo por correo");
   }
 };
 
@@ -222,7 +229,7 @@ export const sendGmail2FACode = async (email, code) => {
     const sendSmtpEmail = {
       sender: SENDER,
       to: [{ email }],
-      subject: 'Codigo de verificacion (2FA) - NU-B Studio',
+      subject: "Codigo de verificacion (2FA) - NU-B Studio",
       htmlContent: `
         <!DOCTYPE html>
         <html lang="es">
@@ -259,7 +266,9 @@ export const sendGmail2FACode = async (email, code) => {
     return { success: true, messageId: result.messageId };
   } catch (error) {
     logger.error(`Error al enviar email 2FA: ${error.message}`);
-    throw new Error(`Email service error: ${error.message || error.code || 'UNKNOWN'}`);
+    throw new Error(
+      `Email service error: ${error.message || error.code || "UNKNOWN"}`,
+    );
   }
 };
 
@@ -302,7 +311,9 @@ export const sendObraAprobadaEmail = async (email, nombre, tituloObra) => {
       `,
     };
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    logger.info(`Email obra aprobada enviado a ${email.substring(0,3)}*** (Message ID: ${result.messageId})`);
+    logger.info(
+      `Email obra aprobada enviado a ${email.substring(0, 3)}*** (Message ID: ${result.messageId})`,
+    );
     return { success: true, messageId: result.messageId };
   } catch (error) {
     logger.error(`Error al enviar email obra aprobada: ${error.message}`);
@@ -312,7 +323,12 @@ export const sendObraAprobadaEmail = async (email, nombre, tituloObra) => {
 // =========================================================
 // NOTIFICAR OBRA RECHAZADA
 // =========================================================
-export const sendObraRechazadaEmail = async (email, nombre, tituloObra, motivo) => {
+export const sendObraRechazadaEmail = async (
+  email,
+  nombre,
+  tituloObra,
+  motivo,
+) => {
   try {
     const sendSmtpEmail = {
       sender: SENDER,
@@ -347,7 +363,7 @@ export const sendObraRechazadaEmail = async (email, nombre, tituloObra, motivo) 
             <p>Hola <strong style="color:#fff">${nombre}</strong>,</p>
             <p>Hemos revisado tu obra y por el momento no puede ser publicada.</p>
             <div class="obra"><div class="lbl">Obra revisada</div><div class="tit">${tituloObra}</div></div>
-            ${motivo ? `<div class="motivo"><div class="ml">Motivo</div><p>${motivo}</p></div>` : ''}
+            ${motivo ? `<div class="motivo"><div class="ml">Motivo</div><p>${motivo}</p></div>` : ""}
             <div class="tips">
               <h3>Sugerencias para que tu obra sea aprobada</h3>
               <ul>
@@ -365,7 +381,9 @@ export const sendObraRechazadaEmail = async (email, nombre, tituloObra, motivo) 
       `,
     };
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    logger.info(`Email obra rechazada enviado a ${email.substring(0,3)}*** (Message ID: ${result.messageId})`);
+    logger.info(
+      `Email obra rechazada enviado a ${email.substring(0, 3)}*** (Message ID: ${result.messageId})`,
+    );
     return { success: true, messageId: result.messageId };
   } catch (error) {
     logger.error(`Error al enviar email obra rechazada: ${error.message}`);
@@ -380,7 +398,7 @@ export const sendArtistaSolicitudEmail = async (email, nombre) => {
     const sendSmtpEmail = {
       sender: SENDER,
       to: [{ email, name: nombre }],
-      subject: 'Tu solicitud fue recibida - NU-B Studio',
+      subject: "Tu solicitud fue recibida - NU-B Studio",
       htmlContent: `
         <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -415,7 +433,9 @@ export const sendArtistaSolicitudEmail = async (email, nombre) => {
       `,
     };
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    logger.info(`Email solicitud artista enviado a ${email.substring(0,3)}*** (Message ID: ${result.messageId})`);
+    logger.info(
+      `Email solicitud artista enviado a ${email.substring(0, 3)}*** (Message ID: ${result.messageId})`,
+    );
     return { success: true, messageId: result.messageId };
   } catch (error) {
     logger.error(`Error al enviar email solicitud artista: ${error.message}`);
@@ -430,7 +450,7 @@ export const sendArtistaAprobadoEmail = async (email, nombre) => {
     const sendSmtpEmail = {
       sender: SENDER,
       to: [{ email, name: nombre }],
-      subject: 'Bienvenido al equipo! Tu cuenta fue aprobada - NU-B Studio',
+      subject: "Bienvenido al equipo! Tu cuenta fue aprobada - NU-B Studio",
       htmlContent: `
         <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -468,7 +488,9 @@ export const sendArtistaAprobadoEmail = async (email, nombre) => {
       `,
     };
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    logger.info(`Email artista aprobado enviado a ${email.substring(0,3)}*** (Message ID: ${result.messageId})`);
+    logger.info(
+      `Email artista aprobado enviado a ${email.substring(0, 3)}*** (Message ID: ${result.messageId})`,
+    );
     return { success: true, messageId: result.messageId };
   } catch (error) {
     logger.error(`Error al enviar email artista aprobado: ${error.message}`);
@@ -483,7 +505,7 @@ export const sendArtistaRechazadoEmail = async (email, nombre, motivo) => {
     const sendSmtpEmail = {
       sender: SENDER,
       to: [{ email, name: nombre }],
-      subject: 'Actualizacion sobre tu solicitud - NU-B Studio',
+      subject: "Actualizacion sobre tu solicitud - NU-B Studio",
       htmlContent: `
         <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -507,7 +529,7 @@ export const sendArtistaRechazadoEmail = async (email, nombre, motivo) => {
           <div class="b">
             <p>Hola <strong style="color:#fff">${nombre}</strong>,</p>
             <p>Hemos revisado tu solicitud y por el momento no podemos aprobarla.</p>
-            ${motivo ? `<div class="motivo"><div class="ml">Motivo</div><p>${motivo}</p></div>` : ''}
+            ${motivo ? `<div class="motivo"><div class="ml">Motivo</div><p>${motivo}</p></div>` : ""}
             <div class="tips">
               <h3>Sugerencias para mejorar tu solicitud</h3>
               <ul>
@@ -524,7 +546,9 @@ export const sendArtistaRechazadoEmail = async (email, nombre, motivo) => {
       `,
     };
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    logger.info(`Email artista rechazado enviado a ${email.substring(0,3)}*** (Message ID: ${result.messageId})`);
+    logger.info(
+      `Email artista rechazado enviado a ${email.substring(0, 3)}*** (Message ID: ${result.messageId})`,
+    );
     return { success: true, messageId: result.messageId };
   } catch (error) {
     logger.error(`Error al enviar email artista rechazado: ${error.message}`);
@@ -543,7 +567,7 @@ export const sendActivacionCuentaEmail = async (correo, nombre, token) => {
     const sendSmtpEmail = {
       sender: SENDER,
       to: [{ email: correo, name: nombre }],
-      subject: 'Activa tu cuenta en Nu-B Studio — Crea tu contraseña',
+      subject: "Activa tu cuenta en Nu-B Studio — Crea tu contraseña",
       htmlContent: `
         <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -598,7 +622,9 @@ export const sendActivacionCuentaEmail = async (correo, nombre, token) => {
         </body></html>`,
     };
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    logger.info(`Email activacion cuenta enviado a ${correo.substring(0,3)}*** (ID: ${result.messageId})`);
+    logger.info(
+      `Email activacion cuenta enviado a ${correo.substring(0, 3)}*** (ID: ${result.messageId})`,
+    );
     return { success: true, messageId: result.messageId };
   } catch (error) {
     logger.error(`Error email activacion cuenta: ${error.message}`);
@@ -616,7 +642,7 @@ export const sendVerificacionEmailArtista = async (correo, nombre, token) => {
     const sendSmtpEmail = {
       sender: SENDER,
       to: [{ email: correo, name: nombre }],
-      subject: 'Verifica tu correo — Nu-B Studio',
+      subject: "Verifica tu correo — Nu-B Studio",
       htmlContent: `
         <!DOCTYPE html><html lang="es"><head><meta charset="UTF-8"/>
         <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -681,7 +707,9 @@ export const sendVerificacionEmailArtista = async (correo, nombre, token) => {
         </body></html>`,
     };
     const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
-    logger.info(`Email verificacion artista enviado a ${correo.substring(0,3)}*** (ID: ${result.messageId})`);
+    logger.info(
+      `Email verificacion artista enviado a ${correo.substring(0, 3)}*** (ID: ${result.messageId})`,
+    );
     return { success: true, messageId: result.messageId };
   } catch (error) {
     logger.error(`Error email verificacion artista: ${error.message}`);
@@ -693,8 +721,8 @@ export const sendVerificacionEmailArtista = async (correo, nombre, token) => {
 // =========================================================
 export const cleanupExpiredCodes = async () => {
   try {
-    logger.info('Ejecutando limpieza de codigos expirados...');
-    logger.info('Limpieza completada');
+    logger.info("Ejecutando limpieza de codigos expirados...");
+    logger.info("Limpieza completada");
     return true;
   } catch (error) {
     logger.error(`Error en limpieza de codigos: ${error.message}`);
