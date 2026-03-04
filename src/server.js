@@ -43,10 +43,10 @@ app.use(helmet({
 // CONFIGURACION DE CORS
 // =========================================================
 const allowedOrigins = [
-  'https://front-auth-eight.vercel.app',
+  process.env.FRONTEND_URL,
   'http://localhost:4200',
   'http://localhost:5173',
-];
+].filter(Boolean);
 
 app.use(cors({
   origin: function (origin, callback) {
