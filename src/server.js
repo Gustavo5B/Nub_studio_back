@@ -25,7 +25,7 @@ import statsRoutes from "./routes/statsRoutes.js";
 import artistaPortalRoutes from './routes/artistaPortalRoutes.js';
 import logger from './config/logger.js';
 import adminRoutes from './routes/adminRoutes.js';
-
+import reportesRoutes from './routes/reportesRoutes.js'; 
 // =========================================================
 // CONFIGURACION INICIAL
 // =========================================================
@@ -88,6 +88,7 @@ app.use('/api/artista-portal', artistaPortalRoutes);
 app.use("/api/tecnicas", tecnicasRoutes);
 app.use("/api/stats", statsRoutes);
 app.use("/api/admin", adminRoutes);
+app.use("/api/reportes", reportesRoutes); // ← agregar
 
 // =========================================================
 // RUTA DE PRUEBA DEL SERVIDOR

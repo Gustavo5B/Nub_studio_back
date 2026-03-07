@@ -107,15 +107,16 @@ export const obtenerObraPorId = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const resultObra = await pool.query(`
-      SELECT o.*, a.nombre_completo AS artista_nombre, a.nombre_artistico AS artista_alias,
-        a.biografia AS artista_biografia, a.foto_perfil AS artista_foto,
-        c.nombre AS categoria_nombre, c.slug AS categoria_slug
-      FROM obras o
-      INNER JOIN artistas a ON o.id_artista = a.id_artista
-      INNER JOIN categorias c ON o.id_categoria = c.id_categoria
-      WHERE o.id_obra = $1 AND o.activa = TRUE LIMIT 1
-    `, [id]);
+    // ✅ Corrección en obtenerObraPorId
+const resultObra = await pool.query(`
+  SELECT o.*, a.nombre_completo AS artista_nombre, a.nombre_artistico AS artista_alias,
+    a.biografia AS artista_biografia, a.foto_perfil AS artista_foto,
+    c.nombre AS categoria_nombre, c.slug AS categoria_slug
+  FROM obras o
+  INNER JOIN artistas a ON o.id_artista = a.id_artista
+  INNER JOIN categorias c ON o.id_categoria = c.id_categoria
+  WHERE o.id_obra = $1 AND o.eliminada IS NOT TRUE LIMIT 1
+`, [id]);
 
     if (resultObra.rows.length === 0)
       return res.status(404).json({ success: false, message: "Obra no encontrada" });
