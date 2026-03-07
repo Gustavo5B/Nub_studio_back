@@ -15,6 +15,7 @@
   "description": "Backend de autenticación con recuperación y 2FA para NU-B Studio",
   "dependencies": {
     "@getbrevo/brevo": "^1.0.1",
+    "@supabase/supabase-js": "^2.98.0",
     "bcrypt": "^6.0.0",
     "cloudinary": "^1.41.3",
     "cors": "^2.8.5",
