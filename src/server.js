@@ -175,3 +175,24 @@ app.listen(PORT, async () => {
     logger.error(`Error en la conexion PostgreSQL: ${error.message}`);
   }
 });
+app.use(cors({
+  origin: function (origin, callback) {
+    if (!origin) return callback(null, true);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    } else {
+      logger.warn(`Bloqueado por CORS: ${origin}`);
+      return callback(new Error('Origen no permitido por CORS'), false);
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: [                  // ← agrega esto
+    'Content-Disposition',
+    'X-Backup-Rows',
+    'X-Backup-Tables',
+    'X-Backup-Duration',
+    'X-Backup-Checksum',
+  ],
+}));
