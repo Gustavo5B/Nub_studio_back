@@ -131,7 +131,7 @@ function applyRowStyles(ws, firstDataRow = 2, lastRow = null, numCols = null) {
 }
 
 function addTotalsRow(ws, totalsCols, label = "TOTALES") {
-  const lastData = ws.lastRow?.number ?? 1;
+  const lastData = Math.max(ws.lastRow?.number ?? 1, 2);
   const totRow   = ws.addRow([]);
   totRow.height  = 22;
 
@@ -140,8 +140,9 @@ function addTotalsRow(ws, totalsCols, label = "TOTALES") {
   totRow.getCell(1).fill  = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A0F2E" } };
 
   for (const [col, formula] of Object.entries(totalsCols)) {
-    const cell = totRow.getCell(col);
-    cell.value  = { formula: `${formula}(${ws.getColumn(col).letter}2:${ws.getColumn(col).letter}${lastData})` };
+    const colNum = parseInt(col);  // ← ESTE ES EL FIX
+    const cell = totRow.getCell(colNum);
+    cell.value  = { formula: `${formula}(${ws.getColumn(colNum).letter}2:${ws.getColumn(colNum).letter}${lastData})` };
     cell.numFmt = '"$"#,##0.00';
     cell.font   = { bold: true, color: { argb: BRAND.greenNum }, size: 11 };
     cell.fill   = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A0F2E" } };
