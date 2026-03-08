@@ -49,6 +49,16 @@ async function descubrirTablas(client) {
   return orden;
 }
 
+// ── Resolver qué tablas respaldar, respetando orden topológico ────────────────
+// tablasDeseadas = null | [] → todas las tablas (backup completo)
+// tablasDeseadas = ["obras","artistas"] → solo esas, en orden correcto
+async function resolverTablas(client, tablasDeseadas) {
+  const todasOrdenadas = await descubrirTablas(client);
+  if (!tablasDeseadas || !tablasDeseadas.length) return todasOrdenadas;
+  const set = new Set(tablasDeseadas);
+  return todasOrdenadas.filter(t => set.has(t));
+}
+
 function escaparValor(val) {
   if (val === null || val === undefined) return "NULL";
   if (typeof val === "boolean") return val ? "TRUE" : "FALSE";
@@ -186,7 +196,7 @@ async function limpiarBackupsAntiguos(client) {
       if (error) console.warn("Storage remove warning:", error.message);
     }
     await client.query(`DELETE FROM backups_historial WHERE id = ANY($1::int[])`, [antiguos.map(r => r.id)]);
-    console.log(`[backup] Limpieza automática: ${antiguos.length} backup(s) eliminado(s)`);
+    console.log(`[backup] Limpieza: ${antiguos.length} backup(s) eliminado(s)`);
   } catch (err) {
     console.warn("[backup] Error en limpieza:", err.message);
   }
@@ -267,18 +277,35 @@ async function construirSQL(client, tablasSeleccionadas, label = "Respaldo compl
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// CONTROLADOR: Generar backup completo (original)
+// CONTROLADOR: Generar backup  POST /api/admin/backup
+//
+// Body opcional: { tablas: ["obras", "artistas", ...] }
+//   Sin body / tablas vacío  → backup COMPLETO de toda la base
+//   Con tablas               → backup SELECTIVO solo de esas tablas
 // ══════════════════════════════════════════════════════════════════════════════
 async function generarBackup(req, res) {
   const t0      = Date.now();
   const adminId = req.user?.id_usuario ?? req.user?.sub ?? null;
-  const client  = await pool.connect();
+  const { tablas: tablasBody } = req.body || {};
+
+  const client = await pool.connect();
   try {
-    const ahora   = new Date();
-    const ts      = ahora.toISOString().replace(/[:.]/g, "-").slice(0, 19);
-    const archivo = `nub-studio-backup-${ts}.sql`;
-    const TABLAS_ORDEN = await descubrirTablas(client);
-    const { sql, filasTotal, tablasOk, md5, bytes } = await construirSQL(client, TABLAS_ORDEN);
+    // resolverTablas respeta orden topológico y aplica el filtro si viene
+    const tablasABackup = await resolverTablas(client, tablasBody);
+    if (!tablasABackup.length)
+      return res.status(400).json({ success: false, message: "No se encontraron tablas válidas" });
+
+    const esSelectivo = Array.isArray(tablasBody) && tablasBody.length > 0;
+    const label  = esSelectivo
+      ? `Respaldo selectivo (${tablasABackup.length} tablas)`
+      : "Respaldo completo";
+    const ahora  = new Date();
+    const ts     = ahora.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    const archivo = esSelectivo
+      ? `nub-studio-backup-selectivo-${ts}.sql`
+      : `nub-studio-backup-${ts}.sql`;
+
+    const { sql, filasTotal, tablasOk, md5, bytes } = await construirSQL(client, tablasABackup, label);
     const ms  = Date.now() - t0;
     const buf = Buffer.from(sql, "utf8");
 
@@ -287,7 +314,9 @@ async function generarBackup(req, res) {
     catch (err) { console.warn("[backup] No se pudo subir:", err.message); }
 
     await guardarHistorial(client, adminId, { tablas: tablasOk, filas: filasTotal, bytes, ms, md5, archivo, url: urlArchivo });
-    await limpiarBackupsAntiguos(client);
+
+    // Limpieza automática solo en backups completos
+    if (!esSelectivo) await limpiarBackupsAntiguos(client);
 
     res.setHeader("Content-Type",        "application/sql");
     res.setHeader("Content-Disposition", `attachment; filename="${archivo}"`);
@@ -305,122 +334,55 @@ async function generarBackup(req, res) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// CONTROLADOR: Backup SELECTIVO  POST /api/admin/backup/selectivo
-// Body: { tablas: ["obras", "artistas", ...] }
-// ══════════════════════════════════════════════════════════════════════════════
-async function generarBackupSelectivo(req, res) {
-  const t0       = Date.now();
-  const adminId  = req.user?.id_usuario ?? req.user?.sub ?? null;
-  const { tablas: tablasBody } = req.body || {};
-
-  if (!Array.isArray(tablasBody) || tablasBody.length === 0)
-    return res.status(400).json({ success: false, message: "Debes seleccionar al menos una tabla" });
-
-  const client = await pool.connect();
-  try {
-    // Verificar que las tablas existen (seguridad)
-    const todasTablas = await descubrirTablas(client);
-    const tablasSet   = new Set(todasTablas);
-    const tablasValidas = tablasBody.filter(t => tablasSet.has(t));
-    if (!tablasValidas.length)
-      return res.status(400).json({ success: false, message: "Ninguna tabla seleccionada es válida" });
-
-    // Mantener orden topológico
-    const tablasOrdenadas = todasTablas.filter(t => tablasValidas.includes(t));
-
-    const ahora   = new Date();
-    const ts      = ahora.toISOString().replace(/[:.]/g, "-").slice(0, 19);
-    const archivo = `nub-studio-backup-selectivo-${ts}.sql`;
-
-    const { sql, filasTotal, tablasOk, md5, bytes } = await construirSQL(client, tablasOrdenadas, `Respaldo selectivo (${tablasValidas.length} tablas)`);
-    const ms  = Date.now() - t0;
-    const buf = Buffer.from(sql, "utf8");
-
-    // Subir a Storage (sin contar para el límite de 3 completos)
-    let urlArchivo = null;
-    try { urlArchivo = await subirAStorage(archivo, buf); }
-    catch (err) { console.warn("[backup selectivo] Storage:", err.message); }
-
-    // Guardar en historial (sin limpiar automático para selectivos)
-    await guardarHistorial(client, adminId, { tablas: tablasOk, filas: filasTotal, bytes, ms, md5, archivo, url: urlArchivo });
-
-    res.setHeader("Content-Type",        "application/sql");
-    res.setHeader("Content-Disposition", `attachment; filename="${archivo}"`);
-    res.setHeader("Content-Length",      buf.length);
-    res.setHeader("X-Backup-Checksum",   md5);
-    res.setHeader("X-Backup-Tables",     tablasOk);
-    res.setHeader("X-Backup-Rows",       filasTotal);
-    res.setHeader("X-Backup-Duration",   ms);
-    return res.status(200).send(buf);
-  } catch (err) {
-    console.error("Error backup selectivo:", err);
-    return res.status(500).json({ success: false, message: "Error al generar respaldo selectivo", error: err.message });
-  } finally { client.release(); }
-}
-
-// ══════════════════════════════════════════════════════════════════════════════
-// CONTROLADOR: Salud de tablas  GET /api/admin/backups/salud
+// CONTROLADOR: Salud de tablas  GET /api/admin/backups/tablas
 // ══════════════════════════════════════════════════════════════════════════════
 async function obtenerSaludTablas(req, res) {
   const client = await pool.connect();
   try {
     const tablas = await descubrirTablas(client);
-
     const resultados = await Promise.all(tablas.map(async (tabla) => {
       try {
         const [countRes, sizeRes] = await Promise.all([
           client.query(`SELECT COUNT(*) AS filas FROM "${tabla}"`),
           client.query(`SELECT pg_relation_size($1::regclass) AS bytes`, [`public.${tabla}`]),
         ]);
-        return {
-          tabla,
-          filas:  parseInt(countRes.rows[0].filas, 10),
-          bytes:  parseInt(sizeRes.rows[0].bytes, 10) || 0,
-        };
-      } catch {
-        return { tabla, filas: 0, bytes: 0 };
-      }
+        return { tabla, filas: parseInt(countRes.rows[0].filas, 10), bytes: parseInt(sizeRes.rows[0].bytes, 10) || 0 };
+      } catch { return { tabla, filas: 0, bytes: 0 }; }
     }));
-
-    // Orden: más filas primero
     resultados.sort((a, b) => b.filas - a.filas);
-
-    const totalFilas  = resultados.reduce((s, r) => s + r.filas, 0);
-    const totalBytes  = resultados.reduce((s, r) => s + r.bytes, 0);
-    const maxFilas    = Math.max(...resultados.map(r => r.filas), 1);
-
     return res.json({
       success: true,
       data: {
         tablas:     resultados,
-        totalFilas,
-        totalBytes,
-        maxFilas,
+        totalFilas: resultados.reduce((s, r) => s + r.filas, 0),
+        totalBytes: resultados.reduce((s, r) => s + r.bytes, 0),
         numTablas:  resultados.length,
       },
     });
   } catch (err) {
-    console.error("Error salud tablas:", err);
     return res.status(500).json({ success: false, message: "Error al obtener salud de tablas" });
   } finally { client.release(); }
 }
 
-// ── Helper: crear tabla config cron ──────────────────────────────────────────
+// ── Helper: crear / migrar tabla config cron ──────────────────────────────────
 async function ensureConfigCronTable() {
   await pool.query(`
     CREATE TABLE IF NOT EXISTS backup_config_cron (
-      id SERIAL PRIMARY KEY,
-      activo BOOLEAN DEFAULT FALSE,
-      frecuencia VARCHAR(20) DEFAULT 'diario',
-      hora INTEGER DEFAULT 2,
-      dia_semana INTEGER DEFAULT 1,
-      ultimo_cron TIMESTAMPTZ,
-      proximo_cron TIMESTAMPTZ,
-      id_admin INTEGER REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
+      id             SERIAL PRIMARY KEY,
+      activo         BOOLEAN DEFAULT FALSE,
+      frecuencia     VARCHAR(20) DEFAULT 'diario',
+      hora           INTEGER DEFAULT 2,
+      dia_semana     INTEGER DEFAULT 1,
+      tablas         JSONB DEFAULT NULL,
+      ultimo_cron    TIMESTAMPTZ,
+      proximo_cron   TIMESTAMPTZ,
+      id_admin       INTEGER REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
       actualizado_en TIMESTAMPTZ DEFAULT NOW()
     )
   `);
-  // Insertar config por defecto si no existe
+  // Migración: agregar columna tablas si viene de versión anterior
+  await pool.query(`ALTER TABLE backup_config_cron ADD COLUMN IF NOT EXISTS tablas JSONB DEFAULT NULL`).catch(() => {});
+  // Registro por defecto
   await pool.query(`
     INSERT INTO backup_config_cron (activo, frecuencia, hora, dia_semana)
     SELECT FALSE, 'diario', 2, 1
@@ -428,21 +390,16 @@ async function ensureConfigCronTable() {
   `);
 }
 
-// ── Estado del cron job en memoria ───────────────────────────────────────────
 let cronJob = null;
 
 function calcularProximoCron(frecuencia, hora, diaSemana) {
-  const ahora = new Date();
-  const prox  = new Date();
-  prox.setSeconds(0, 0);
+  const ahora = new Date(), prox = new Date();
   prox.setHours(hora, 0, 0, 0);
-
   if (frecuencia === "diario") {
     if (prox <= ahora) prox.setDate(prox.getDate() + 1);
   } else if (frecuencia === "semanal") {
-    // dia_semana: 0=dom...6=sab
-    const hoy = ahora.getDay();
-    let diff  = (diaSemana - hoy + 7) % 7;
+    const hoy  = ahora.getDay();
+    let diff   = (diaSemana - hoy + 7) % 7;
     if (diff === 0 && prox <= ahora) diff = 7;
     prox.setDate(prox.getDate() + diff);
   } else if (frecuencia === "mensual") {
@@ -453,23 +410,32 @@ function calcularProximoCron(frecuencia, hora, diaSemana) {
 }
 
 function buildCronExpression(frecuencia, hora, diaSemana) {
-  if (frecuencia === "diario")   return `0 ${hora} * * *`;
-  if (frecuencia === "semanal")  return `0 ${hora} * * ${diaSemana}`;
-  if (frecuencia === "mensual")  return `0 ${hora} 1 * *`;
+  if (frecuencia === "semanal") return `0 ${hora} * * ${diaSemana}`;
+  if (frecuencia === "mensual") return `0 ${hora} 1 * *`;
   return `0 ${hora} * * *`;
 }
 
+// ── Ejecutar backup automático ────────────────────────────────────────────────
+// Lee la columna `tablas` del config para decidir completo vs selectivo
 async function ejecutarBackupAutomatico() {
   console.log("[cron] Iniciando backup automático...");
   const client = await pool.connect();
   try {
-    const tablas  = await descubrirTablas(client);
+    const { rows } = await pool.query(`SELECT tablas FROM backup_config_cron LIMIT 1`);
+    const tablasConfig = rows[0]?.tablas ?? null; // null = completo
+
+    const tablasABackup = await resolverTablas(client, tablasConfig);
+    const esSelectivo   = Array.isArray(tablasConfig) && tablasConfig.length > 0;
+    const label = esSelectivo
+      ? `Backup automático selectivo (${tablasABackup.length} tablas)`
+      : "Backup automático completo";
+
     const ahora   = new Date();
     const ts      = ahora.toISOString().replace(/[:.]/g, "-").slice(0, 19);
     const archivo = `nub-studio-backup-auto-${ts}.sql`;
     const t0      = Date.now();
 
-    const { sql, filasTotal, tablasOk, md5, bytes } = await construirSQL(client, tablas, "Backup automático");
+    const { sql, filasTotal, tablasOk, md5, bytes } = await construirSQL(client, tablasABackup, label);
     const ms  = Date.now() - t0;
     const buf = Buffer.from(sql, "utf8");
 
@@ -479,12 +445,10 @@ async function ejecutarBackupAutomatico() {
 
     await guardarHistorial(client, null, { tablas: tablasOk, filas: filasTotal, bytes, ms, md5, archivo, url: urlArchivo });
     await limpiarBackupsAntiguos(client);
-
-    // Actualizar ultimo_cron en config
     await pool.query(`UPDATE backup_config_cron SET ultimo_cron = NOW() WHERE id = 1`);
-    console.log(`[cron] Backup automático exitoso: ${archivo} (${filasTotal} filas, ${ms}ms)`);
+    console.log(`[cron] OK: ${archivo} | ${tablasOk} tablas | ${filasTotal} filas | ${ms}ms`);
   } catch (err) {
-    console.error("[cron] Error en backup automático:", err.message);
+    console.error("[cron] Error:", err.message);
   } finally { client.release(); }
 }
 
@@ -495,71 +459,72 @@ async function obtenerConfigCron(req, res) {
   try {
     await ensureConfigCronTable();
     const { rows } = await pool.query(`SELECT * FROM backup_config_cron LIMIT 1`);
-    const config   = rows[0] || { activo: false, frecuencia: "diario", hora: 2, dia_semana: 1 };
-    const activo   = cronJob !== null;
-
+    const config   = rows[0] || { activo: false, frecuencia: "diario", hora: 2, dia_semana: 1, tablas: null };
     return res.json({
       success: true,
       data: {
-        activo:        config.activo && activo,
-        frecuencia:    config.frecuencia,
-        hora:          config.hora,
-        dia_semana:    config.dia_semana,
-        ultimo_cron:   config.ultimo_cron,
-        proximo_cron:  config.activo
+        id:                config.id,
+        activo:            config.activo && cronJob !== null,
+        frecuencia:        config.frecuencia,
+        hora:              config.hora,
+        dia_semana:        config.dia_semana,
+        tablas:            config.tablas ?? null,
+        ultima_ejecucion:  config.ultimo_cron ?? null,
+        proxima_ejecucion: config.activo
           ? calcularProximoCron(config.frecuencia, config.hora, config.dia_semana)
           : null,
       },
     });
   } catch (err) {
-    console.error("Error obtener config cron:", err);
     return res.status(500).json({ success: false, message: "Error al obtener configuración" });
   }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
 // CONTROLADOR: Guardar config cron  POST /api/admin/backups/cron
-// Body: { activo, frecuencia, hora, dia_semana }
+// Body: { activo, frecuencia, hora, dia_semana, tablas }
+//   tablas: null | [] → cron hará backup completo
+//   tablas: ["obras","artistas"] → cron hará backup selectivo
 // ══════════════════════════════════════════════════════════════════════════════
 async function guardarConfigCron(req, res) {
   const adminId = req.user?.id_usuario ?? null;
-  const { activo, frecuencia, hora, dia_semana } = req.body || {};
+  const { activo, frecuencia, hora, dia_semana, tablas } = req.body || {};
 
-  const frecuenciasValidas = ["diario", "semanal", "mensual"];
-  if (!frecuenciasValidas.includes(frecuencia))
+  if (!["diario","semanal","mensual"].includes(frecuencia))
     return res.status(400).json({ success: false, message: "Frecuencia inválida" });
   if (hora < 0 || hora > 23)
     return res.status(400).json({ success: false, message: "Hora inválida (0-23)" });
+
+  // Array vacío equivale a "backup completo" → guardar null
+  const tablasAGuardar = Array.isArray(tablas) && tablas.length > 0 ? tablas : null;
 
   try {
     await ensureConfigCronTable();
     await pool.query(`
       UPDATE backup_config_cron SET
-        activo       = $1,
-        frecuencia   = $2,
-        hora         = $3,
-        dia_semana   = $4,
-        id_admin     = $5,
+        activo         = $1,
+        frecuencia     = $2,
+        hora           = $3,
+        dia_semana     = $4,
+        tablas         = $5,
+        id_admin       = $6,
         actualizado_en = NOW()
       WHERE id = 1
-    `, [activo, frecuencia, hora, dia_semana ?? 1, adminId]);
+    `, [activo, frecuencia, hora, dia_semana ?? 1, tablasAGuardar ? JSON.stringify(tablasAGuardar) : null, adminId]);
 
-    // Reiniciar cron job
     if (cronJob) { cronJob.stop(); cronJob = null; }
-
     if (activo) {
       const expr = buildCronExpression(frecuencia, hora, dia_semana ?? 1);
       cronJob    = cron.schedule(expr, ejecutarBackupAutomatico, { timezone: "America/Mexico_City" });
-      console.log(`[cron] Programado: ${expr} (${frecuencia} a las ${hora}:00)`);
-    } else {
-      console.log("[cron] Backup automático desactivado");
+      console.log(`[cron] Programado: ${expr} — ${tablasAGuardar ? `${tablasAGuardar.length} tablas` : "completo"}`);
     }
 
-    const proximo = activo
-      ? calcularProximoCron(frecuencia, hora, dia_semana ?? 1)
-      : null;
-
-    return res.json({ success: true, message: activo ? "Backup automático activado" : "Backup automático desactivado", proximo_cron: proximo });
+    const proximo = activo ? calcularProximoCron(frecuencia, hora, dia_semana ?? 1) : null;
+    return res.json({
+      success: true,
+      message: activo ? "Backup automático activado" : "Backup automático desactivado",
+      data: { activo, frecuencia, hora, dia_semana, tablas: tablasAGuardar, proxima_ejecucion: proximo },
+    });
   } catch (err) {
     console.error("Error guardar config cron:", err);
     return res.status(500).json({ success: false, message: "Error al guardar configuración" });
@@ -595,27 +560,22 @@ async function eliminarBackup(req, res) {
   const { id } = req.params;
   const client = await pool.connect();
   try {
-    const { rows } = await client.query(
-      `SELECT nombre_archivo FROM backups_historial WHERE id = $1`, [id]
-    );
+    const { rows } = await client.query(`SELECT nombre_archivo FROM backups_historial WHERE id = $1`, [id]);
     if (!rows.length) return res.status(404).json({ success: false, message: "Backup no encontrado" });
     const { nombre_archivo } = rows[0];
     if (nombre_archivo) {
       const { error } = await supabase.storage.from(BUCKET).remove([nombre_archivo]);
-      if (error) console.warn(`[backup] Storage remove warning:`, error.message);
-      else console.log(`[backup] Eliminado de Storage: ${nombre_archivo}`);
+      if (error) console.warn(`[backup] Storage remove:`, error.message);
     }
     await client.query(`DELETE FROM backups_historial WHERE id = $1`, [id]);
     return res.json({ success: true, message: "Backup eliminado correctamente" });
   } catch (err) {
-    console.error("Error eliminando backup:", err);
     return res.status(500).json({ success: false, message: "Error al eliminar", error: err.message });
   } finally { client.release(); }
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// INIT: Restaurar cron al iniciar el servidor
-// Llama a iniciarCron() en tu server.js al arrancar
+// INIT: Restaurar cron al arrancar el servidor → importar y llamar en server.js
 // ══════════════════════════════════════════════════════════════════════════════
 async function iniciarCron() {
   try {
@@ -625,15 +585,14 @@ async function iniciarCron() {
     if (!config?.activo) return;
     const expr = buildCronExpression(config.frecuencia, config.hora, config.dia_semana);
     cronJob    = cron.schedule(expr, ejecutarBackupAutomatico, { timezone: "America/Mexico_City" });
-    console.log(`[cron] Backup automático restaurado: ${expr}`);
+    console.log(`[cron] Restaurado: ${expr} — ${config.tablas ? `${config.tablas.length} tablas selectivas` : "backup completo"}`);
   } catch (err) {
-    console.warn("[cron] No se pudo restaurar config:", err.message);
+    console.warn("[cron] No se pudo restaurar:", err.message);
   }
 }
 
 export {
   generarBackup,
-  generarBackupSelectivo,
   obtenerSaludTablas,
   obtenerHistorial,
   eliminarBackup,
