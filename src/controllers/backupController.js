@@ -2,6 +2,7 @@
 import { pool }         from "../config/db.js";
 import { createClient } from "@supabase/supabase-js";
 import crypto           from "crypto";
+import cron             from "node-cron";
 
 const supabase    = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 const BUCKET      = "backups";
@@ -162,14 +163,13 @@ async function subirAStorage(nombreArchivo, buffer) {
   if (error) throw new Error(`Storage upload: ${error.message}`);
   const { data, error: urlError } = await supabase.storage
     .from(BUCKET)
-    .createSignedUrl(nombreArchivo, 60 * 60 * 24 * 7); // 7 días
+    .createSignedUrl(nombreArchivo, 60 * 60 * 24 * 7);
   if (urlError) throw new Error(`Signed URL: ${urlError.message}`);
   return data.signedUrl;
 }
 
 async function limpiarBackupsAntiguos(client) {
   try {
-    // Solo aplica sobre los que tienen url_archivo (están en Storage)
     const { rows: antiguos } = await client.query(`
       SELECT id, nombre_archivo FROM backups_historial
       WHERE url_archivo IS NOT NULL
@@ -213,8 +213,61 @@ async function guardarHistorial(client, adminId, stats) {
   } catch (err) { console.warn("Historial backup no guardado:", err.message); }
 }
 
+// ── Core: construir SQL para un set de tablas ─────────────────────────────────
+async function construirSQL(client, tablasSeleccionadas, label = "Respaldo completo") {
+  const ahora = new Date();
+  let sql = "", filasTotal = 0, tablasOk = 0;
+  const esquemas = {};
+
+  sql += `-- =============================================\n-- Nu-B Studio — ${label}\n-- Fecha: ${ahora.toLocaleString("es-MX")}\n-- Tablas: ${tablasSeleccionadas.join(", ")}\n-- =============================================\n\n`;
+  sql += `SET client_encoding = 'UTF8';\nSET standard_conforming_strings = on;\nSET check_function_bodies = false;\nSET client_min_messages = warning;\n\n`;
+  sql += `-- =============================================\n-- SECCIÓN 1: ESQUEMA\n-- =============================================\n\n`;
+
+  for (const tabla of tablasSeleccionadas) {
+    const esq = await obtenerEsquemaTabla(client, tabla);
+    if (!esq) continue;
+    esquemas[tabla] = true;
+    sql += `-- Tabla: ${tabla}\nDROP TABLE IF EXISTS "${tabla}" CASCADE;\n${esq}\n\n`;
+    const idx = await obtenerIndices(client, tabla);
+    if (idx) sql += idx + "\n\n";
+  }
+
+  sql += `-- =============================================\n-- SECCIÓN 2: DATOS\n-- =============================================\n\n`;
+  for (const tabla of tablasSeleccionadas) {
+    if (!esquemas[tabla]) continue;
+    let conteo = 0;
+    try { const r = await client.query(`SELECT COUNT(*) FROM "${tabla}"`); conteo = parseInt(r.rows[0].count, 10); }
+    catch { sql += `-- Tabla: ${tabla} (no accesible)\n\n`; continue; }
+    tablasOk++;
+    sql += `-- Tabla: ${tabla} (${conteo} filas)\n`;
+    if (!conteo) { sql += `-- (sin datos)\n`; }
+    else {
+      try {
+        const colRes = await client.query(`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position`, [tabla]);
+        const cols = colRes.rows.map(r => `"${r.column_name}"`);
+        const LOTE = 500;
+        for (let off = 0; off < conteo; off += LOTE) {
+          const data = await client.query(`SELECT * FROM "${tabla}" ORDER BY 1 LIMIT ${LOTE} OFFSET ${off}`);
+          if (!data.rows.length) break;
+          sql += `INSERT INTO "${tabla}" (${cols.join(", ")}) VALUES\n`;
+          sql += data.rows.map(row => `  (${Object.values(row).map(escaparValor).join(", ")})`).join(",\n");
+          sql += `\nON CONFLICT DO NOTHING;\n`;
+        }
+        filasTotal += conteo;
+      } catch (err) { sql += `-- ERROR datos ${tabla}: ${err.message}\n`; }
+    }
+    const seq = await resetSecuencia(client, tabla);
+    if (seq) sql += seq + "\n";
+    sql += "\n";
+  }
+
+  const md5 = checksum(sql), bytes = Buffer.byteLength(sql, "utf8");
+  sql += `-- Tablas: ${tablasOk} | Filas: ${filasTotal} | MD5: ${md5}\n`;
+  return { sql, filasTotal, tablasOk, md5, bytes };
+}
+
 // ══════════════════════════════════════════════════════════════════════════════
-// CONTROLADOR: Generar backup
+// CONTROLADOR: Generar backup completo (original)
 // ══════════════════════════════════════════════════════════════════════════════
 async function generarBackup(req, res) {
   const t0      = Date.now();
@@ -225,53 +278,8 @@ async function generarBackup(req, res) {
     const ts      = ahora.toISOString().replace(/[:.]/g, "-").slice(0, 19);
     const archivo = `nub-studio-backup-${ts}.sql`;
     const TABLAS_ORDEN = await descubrirTablas(client);
-    let sql = "", filasTotal = 0, tablasOk = 0;
-    const esquemas = {};
-
-    sql += `-- =============================================\n-- Nu-B Studio — Respaldo completo\n-- Fecha: ${ahora.toLocaleString("es-MX")}\n-- =============================================\n\n`;
-    sql += `SET client_encoding = 'UTF8';\nSET standard_conforming_strings = on;\nSET check_function_bodies = false;\nSET client_min_messages = warning;\n\n`;
-    sql += `-- =============================================\n-- SECCIÓN 1: ESQUEMA\n-- =============================================\n\n`;
-
-    for (const tabla of TABLAS_ORDEN) {
-      const esq = await obtenerEsquemaTabla(client, tabla);
-      if (!esq) continue;
-      esquemas[tabla] = true;
-      sql += `-- Tabla: ${tabla}\nDROP TABLE IF EXISTS "${tabla}" CASCADE;\n${esq}\n\n`;
-      const idx = await obtenerIndices(client, tabla);
-      if (idx) sql += idx + "\n\n";
-    }
-
-    sql += `-- =============================================\n-- SECCIÓN 2: DATOS\n-- =============================================\n\n`;
-    for (const tabla of TABLAS_ORDEN) {
-      if (!esquemas[tabla]) continue;
-      let conteo = 0;
-      try { const r = await client.query(`SELECT COUNT(*) FROM "${tabla}"`); conteo = parseInt(r.rows[0].count, 10); }
-      catch { sql += `-- Tabla: ${tabla} (no accesible)\n\n`; continue; }
-      tablasOk++;
-      sql += `-- Tabla: ${tabla} (${conteo} filas)\n`;
-      if (!conteo) { sql += `-- (sin datos)\n`; }
-      else {
-        try {
-          const colRes = await client.query(`SELECT column_name FROM information_schema.columns WHERE table_schema = 'public' AND table_name = $1 ORDER BY ordinal_position`, [tabla]);
-          const cols = colRes.rows.map(r => `"${r.column_name}"`);
-          const LOTE = 500;
-          for (let off = 0; off < conteo; off += LOTE) {
-            const data = await client.query(`SELECT * FROM "${tabla}" ORDER BY 1 LIMIT ${LOTE} OFFSET ${off}`);
-            if (!data.rows.length) break;
-            sql += `INSERT INTO "${tabla}" (${cols.join(", ")}) VALUES\n`;
-            sql += data.rows.map(row => `  (${Object.values(row).map(escaparValor).join(", ")})`).join(",\n");
-            sql += `\nON CONFLICT DO NOTHING;\n`;
-          }
-          filasTotal += conteo;
-        } catch (err) { sql += `-- ERROR datos ${tabla}: ${err.message}\n`; }
-      }
-      const seq = await resetSecuencia(client, tabla);
-      if (seq) sql += seq + "\n";
-      sql += "\n";
-    }
-
-    const ms = Date.now() - t0, md5 = checksum(sql), bytes = Buffer.byteLength(sql, "utf8");
-    sql += `-- Tablas: ${tablasOk} | Filas: ${filasTotal} | MD5: ${md5}\n`;
+    const { sql, filasTotal, tablasOk, md5, bytes } = await construirSQL(client, TABLAS_ORDEN);
+    const ms  = Date.now() - t0;
     const buf = Buffer.from(sql, "utf8");
 
     let urlArchivo = null;
@@ -297,7 +305,269 @@ async function generarBackup(req, res) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// CONTROLADOR: Historial — SOLO backups guardados en Storage
+// CONTROLADOR: Backup SELECTIVO  POST /api/admin/backup/selectivo
+// Body: { tablas: ["obras", "artistas", ...] }
+// ══════════════════════════════════════════════════════════════════════════════
+async function generarBackupSelectivo(req, res) {
+  const t0       = Date.now();
+  const adminId  = req.user?.id_usuario ?? req.user?.sub ?? null;
+  const { tablas: tablasBody } = req.body || {};
+
+  if (!Array.isArray(tablasBody) || tablasBody.length === 0)
+    return res.status(400).json({ success: false, message: "Debes seleccionar al menos una tabla" });
+
+  const client = await pool.connect();
+  try {
+    // Verificar que las tablas existen (seguridad)
+    const todasTablas = await descubrirTablas(client);
+    const tablasSet   = new Set(todasTablas);
+    const tablasValidas = tablasBody.filter(t => tablasSet.has(t));
+    if (!tablasValidas.length)
+      return res.status(400).json({ success: false, message: "Ninguna tabla seleccionada es válida" });
+
+    // Mantener orden topológico
+    const tablasOrdenadas = todasTablas.filter(t => tablasValidas.includes(t));
+
+    const ahora   = new Date();
+    const ts      = ahora.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    const archivo = `nub-studio-backup-selectivo-${ts}.sql`;
+
+    const { sql, filasTotal, tablasOk, md5, bytes } = await construirSQL(client, tablasOrdenadas, `Respaldo selectivo (${tablasValidas.length} tablas)`);
+    const ms  = Date.now() - t0;
+    const buf = Buffer.from(sql, "utf8");
+
+    // Subir a Storage (sin contar para el límite de 3 completos)
+    let urlArchivo = null;
+    try { urlArchivo = await subirAStorage(archivo, buf); }
+    catch (err) { console.warn("[backup selectivo] Storage:", err.message); }
+
+    // Guardar en historial (sin limpiar automático para selectivos)
+    await guardarHistorial(client, adminId, { tablas: tablasOk, filas: filasTotal, bytes, ms, md5, archivo, url: urlArchivo });
+
+    res.setHeader("Content-Type",        "application/sql");
+    res.setHeader("Content-Disposition", `attachment; filename="${archivo}"`);
+    res.setHeader("Content-Length",      buf.length);
+    res.setHeader("X-Backup-Checksum",   md5);
+    res.setHeader("X-Backup-Tables",     tablasOk);
+    res.setHeader("X-Backup-Rows",       filasTotal);
+    res.setHeader("X-Backup-Duration",   ms);
+    return res.status(200).send(buf);
+  } catch (err) {
+    console.error("Error backup selectivo:", err);
+    return res.status(500).json({ success: false, message: "Error al generar respaldo selectivo", error: err.message });
+  } finally { client.release(); }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CONTROLADOR: Salud de tablas  GET /api/admin/backups/salud
+// ══════════════════════════════════════════════════════════════════════════════
+async function obtenerSaludTablas(req, res) {
+  const client = await pool.connect();
+  try {
+    const tablas = await descubrirTablas(client);
+
+    const resultados = await Promise.all(tablas.map(async (tabla) => {
+      try {
+        const [countRes, sizeRes] = await Promise.all([
+          client.query(`SELECT COUNT(*) AS filas FROM "${tabla}"`),
+          client.query(`SELECT pg_relation_size($1::regclass) AS bytes`, [`public.${tabla}`]),
+        ]);
+        return {
+          tabla,
+          filas:  parseInt(countRes.rows[0].filas, 10),
+          bytes:  parseInt(sizeRes.rows[0].bytes, 10) || 0,
+        };
+      } catch {
+        return { tabla, filas: 0, bytes: 0 };
+      }
+    }));
+
+    // Orden: más filas primero
+    resultados.sort((a, b) => b.filas - a.filas);
+
+    const totalFilas  = resultados.reduce((s, r) => s + r.filas, 0);
+    const totalBytes  = resultados.reduce((s, r) => s + r.bytes, 0);
+    const maxFilas    = Math.max(...resultados.map(r => r.filas), 1);
+
+    return res.json({
+      success: true,
+      data: {
+        tablas:     resultados,
+        totalFilas,
+        totalBytes,
+        maxFilas,
+        numTablas:  resultados.length,
+      },
+    });
+  } catch (err) {
+    console.error("Error salud tablas:", err);
+    return res.status(500).json({ success: false, message: "Error al obtener salud de tablas" });
+  } finally { client.release(); }
+}
+
+// ── Helper: crear tabla config cron ──────────────────────────────────────────
+async function ensureConfigCronTable() {
+  await pool.query(`
+    CREATE TABLE IF NOT EXISTS backup_config_cron (
+      id SERIAL PRIMARY KEY,
+      activo BOOLEAN DEFAULT FALSE,
+      frecuencia VARCHAR(20) DEFAULT 'diario',
+      hora INTEGER DEFAULT 2,
+      dia_semana INTEGER DEFAULT 1,
+      ultimo_cron TIMESTAMPTZ,
+      proximo_cron TIMESTAMPTZ,
+      id_admin INTEGER REFERENCES usuarios(id_usuario) ON DELETE SET NULL,
+      actualizado_en TIMESTAMPTZ DEFAULT NOW()
+    )
+  `);
+  // Insertar config por defecto si no existe
+  await pool.query(`
+    INSERT INTO backup_config_cron (activo, frecuencia, hora, dia_semana)
+    SELECT FALSE, 'diario', 2, 1
+    WHERE NOT EXISTS (SELECT 1 FROM backup_config_cron)
+  `);
+}
+
+// ── Estado del cron job en memoria ───────────────────────────────────────────
+let cronJob = null;
+
+function calcularProximoCron(frecuencia, hora, diaSemana) {
+  const ahora = new Date();
+  const prox  = new Date();
+  prox.setSeconds(0, 0);
+  prox.setHours(hora, 0, 0, 0);
+
+  if (frecuencia === "diario") {
+    if (prox <= ahora) prox.setDate(prox.getDate() + 1);
+  } else if (frecuencia === "semanal") {
+    // dia_semana: 0=dom...6=sab
+    const hoy = ahora.getDay();
+    let diff  = (diaSemana - hoy + 7) % 7;
+    if (diff === 0 && prox <= ahora) diff = 7;
+    prox.setDate(prox.getDate() + diff);
+  } else if (frecuencia === "mensual") {
+    prox.setDate(1);
+    if (prox <= ahora) { prox.setMonth(prox.getMonth() + 1); prox.setDate(1); }
+  }
+  return prox;
+}
+
+function buildCronExpression(frecuencia, hora, diaSemana) {
+  if (frecuencia === "diario")   return `0 ${hora} * * *`;
+  if (frecuencia === "semanal")  return `0 ${hora} * * ${diaSemana}`;
+  if (frecuencia === "mensual")  return `0 ${hora} 1 * *`;
+  return `0 ${hora} * * *`;
+}
+
+async function ejecutarBackupAutomatico() {
+  console.log("[cron] Iniciando backup automático...");
+  const client = await pool.connect();
+  try {
+    const tablas  = await descubrirTablas(client);
+    const ahora   = new Date();
+    const ts      = ahora.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    const archivo = `nub-studio-backup-auto-${ts}.sql`;
+    const t0      = Date.now();
+
+    const { sql, filasTotal, tablasOk, md5, bytes } = await construirSQL(client, tablas, "Backup automático");
+    const ms  = Date.now() - t0;
+    const buf = Buffer.from(sql, "utf8");
+
+    let urlArchivo = null;
+    try { urlArchivo = await subirAStorage(archivo, buf); }
+    catch (err) { console.warn("[cron] Storage:", err.message); }
+
+    await guardarHistorial(client, null, { tablas: tablasOk, filas: filasTotal, bytes, ms, md5, archivo, url: urlArchivo });
+    await limpiarBackupsAntiguos(client);
+
+    // Actualizar ultimo_cron en config
+    await pool.query(`UPDATE backup_config_cron SET ultimo_cron = NOW() WHERE id = 1`);
+    console.log(`[cron] Backup automático exitoso: ${archivo} (${filasTotal} filas, ${ms}ms)`);
+  } catch (err) {
+    console.error("[cron] Error en backup automático:", err.message);
+  } finally { client.release(); }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CONTROLADOR: Obtener config cron  GET /api/admin/backups/cron
+// ══════════════════════════════════════════════════════════════════════════════
+async function obtenerConfigCron(req, res) {
+  try {
+    await ensureConfigCronTable();
+    const { rows } = await pool.query(`SELECT * FROM backup_config_cron LIMIT 1`);
+    const config   = rows[0] || { activo: false, frecuencia: "diario", hora: 2, dia_semana: 1 };
+    const activo   = cronJob !== null;
+
+    return res.json({
+      success: true,
+      data: {
+        activo:        config.activo && activo,
+        frecuencia:    config.frecuencia,
+        hora:          config.hora,
+        dia_semana:    config.dia_semana,
+        ultimo_cron:   config.ultimo_cron,
+        proximo_cron:  config.activo
+          ? calcularProximoCron(config.frecuencia, config.hora, config.dia_semana)
+          : null,
+      },
+    });
+  } catch (err) {
+    console.error("Error obtener config cron:", err);
+    return res.status(500).json({ success: false, message: "Error al obtener configuración" });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CONTROLADOR: Guardar config cron  POST /api/admin/backups/cron
+// Body: { activo, frecuencia, hora, dia_semana }
+// ══════════════════════════════════════════════════════════════════════════════
+async function guardarConfigCron(req, res) {
+  const adminId = req.user?.id_usuario ?? null;
+  const { activo, frecuencia, hora, dia_semana } = req.body || {};
+
+  const frecuenciasValidas = ["diario", "semanal", "mensual"];
+  if (!frecuenciasValidas.includes(frecuencia))
+    return res.status(400).json({ success: false, message: "Frecuencia inválida" });
+  if (hora < 0 || hora > 23)
+    return res.status(400).json({ success: false, message: "Hora inválida (0-23)" });
+
+  try {
+    await ensureConfigCronTable();
+    await pool.query(`
+      UPDATE backup_config_cron SET
+        activo       = $1,
+        frecuencia   = $2,
+        hora         = $3,
+        dia_semana   = $4,
+        id_admin     = $5,
+        actualizado_en = NOW()
+      WHERE id = 1
+    `, [activo, frecuencia, hora, dia_semana ?? 1, adminId]);
+
+    // Reiniciar cron job
+    if (cronJob) { cronJob.stop(); cronJob = null; }
+
+    if (activo) {
+      const expr = buildCronExpression(frecuencia, hora, dia_semana ?? 1);
+      cronJob    = cron.schedule(expr, ejecutarBackupAutomatico, { timezone: "America/Mexico_City" });
+      console.log(`[cron] Programado: ${expr} (${frecuencia} a las ${hora}:00)`);
+    } else {
+      console.log("[cron] Backup automático desactivado");
+    }
+
+    const proximo = activo
+      ? calcularProximoCron(frecuencia, hora, dia_semana ?? 1)
+      : null;
+
+    return res.json({ success: true, message: activo ? "Backup automático activado" : "Backup automático desactivado", proximo_cron: proximo });
+  } catch (err) {
+    console.error("Error guardar config cron:", err);
+    return res.status(500).json({ success: false, message: "Error al guardar configuración" });
+  }
+}
+
+// ══════════════════════════════════════════════════════════════════════════════
+// CONTROLADOR: Historial
 // ══════════════════════════════════════════════════════════════════════════════
 async function obtenerHistorial(req, res) {
   try {
@@ -319,7 +589,7 @@ async function obtenerHistorial(req, res) {
 }
 
 // ══════════════════════════════════════════════════════════════════════════════
-// CONTROLADOR: Eliminar backup (Storage + BD)
+// CONTROLADOR: Eliminar backup
 // ══════════════════════════════════════════════════════════════════════════════
 async function eliminarBackup(req, res) {
   const { id } = req.params;
@@ -329,19 +599,13 @@ async function eliminarBackup(req, res) {
       `SELECT nombre_archivo FROM backups_historial WHERE id = $1`, [id]
     );
     if (!rows.length) return res.status(404).json({ success: false, message: "Backup no encontrado" });
-
     const { nombre_archivo } = rows[0];
-
-    // 1. Borrar de Supabase Storage
     if (nombre_archivo) {
       const { error } = await supabase.storage.from(BUCKET).remove([nombre_archivo]);
       if (error) console.warn(`[backup] Storage remove warning:`, error.message);
       else console.log(`[backup] Eliminado de Storage: ${nombre_archivo}`);
     }
-
-    // 2. Borrar de BD
     await client.query(`DELETE FROM backups_historial WHERE id = $1`, [id]);
-
     return res.json({ success: true, message: "Backup eliminado correctamente" });
   } catch (err) {
     console.error("Error eliminando backup:", err);
@@ -349,4 +613,31 @@ async function eliminarBackup(req, res) {
   } finally { client.release(); }
 }
 
-export { generarBackup, obtenerHistorial, eliminarBackup };
+// ══════════════════════════════════════════════════════════════════════════════
+// INIT: Restaurar cron al iniciar el servidor
+// Llama a iniciarCron() en tu server.js al arrancar
+// ══════════════════════════════════════════════════════════════════════════════
+async function iniciarCron() {
+  try {
+    await ensureConfigCronTable();
+    const { rows } = await pool.query(`SELECT * FROM backup_config_cron LIMIT 1`);
+    const config   = rows[0];
+    if (!config?.activo) return;
+    const expr = buildCronExpression(config.frecuencia, config.hora, config.dia_semana);
+    cronJob    = cron.schedule(expr, ejecutarBackupAutomatico, { timezone: "America/Mexico_City" });
+    console.log(`[cron] Backup automático restaurado: ${expr}`);
+  } catch (err) {
+    console.warn("[cron] No se pudo restaurar config:", err.message);
+  }
+}
+
+export {
+  generarBackup,
+  generarBackupSelectivo,
+  obtenerSaludTablas,
+  obtenerHistorial,
+  eliminarBackup,
+  obtenerConfigCron,
+  guardarConfigCron,
+  iniciarCron,
+};

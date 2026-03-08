@@ -1,21 +1,21 @@
 import pkg from 'pg';
 const { Pool } = pkg;
-import dotenv from "dotenv";
-import logger from './logger.js';
+import dotenv  from "dotenv";
+import logger  from './logger.js';
 
 dotenv.config();
 
 export const pool = new Pool({
-  host: process.env.DB_HOST,
-  user: process.env.DB_USER,
+  host:     process.env.DB_HOST,
+  user:     process.env.DB_USER,
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
-  port: parseInt(process.env.DB_PORT, 10) || 5432,
-  max: 10,
-  idleTimeoutMillis: 30000,
+  port:     parseInt(process.env.DB_PORT, 10) || 5432,
+  max:                    10,
+  idleTimeoutMillis:      30000,
   connectionTimeoutMillis: 2000,
-  ssl: false,
-  application_name: 'nuub_studio_backend'
+  ssl:              false,
+  application_name: 'nuub_studio_backend',
 });
 
 export const poolPromise = pool;
@@ -31,7 +31,7 @@ export const testConnection = async () => {
     return true;
   } catch (error) {
     logger.error(`Error de conexion a PostgreSQL: ${error.message}`);
-    logger.error('Verifica que PostgreSQL este corriendo, las credenciales en .env sean correctas y que la base de datos nuub_studio exista');
+    logger.error('Verifica que PostgreSQL este corriendo y las credenciales en .env sean correctas');
     return false;
   } finally {
     if (client) client.release();
@@ -43,8 +43,8 @@ pool.on('connect', () => {
 });
 
 pool.on('error', (err) => {
-  logger.error(`Error inesperado en el pool de PostgreSQL: ${err.message}`);
-  process.exit(-1);
+  // ⚠️  NO hacer process.exit() aquí — deja que el pool se recupere solo
+  logger.error(`Error en el pool de PostgreSQL: ${err.message}`);
 });
 
 pool.on('remove', () => {
@@ -53,21 +53,16 @@ pool.on('remove', () => {
 
 export const queryWithRetry = async (sql, params, maxRetries = 3) => {
   let lastError;
-
   for (let i = 0; i < maxRetries; i++) {
     try {
-      const result = await pool.query(sql, params);
-      return result;
+      return await pool.query(sql, params);
     } catch (error) {
       lastError = error;
       logger.error(`Intento ${i + 1}/${maxRetries} fallo: ${error.message}`);
-
-      if (i < maxRetries - 1) {
+      if (i < maxRetries - 1)
         await new Promise(resolve => setTimeout(resolve, Math.pow(2, i) * 1000));
-      }
     }
   }
-
   throw lastError;
 };
 

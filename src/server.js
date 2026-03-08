@@ -1,31 +1,43 @@
 // =========================================================
 // 📦 IMPORTACIONES
 // =========================================================
-import tecnicasRoutes from "./routes/tecnicasRoutes.js";
-import express from 'express';
-import cors from 'cors';
-import cron from 'node-cron';
-import dotenv from 'dotenv';
-import helmet from 'helmet';
-import authRoutes from './routes/authRoutes.js';
-import recoveryRoutes from './routes/recoveryRoutes.js';
-import twoFactorRoutes from './routes/twoFactorRoutes.js';
-import gmail2faRoutes from "./routes/gmail2faRoutes.js";
-import obrasRoutes from './routes/obrasRoutes.js';
-import categoriasRoutes from './routes/categoriasRoutes.js';
-import artistasRoutes from './routes/Artistasroutes.js';
-import etiquetasRoutes from './routes/etiquetasRoutes.js';
-import imagenesRoutes from './routes/imagenesRoutes.js';
-import { testConnection } from './config/db.js';
-import { cleanupExpiredCodes, sendRecoveryCode, generateCode } from './services/emailService.js';
-import { cleanupExpiredSessions } from './services/sessionService.js';
-import { sanitizeInput } from './middlewares/sanitize.middleware.js';
-import { preventSQLInjection } from './middlewares/sql-injection.middleware.js';
-import statsRoutes from "./routes/statsRoutes.js";
+import tecnicasRoutes      from "./routes/tecnicasRoutes.js";
+import express             from 'express';
+import cors                from 'cors';
+import cron                from 'node-cron';
+import dotenv              from 'dotenv';
+import helmet              from 'helmet';
+import authRoutes          from './routes/authRoutes.js';
+import recoveryRoutes      from './routes/recoveryRoutes.js';
+import twoFactorRoutes     from './routes/twoFactorRoutes.js';
+import gmail2faRoutes      from "./routes/gmail2faRoutes.js";
+import obrasRoutes         from './routes/obrasRoutes.js';
+import categoriasRoutes    from './routes/categoriasRoutes.js';
+import artistasRoutes      from './routes/Artistasroutes.js';
+import etiquetasRoutes     from './routes/etiquetasRoutes.js';
+import imagenesRoutes      from './routes/imagenesRoutes.js';
+import statsRoutes         from "./routes/statsRoutes.js";
 import artistaPortalRoutes from './routes/artistaPortalRoutes.js';
-import logger from './config/logger.js';
-import adminRoutes from './routes/adminRoutes.js';
-import reportesRoutes from './routes/reportesRoutes.js'; 
+import adminRoutes         from './routes/adminRoutes.js';
+import reportesRoutes      from './routes/reportesRoutes.js';
+import { testConnection }                                      from './config/db.js';
+import { cleanupExpiredCodes, sendRecoveryCode, generateCode } from './services/emailService.js';
+import { cleanupExpiredSessions }                              from './services/sessionService.js';
+import { sanitizeInput }                                       from './middlewares/sanitize.middleware.js';
+import { preventSQLInjection }                                 from './middlewares/sql-injection.middleware.js';
+import logger                                                  from './config/logger.js';
+import { iniciarCron }                                         from './controllers/backupController.js';
+
+// =========================================================
+// MANEJO DE ERRORES NO CAPTURADOS  ← evita crash por pg
+// =========================================================
+process.on('uncaughtException', (err) => {
+  logger.error(`uncaughtException: ${err.message}`);
+});
+process.on('unhandledRejection', (reason) => {
+  logger.error(`unhandledRejection: ${reason}`);
+});
+
 // =========================================================
 // CONFIGURACION INICIAL
 // =========================================================
@@ -33,15 +45,15 @@ dotenv.config();
 const app = express();
 
 // =========================================================
-// HELMET - HEADERS DE SEGURIDAD
+// HELMET
 // =========================================================
 app.use(helmet({
-  contentSecurityPolicy: false,
-  crossOriginEmbedderPolicy: false
+  contentSecurityPolicy:     false,
+  crossOriginEmbedderPolicy: false,
 }));
 
 // =========================================================
-// CONFIGURACION DE CORS
+// CORS  (una sola vez, con exposedHeaders para backups)
 // =========================================================
 const allowedOrigins = [
   process.env.FRONTEND_URL,
@@ -52,111 +64,88 @@ const allowedOrigins = [
 app.use(cors({
   origin: function (origin, callback) {
     if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      logger.warn(`Bloqueado por CORS: ${origin}`);
-      return callback(new Error('Origen no permitido por CORS'), false);
-    }
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    logger.warn(`Bloqueado por CORS: ${origin}`);
+    return callback(new Error('Origen no permitido por CORS'), false);
   },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH','OPTIONS'],
+  credentials:    true,
+  methods:        ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
+  exposedHeaders: [
+    'Content-Disposition',
+    'X-Backup-Rows',
+    'X-Backup-Tables',
+    'X-Backup-Duration',
+    'X-Backup-Checksum',
+    'X-Backup-Url',
+  ],
 }));
 
 // =========================================================
-// MIDDLEWARES
+// MIDDLEWARES GLOBALES
 // =========================================================
 app.use(express.json({ limit: '10mb' }));
 app.use(sanitizeInput);
 app.use(preventSQLInjection);
 
 // =========================================================
-// RUTAS PRINCIPALES
+// RUTAS
 // =========================================================
-app.use('/api/auth', authRoutes);
-app.use('/api/recovery', recoveryRoutes);
-app.use('/api/2fa', twoFactorRoutes);
-app.use("/api/gmail-2fa", gmail2faRoutes);
-app.use('/api/gmail2fa', gmail2faRoutes);
-app.use('/api/imagenes', imagenesRoutes);
-app.use('/api/obras', obrasRoutes);
-app.use('/api/categorias', categoriasRoutes);
-app.use('/api/artistas', artistasRoutes);
-app.use('/api/etiquetas', etiquetasRoutes);
+app.use('/api/auth',           authRoutes);
+app.use('/api/recovery',       recoveryRoutes);
+app.use('/api/2fa',            twoFactorRoutes);
+app.use("/api/gmail-2fa",      gmail2faRoutes);
+app.use('/api/gmail2fa',       gmail2faRoutes);
+app.use('/api/imagenes',       imagenesRoutes);
+app.use('/api/obras',          obrasRoutes);
+app.use('/api/categorias',     categoriasRoutes);
+app.use('/api/artistas',       artistasRoutes);
+app.use('/api/etiquetas',      etiquetasRoutes);
 app.use('/api/artista-portal', artistaPortalRoutes);
-app.use("/api/tecnicas", tecnicasRoutes);
-app.use("/api/stats", statsRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api/reportes", reportesRoutes); // ← agregar
+app.use("/api/tecnicas",       tecnicasRoutes);
+app.use("/api/stats",          statsRoutes);
+app.use("/api/admin",          adminRoutes);
+app.use("/api/reportes",       reportesRoutes);
 
 // =========================================================
-// RUTA DE PRUEBA DEL SERVIDOR
+// RUTA DE PRUEBA
 // =========================================================
 app.get('/', (req, res) => {
   res.json({
-    message: 'Backend AUTH activo y corriendo correctamente.',
+    message:  'Backend AUTH activo y corriendo correctamente.',
     database: 'PostgreSQL',
-    cors: allowedOrigins,
-    security: {
-      xss: 'enabled',
-      sqlInjection: 'enabled',
-      csrf: 'not-needed (JWT-based)',
-      helmet: 'enabled',
-      https: 'enforced'
-    },
+    cors:     allowedOrigins,
+    security: { xss:'enabled', sqlInjection:'enabled', csrf:'not-needed (JWT-based)', helmet:'enabled' },
     timestamp: new Date().toISOString(),
   });
 });
 
-// =========================================================
-// RUTA DE PRUEBA DE EMAIL (BREVO)
-// =========================================================
 app.get('/api/test-email', async (req, res) => {
   try {
     const testEmail = 'tucorreo@gmail.com';
     const code = generateCode();
-
     logger.info(`Probando envio de correo a ${testEmail}...`);
     await sendRecoveryCode(testEmail, code);
-
-    res.json({
-      message: `Correo de prueba enviado correctamente a ${testEmail}`,
-      code,
-    });
+    res.json({ message: `Correo de prueba enviado a ${testEmail}`, code });
   } catch (error) {
     logger.error(`Error al enviar el correo de prueba: ${error.message}`);
-    res.status(500).json({
-      message: 'Error al enviar correo de prueba',
-      error: error.message,
-    });
+    res.status(500).json({ message: 'Error al enviar correo de prueba', error: error.message });
   }
 });
 
 // =========================================================
-// CRON JOB: Limpieza automatica cada hora
+// CRONS DE SISTEMA
 // =========================================================
 cron.schedule('0 * * * *', async () => {
-  logger.info('Ejecutando limpieza de codigos expirados...');
-  try {
-    await cleanupExpiredCodes();
-    logger.info('Limpieza completada.');
-  } catch (err) {
-    logger.error(`Error en limpieza automatica: ${err.message}`);
-  }
+  logger.info('Limpieza de codigos expirados...');
+  try { await cleanupExpiredCodes(); logger.info('Limpieza completada.'); }
+  catch (err) { logger.error(`Error en limpieza: ${err.message}`); }
 });
 
-// =========================================================
-// CRON JOB: Limpieza de sesiones antiguas cada dia
-// =========================================================
 cron.schedule('0 0 * * *', async () => {
-  logger.info('Ejecutando limpieza de sesiones antiguas...');
-  try {
-    await cleanupExpiredSessions();
-    logger.info('Limpieza de sesiones completada.');
-  } catch (err) {
-    logger.error(`Error en limpieza de sesiones: ${err.message}`);
-  }
+  logger.info('Limpieza de sesiones antiguas...');
+  try { await cleanupExpiredSessions(); logger.info('Sesiones limpiadas.'); }
+  catch (err) { logger.error(`Error limpieza sesiones: ${err.message}`); }
 });
 
 // =========================================================
@@ -175,25 +164,12 @@ app.listen(PORT, async () => {
   } catch (error) {
     logger.error(`Error en la conexion PostgreSQL: ${error.message}`);
   }
+
+  // Restaurar cron de backups automáticos si estaba activo en BD
+  try {
+    await iniciarCron();
+    logger.info('Cron de backups inicializado.');
+  } catch (err) {
+    logger.warn(`Cron de backups no pudo inicializarse: ${err.message}`);
+  }
 });
-app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    } else {
-      logger.warn(`Bloqueado por CORS: ${origin}`);
-      return callback(new Error('Origen no permitido por CORS'), false);
-    }
-  },
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: [                  // ← agrega esto
-    'Content-Disposition',
-    'X-Backup-Rows',
-    'X-Backup-Tables',
-    'X-Backup-Duration',
-    'X-Backup-Checksum',
-  ],
-}));
