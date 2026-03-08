@@ -20,6 +20,7 @@ import statsRoutes         from "./routes/statsRoutes.js";
 import artistaPortalRoutes from './routes/artistaPortalRoutes.js';
 import adminRoutes         from './routes/adminRoutes.js';
 import reportesRoutes      from './routes/reportesRoutes.js';
+import estadosRoutes from       './routes/estadosRoutes.js';
 import { testConnection }                                      from './config/db.js';
 import { cleanupExpiredCodes, sendRecoveryCode, generateCode } from './services/emailService.js';
 import { cleanupExpiredSessions }                              from './services/sessionService.js';
@@ -106,7 +107,7 @@ app.use("/api/tecnicas",       tecnicasRoutes);
 app.use("/api/stats",          statsRoutes);
 app.use("/api/admin",          adminRoutes);
 app.use("/api/reportes",       reportesRoutes);
-
+app.use('/api/estados', estadosRoutes);
 // =========================================================
 // RUTA DE PRUEBA
 // =========================================================

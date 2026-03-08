@@ -326,10 +326,24 @@ export const registroArtista = async (req, res) => {
     if (existeUsuario.rows.length > 0)
       return res.status(400).json({ message: "El correo ya esta registrado" });
 
+    // ── VALIDACIÓN NOMBRE ARTÍSTICO ──────────────────────────
+    if (nombre_artistico && nombre_artistico.trim()) {
+      const existeNombre = await pool.query(
+        "SELECT id_artista FROM artistas WHERE nombre_artistico = $1 AND eliminado = FALSE LIMIT 1",
+        [nombre_artistico.trim()]
+      );
+      if (existeNombre.rows.length > 0) {
+        return res.status(409).json({
+          message: "El nombre artístico ya está registrado en Nu-B Studio.",
+          nombreArtisticoOcupado: true,
+        });
+      }
+    }
+    // ────────────────────────────────────────────────────────
+
     const hash = await bcrypt.hash(contrasena, 12);
     const { token: tokenVerif, expiracion: tokenExp } = generarTokenActivacion();
 
-    // usuario.estado = 'pendiente' hasta verificar email
     const resUsuario = await pool.query(
       `INSERT INTO usuarios (nombre_completo, correo, contraseña_hash, rol, estado, activo, verificado, token_verificacion, token_expiracion)
        VALUES ($1, $2, $3, 'artista', 'pendiente', TRUE, FALSE, $4, $5)
@@ -342,14 +356,12 @@ export const registroArtista = async (req, res) => {
     await pool.query(
       `INSERT INTO artistas (id_usuario, nombre_completo, nombre_artistico, correo, telefono, biografia, id_categoria_principal, estado, activo, eliminado, matricula)
        VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', TRUE, FALSE, $8)`,
-      [id_usuario, nombre_completo, nombre_artistico || null, correo, telefono || null, biografia, id_categoria_principal, matricula]
+      [id_usuario, nombre_completo, nombre_artistico?.trim() || null, correo, telefono || null, biografia, id_categoria_principal, matricula]
     );
 
     logger.info(`Registro artista: usuario ${id_usuario} ${maskEmail(correo)} matrícula ${matricula}`);
 
-    // Email 1: verificar correo
     sendVerificacionEmailArtista(correo, nombre_completo, tokenVerif).catch(() => {});
-    // Email 2: notificar al admin que llegó solicitud
     sendArtistaSolicitudEmail(correo, nombre_completo).catch(() => {});
 
     res.status(201).json({

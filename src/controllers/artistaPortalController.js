@@ -13,12 +13,17 @@ export const getMiPerfil = async (req, res) => {
         a.id_artista, a.nombre_completo, a.nombre_artistico,
         a.biografia, a.foto_perfil, a.correo, a.telefono,
         a.ciudad, a.direccion_taller, a.codigo_postal,
+        a.id_estado_base, e.nombre AS nombre_estado,
+        a.id_categoria_principal, c.nombre AS categoria_nombre,
+        a.dias_preparacion_default,
         a.porcentaje_comision, a.estado, a.fecha_registro,
         a.acepta_envios, a.solo_entrega_personal,
         a.politica_envios, a.politica_devoluciones, a.matricula,
         u.correo AS email_usuario
       FROM artistas a
       JOIN usuarios u ON u.id_usuario = a.id_usuario
+      LEFT JOIN estados_mexico e ON e.id_estado = a.id_estado_base
+      LEFT JOIN categorias c ON c.id_categoria = a.id_categoria_principal
       WHERE a.id_usuario = $1`,
       [usuarioId]
     );
@@ -35,7 +40,8 @@ export const getMiPerfil = async (req, res) => {
 
 // =========================================================
 // PUT /api/artista-portal/mi-perfil
-// El artista edita sus propios datos — NO puede cambiar estado, comisión ni matrícula
+// El artista edita sus propios datos
+// NO puede cambiar: estado, comisión, matrícula
 // =========================================================
 export const actualizarMiPerfil = async (req, res) => {
   try {
@@ -55,7 +61,8 @@ export const actualizarMiPerfil = async (req, res) => {
 
     const {
       nombre_artistico, biografia, telefono, ciudad,
-      direccion_taller, codigo_postal,
+      direccion_taller, codigo_postal, id_estado_base,
+      id_categoria_principal, dias_preparacion_default,
       acepta_envios, solo_entrega_personal,
       politica_envios, politica_devoluciones,
     } = req.body;
@@ -82,29 +89,36 @@ export const actualizarMiPerfil = async (req, res) => {
 
     await pool.query(`
       UPDATE artistas SET
-        nombre_artistico      = COALESCE($1,  nombre_artistico),
-        biografia             = COALESCE($2,  biografia),
-        telefono              = COALESCE($3,  telefono),
-        ciudad                = COALESCE($4,  ciudad),
-        direccion_taller      = COALESCE($5,  direccion_taller),
-        codigo_postal         = COALESCE($6,  codigo_postal),
-        acepta_envios         = COALESCE($7,  acepta_envios),
-        solo_entrega_personal = COALESCE($8,  solo_entrega_personal),
-        politica_envios       = COALESCE($9,  politica_envios),
-        politica_devoluciones = COALESCE($10, politica_devoluciones),
-        foto_perfil           = COALESCE($11, foto_perfil)
-      WHERE id_artista = $12
+        nombre_artistico        = COALESCE($1,  nombre_artistico),
+        biografia               = COALESCE($2,  biografia),
+        telefono                = COALESCE($3,  telefono),
+        ciudad                  = COALESCE($4,  ciudad),
+        direccion_taller        = COALESCE($5,  direccion_taller),
+        codigo_postal           = COALESCE($6,  codigo_postal),
+        id_estado_base          = COALESCE($7,  id_estado_base),
+        id_categoria_principal  = COALESCE($8,  id_categoria_principal),
+        dias_preparacion_default= COALESCE($9,  dias_preparacion_default),
+        acepta_envios           = COALESCE($10, acepta_envios),
+        solo_entrega_personal   = COALESCE($11, solo_entrega_personal),
+        politica_envios         = COALESCE($12, politica_envios),
+        politica_devoluciones   = COALESCE($13, politica_devoluciones),
+        foto_perfil             = COALESCE($14, foto_perfil),
+        fecha_actualizacion     = NOW()
+      WHERE id_artista = $15
     `, [
-      nombre_artistico  || null,
-      biografia         || null,
-      telefono          || null,
-      ciudad            || null,
-      direccion_taller  || null,
-      codigo_postal     || null,
+      nombre_artistico        || null,
+      biografia               || null,
+      telefono                || null,
+      ciudad                  || null,
+      direccion_taller        || null,
+      codigo_postal           || null,
+      id_estado_base          ? parseInt(id_estado_base)          : null,
+      id_categoria_principal  ? parseInt(id_categoria_principal)  : null,
+      dias_preparacion_default? parseInt(dias_preparacion_default): null,
       acepta_envios         !== undefined ? (acepta_envios         === 'true' || acepta_envios         === true) : null,
       solo_entrega_personal !== undefined ? (solo_entrega_personal === 'true' || solo_entrega_personal === true) : null,
-      politica_envios       || null,
-      politica_devoluciones || null,
+      politica_envios         || null,
+      politica_devoluciones   || null,
       foto_perfil,
       id_artista,
     ]);
@@ -155,10 +169,9 @@ export const getMisObras = async (req, res) => {
     const obras = result.rows;
     const stats = {
       total:      obras.length,
-      publicadas: obras.filter(o => o.estado === 'publicada').length,
+      publicadas: obras.filter(o => o.estado === 'aprobada').length,
       pendientes: obras.filter(o => o.estado === 'pendiente').length,
       rechazadas: obras.filter(o => o.estado === 'rechazada').length,
-      borradores: obras.filter(o => o.estado === 'borrador').length,
     };
 
     res.json({ obras, stats });
@@ -170,13 +183,18 @@ export const getMisObras = async (req, res) => {
 
 // =========================================================
 // POST /api/artista-portal/nueva-obra
+// Bloquea si el perfil no está completo
 // =========================================================
 export const nuevaObra = async (req, res) => {
   try {
     const usuarioId = req.user.id_usuario;
 
     const artistaRes = await pool.query(
-      'SELECT id_artista, estado FROM artistas WHERE id_usuario = $1',
+      `SELECT id_artista, estado,
+        nombre_artistico, biografia, telefono, foto_perfil,
+        ciudad, id_estado_base, codigo_postal, direccion_taller,
+        id_categoria_principal
+      FROM artistas WHERE id_usuario = $1`,
       [usuarioId]
     );
     if (artistaRes.rows.length === 0)
@@ -184,7 +202,26 @@ export const nuevaObra = async (req, res) => {
 
     const artista = artistaRes.rows[0];
     if (artista.estado !== 'activo')
-      return res.status(403).json({ message: 'Tu cuenta de artista aun no esta aprobada' });
+      return res.status(403).json({ message: 'Tu cuenta de artista aún no está aprobada' });
+
+    // ── Verificar perfil completo ───────────────────────────
+    const camposFaltantes = [];
+    if (!artista.nombre_artistico)    camposFaltantes.push('nombre artístico');
+    if (!artista.biografia)           camposFaltantes.push('biografía');
+    if (!artista.telefono)            camposFaltantes.push('teléfono');
+    if (!artista.foto_perfil)         camposFaltantes.push('foto de perfil');
+    if (!artista.ciudad)              camposFaltantes.push('ciudad');
+    if (!artista.id_estado_base)      camposFaltantes.push('estado');
+    if (!artista.codigo_postal)       camposFaltantes.push('código postal');
+    if (!artista.direccion_taller)    camposFaltantes.push('dirección del taller');
+    if (!artista.id_categoria_principal) camposFaltantes.push('categoría principal');
+
+    if (camposFaltantes.length > 0) {
+      return res.status(403).json({
+        message: 'Completa tu perfil antes de subir obras',
+        camposFaltantes,
+      });
+    }
 
     const idArtista = artista.id_artista;
 
@@ -255,7 +292,7 @@ export const nuevaObra = async (req, res) => {
     }
 
     logger.info(`Nueva obra creada: ${obraCreada.titulo} (id: ${obraCreada.id_obra})`);
-    res.status(201).json({ message: 'Obra enviada. Quedara en revision hasta que el admin la apruebe.', obra: obraCreada });
+    res.status(201).json({ message: 'Obra enviada. Quedará en revisión hasta que el admin la apruebe.', obra: obraCreada });
 
   } catch (error) {
     logger.error(`Error en nuevaObra: ${error.message}`);
