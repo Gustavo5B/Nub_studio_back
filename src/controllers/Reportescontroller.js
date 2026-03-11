@@ -13,15 +13,15 @@ const BRAND = {
   orange:   "FFFF840E",
   purple:   "FF8D4CCD",
   pink:     "FFCC59AD",
-  dark:     "FF0C0812",
-  darkCard: "FF120D1E",
-  cream:    "FFFFF8EE",
+  dark:     "FFFFF8EE",
+  darkCard: "FFFFF0DC",
+  cream:    "FF1A1A1A",
   creamSub: "FFD8CABC",
-  rowAlt:   "FF0F0A1A",
+  rowAlt:   "FFFDECD8",
   white:    "FFFFFFFF",
   gray:     "FF888888",
-  greenNum: "FF22C97A",
-  border:   "FF2A2A3A",
+  greenNum: "FF16A34A",
+  border:   "FFDDCCBB",
 };
 
 import https from "https";
@@ -680,23 +680,23 @@ export const exportarObrasPlantilla = async (req, res) => {
 
     const wsObras = wb.addWorksheet("Obras");
     wsObras.columns = [
-      { header: "id_obra",          key: "id_obra",          width: 10 },
-      { header: "titulo *",         key: "titulo",           width: 44 },
-      { header: "artista *",        key: "artista",          width: 28 },
-      { header: "categoria *",      key: "categoria",        width: 22 },
-      { header: "tecnica",          key: "tecnica",          width: 22 },
-      { header: "anio_creacion",    key: "anio_creacion",    width: 14 },
-      { header: "descripcion",      key: "descripcion",      width: 50 },
-      { header: "precio_base",      key: "precio_base",      width: 14, style: { numFmt: "#,##0.00" } },
-      { header: "alto_cm",          key: "alto_cm",          width: 10 },
-      { header: "ancho_cm",         key: "ancho_cm",         width: 10 },
-      { header: "profundidad_cm",   key: "profundidad_cm",   width: 14 },
-      { header: "permite_marco",    key: "permite_marco",    width: 14 },
-      { header: "con_certificado",  key: "con_certificado",  width: 16 },
-      { header: "estado",           key: "estado",           width: 14 },
-      { header: "destacada",        key: "destacada",        width: 12 },
-      { header: "imagen_principal", key: "imagen_principal", width: 50 },
-    ];
+  { header: "ID Obra",            key: "id_obra",          width: 10 },
+  { header: "Título",             key: "titulo",           width: 44 },
+  { header: "Artista",            key: "artista",          width: 28 },
+  { header: "Categoría",          key: "categoria",        width: 22 },
+  { header: "Técnica",            key: "tecnica",          width: 22 },
+  { header: "Año de Creación",    key: "anio_creacion",    width: 16 },
+  { header: "Descripción",        key: "descripcion",      width: 50 },
+  { header: "Precio Base (MXN)",  key: "precio_base",      width: 18, style: { numFmt: "#,##0.00" } },
+  { header: "Alto (cm)",          key: "alto_cm",          width: 12 },
+  { header: "Ancho (cm)",         key: "ancho_cm",         width: 12 },
+  { header: "Profundidad (cm)",   key: "profundidad_cm",   width: 16 },
+  { header: "Permite Marco",      key: "permite_marco",    width: 15 },
+  { header: "Con Certificado",    key: "con_certificado",  width: 17 },
+  { header: "Estado",             key: "estado",           width: 14 },
+  { header: "Destacada",          key: "destacada",        width: 12 },
+  { header: "URL Imagen",         key: "imagen_principal", width: 50 },
+];
 
     applyHeaderStyle(wsObras, BRAND.orange);
     obras.rows.forEach(r => wsObras.addRow(r));
@@ -992,17 +992,17 @@ export const exportarArtistasPlantilla = async (req, res) => {
 
     const wsA = wb.addWorksheet("Artistas");
     wsA.columns = [
-      { header: "id_artista",          key: "id_artista",          width: 12 },
-      { header: "nombre_completo *",   key: "nombre_completo",     width: 34 },
-      { header: "nombre_artistico",    key: "nombre_artistico",    width: 32 },
-      { header: "correo *",            key: "correo",              width: 34 },
-      { header: "telefono",            key: "telefono",            width: 18 },
-      { header: "ciudad",              key: "ciudad",              width: 22 },
-      { header: "porcentaje_comision", key: "porcentaje_comision", width: 20 },
-      { header: "estado",              key: "estado",              width: 16 },
-      { header: "activo",              key: "activo",              width: 12 },
-      { header: "biografia",           key: "biografia",           width: 60 },
-    ];
+  { header: "ID Artista",          key: "id_artista",          width: 12 },
+  { header: "Nombre Completo",     key: "nombre_completo",     width: 34 },
+  { header: "Nombre Artístico",    key: "nombre_artistico",    width: 32 },
+  { header: "Correo",              key: "correo",              width: 34 },
+  { header: "Teléfono",            key: "telefono",            width: 18 },
+  { header: "Ciudad",              key: "ciudad",              width: 22 },
+  { header: "% Comisión",          key: "porcentaje_comision", width: 16 },
+  { header: "Estado",              key: "estado",              width: 16 },
+  { header: "Activo",              key: "activo",              width: 12 },
+  { header: "Biografía",           key: "biografia",           width: 60 },
+];
 
     applyHeaderStyle(wsA, BRAND.pink);
     artistas.rows.forEach(r => wsA.addRow(r));
