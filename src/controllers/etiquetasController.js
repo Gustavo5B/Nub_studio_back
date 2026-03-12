@@ -1,4 +1,4 @@
-import { pool } from "../config/db.js";
+import { pool, pools } from "../config/db.js";
 import logger from "../config/logger.js";
 
 // =========================================================
@@ -6,7 +6,9 @@ import logger from "../config/logger.js";
 // =========================================================
 export const listarEtiquetas = async (req, res) => {
   try {
-    const result = await pool.query(`
+    const db = pools[req.user?.rol] || pool;
+
+    const result = await db.query(`
       SELECT 
         e.id_etiqueta, e.nombre, e.slug,
         COUNT(o.id_obra) AS total_obras
@@ -33,9 +35,10 @@ export const listarEtiquetas = async (req, res) => {
 // =========================================================
 export const obtenerEtiquetaPorSlug = async (req, res) => {
   try {
+    const db = pools[req.user?.rol] || pool;
     const { slug } = req.params;
 
-    const result = await pool.query(`
+    const result = await db.query(`
       SELECT 
         e.id_etiqueta, e.nombre, e.slug,
         COUNT(o.id_obra) AS total_obras

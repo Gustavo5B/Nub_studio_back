@@ -1,4 +1,4 @@
-import { pool } from "../config/db.js";
+import { pool, pools } from "../config/db.js";
 import logger from "../config/logger.js";
 
 // =========================================================
@@ -6,7 +6,9 @@ import logger from "../config/logger.js";
 // =========================================================
 export const listarCategorias = async (req, res) => {
   try {
-    const result = await pool.query(`
+    const db = pools[req.user?.rol] || pool;
+
+    const result = await db.query(`
       SELECT 
         c.id_categoria, c.nombre, c.descripcion,
         c.slug, c.icono,
@@ -32,9 +34,10 @@ export const listarCategorias = async (req, res) => {
 // =========================================================
 export const obtenerCategoriaPorId = async (req, res) => {
   try {
+    const db = pools[req.user?.rol] || pool;
     const { id } = req.params;
 
-    const resultCat = await pool.query(`
+    const resultCat = await db.query(`
       SELECT c.*, COUNT(o.id_obra) AS total_obras
       FROM categorias c
       LEFT JOIN obras o ON c.id_categoria = o.id_categoria AND o.activa = TRUE
@@ -46,7 +49,7 @@ export const obtenerCategoriaPorId = async (req, res) => {
     if (resultCat.rows.length === 0)
       return res.status(404).json({ success: false, message: "Categoria no encontrada" });
 
-    const resultObras = await pool.query(`
+    const resultObras = await db.query(`
       SELECT 
         o.id_obra, o.titulo, o.slug, o.imagen_principal,
         a.nombre_artistico AS artista_alias,
@@ -73,9 +76,10 @@ export const obtenerCategoriaPorId = async (req, res) => {
 // =========================================================
 export const obtenerCategoriaPorSlug = async (req, res) => {
   try {
+    const db = pools[req.user?.rol] || pool;
     const { slug } = req.params;
 
-    const result = await pool.query(
+    const result = await db.query(
       'SELECT id_categoria FROM categorias WHERE slug = $1 AND activa = TRUE LIMIT 1',
       [slug]
     );

@@ -1,4 +1,4 @@
-import { pool } from '../config/db.js';
+import { pool, pools } from '../config/db.js';
 import logger from '../config/logger.js';
 
 // =========================================================
@@ -6,9 +6,10 @@ import logger from '../config/logger.js';
 // =========================================================
 export const getMiPerfil = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const usuarioId = req.user.id_usuario;
 
-    const result = await pool.query(
+    const result = await db.query(
       `SELECT
         a.id_artista, a.nombre_completo, a.nombre_artistico,
         a.biografia, a.foto_perfil, a.correo, a.telefono,
@@ -45,9 +46,10 @@ export const getMiPerfil = async (req, res) => {
 // =========================================================
 export const actualizarMiPerfil = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const usuarioId = req.user.id_usuario;
 
-    const artistaRes = await pool.query(
+    const artistaRes = await db.query(
       'SELECT id_artista, estado FROM artistas WHERE id_usuario = $1 LIMIT 1',
       [usuarioId]
     );
@@ -67,7 +69,6 @@ export const actualizarMiPerfil = async (req, res) => {
       politica_envios, politica_devoluciones,
     } = req.body;
 
-    // Foto: archivo tiene prioridad sobre URL del body
     let foto_perfil = req.body.foto_perfil || null;
 
     if (req.file) {
@@ -87,7 +88,7 @@ export const actualizarMiPerfil = async (req, res) => {
       foto_perfil = uploadResult.secure_url;
     }
 
-    await pool.query(`
+    await db.query(`
       UPDATE artistas SET
         nombre_artistico        = COALESCE($1,  nombre_artistico),
         biografia               = COALESCE($2,  biografia),
@@ -137,9 +138,10 @@ export const actualizarMiPerfil = async (req, res) => {
 // =========================================================
 export const getMisObras = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const usuarioId = req.user.id_usuario;
 
-    const artistaRes = await pool.query(
+    const artistaRes = await db.query(
       'SELECT id_artista FROM artistas WHERE id_usuario = $1',
       [usuarioId]
     );
@@ -148,7 +150,7 @@ export const getMisObras = async (req, res) => {
 
     const idArtista = artistaRes.rows[0].id_artista;
 
-    const result = await pool.query(
+    const result = await db.query(
       `SELECT
         o.id_obra, o.titulo, o.slug, o.descripcion,
         o.imagen_principal, o.precio_base, o.estado,
@@ -187,9 +189,10 @@ export const getMisObras = async (req, res) => {
 // =========================================================
 export const nuevaObra = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const usuarioId = req.user.id_usuario;
 
-    const artistaRes = await pool.query(
+    const artistaRes = await db.query(
       `SELECT id_artista, estado,
         nombre_artistico, biografia, telefono, foto_perfil,
         ciudad, id_estado_base, codigo_postal, direccion_taller,
@@ -204,16 +207,15 @@ export const nuevaObra = async (req, res) => {
     if (artista.estado !== 'activo')
       return res.status(403).json({ message: 'Tu cuenta de artista aún no está aprobada' });
 
-    // ── Verificar perfil completo ───────────────────────────
     const camposFaltantes = [];
-    if (!artista.nombre_artistico)    camposFaltantes.push('nombre artístico');
-    if (!artista.biografia)           camposFaltantes.push('biografía');
-    if (!artista.telefono)            camposFaltantes.push('teléfono');
-    if (!artista.foto_perfil)         camposFaltantes.push('foto de perfil');
-    if (!artista.ciudad)              camposFaltantes.push('ciudad');
-    if (!artista.id_estado_base)      camposFaltantes.push('estado');
-    if (!artista.codigo_postal)       camposFaltantes.push('código postal');
-    if (!artista.direccion_taller)    camposFaltantes.push('dirección del taller');
+    if (!artista.nombre_artistico)       camposFaltantes.push('nombre artístico');
+    if (!artista.biografia)              camposFaltantes.push('biografía');
+    if (!artista.telefono)               camposFaltantes.push('teléfono');
+    if (!artista.foto_perfil)            camposFaltantes.push('foto de perfil');
+    if (!artista.ciudad)                 camposFaltantes.push('ciudad');
+    if (!artista.id_estado_base)         camposFaltantes.push('estado');
+    if (!artista.codigo_postal)          camposFaltantes.push('código postal');
+    if (!artista.direccion_taller)       camposFaltantes.push('dirección del taller');
     if (!artista.id_categoria_principal) camposFaltantes.push('categoría principal');
 
     if (camposFaltantes.length > 0) {
@@ -250,7 +252,7 @@ export const nuevaObra = async (req, res) => {
     const slugBase = titulo.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
     const slug = `${slugBase}-${Date.now()}`;
 
-    const obraRes = await pool.query(
+    const obraRes = await db.query(
       `INSERT INTO obras (
         titulo, slug, descripcion,
         id_categoria, id_artista, id_usuario_creacion,
@@ -283,7 +285,7 @@ export const nuevaObra = async (req, res) => {
       try { etiquetas = typeof etiquetasRaw === 'string' ? JSON.parse(etiquetasRaw) : etiquetasRaw; } catch (_) {}
       if (Array.isArray(etiquetas) && etiquetas.length > 0) {
         for (const idEtiqueta of etiquetas) {
-          await pool.query(
+          await db.query(
             `INSERT INTO obras_etiquetas (id_obra, id_etiqueta) VALUES ($1, $2) ON CONFLICT DO NOTHING`,
             [obraCreada.id_obra, idEtiqueta]
           );
@@ -305,10 +307,11 @@ export const nuevaObra = async (req, res) => {
 // =========================================================
 export const getObraById = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const usuarioId = req.user.id_usuario;
     const { id }    = req.params;
 
-    const artistaRes = await pool.query(
+    const artistaRes = await db.query(
       'SELECT id_artista FROM artistas WHERE id_usuario = $1 AND estado = $2 LIMIT 1',
       [usuarioId, 'activo']
     );
@@ -317,7 +320,7 @@ export const getObraById = async (req, res) => {
 
     const { id_artista } = artistaRes.rows[0];
 
-    const result = await pool.query(`
+    const result = await db.query(`
       SELECT o.*,
         c.nombre AS categoria_nombre,
         COALESCE(json_agg(oe.id_etiqueta) FILTER (WHERE oe.id_etiqueta IS NOT NULL), '[]') AS etiquetas
@@ -345,10 +348,11 @@ export const getObraById = async (req, res) => {
 // =========================================================
 export const actualizarObraArtista = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const usuarioId = req.user.id_usuario;
     const { id }    = req.params;
 
-    const artistaRes = await pool.query(
+    const artistaRes = await db.query(
       'SELECT id_artista, estado FROM artistas WHERE id_usuario = $1 LIMIT 1',
       [usuarioId]
     );
@@ -361,7 +365,7 @@ export const actualizarObraArtista = async (req, res) => {
 
     const { id_artista } = artista;
 
-    const obraCheck = await pool.query(
+    const obraCheck = await db.query(
       `SELECT id_obra FROM obras WHERE id_obra = $1 AND id_artista = $2 AND (eliminada IS NULL OR eliminada = FALSE) LIMIT 1`,
       [id, id_artista]
     );
@@ -389,7 +393,7 @@ export const actualizarObraArtista = async (req, res) => {
       imagen_principal = uploadResult.secure_url;
     }
 
-    await pool.query(`
+    await db.query(`
       UPDATE obras SET
         titulo                  = $1,
         descripcion             = $2,
@@ -425,10 +429,10 @@ export const actualizarObraArtista = async (req, res) => {
     if (etiquetasRaw !== undefined) {
       let etiquetas = [];
       try { etiquetas = typeof etiquetasRaw === 'string' ? JSON.parse(etiquetasRaw) : etiquetasRaw; } catch (_) {}
-      await pool.query('DELETE FROM obras_etiquetas WHERE id_obra = $1', [id]);
+      await db.query('DELETE FROM obras_etiquetas WHERE id_obra = $1', [id]);
       if (Array.isArray(etiquetas) && etiquetas.length > 0) {
         for (const idEtiqueta of etiquetas) {
-          await pool.query('INSERT INTO obras_etiquetas (id_obra, id_etiqueta) VALUES ($1, $2) ON CONFLICT DO NOTHING', [id, idEtiqueta]);
+          await db.query('INSERT INTO obras_etiquetas (id_obra, id_etiqueta) VALUES ($1, $2) ON CONFLICT DO NOTHING', [id, idEtiqueta]);
         }
       }
     }

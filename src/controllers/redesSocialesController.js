@@ -1,14 +1,13 @@
-import { pool } from '../config/db.js';
+import { pool, pools } from '../config/db.js';
 import logger from '../config/logger.js';
 
-// Redes válidas según el ENUM del schema
 const REDES_VALIDAS = ['instagram', 'facebook', 'tiktok', 'youtube', 'twitter', 'pinterest', 'otra'];
 
 // ─────────────────────────────────────────────────────────
-// HELPER — obtener id_artista activo del usuario autenticado
+// HELPER — recibe db para respetar el pool del rol
 // ─────────────────────────────────────────────────────────
-const getArtistaActivo = async (usuarioId) => {
-  const res = await pool.query(
+const getArtistaActivo = async (db, usuarioId) => {
+  const res = await db.query(
     `SELECT id_artista FROM artistas
      WHERE id_usuario = $1 AND estado = 'activo' AND eliminado = FALSE
      LIMIT 1`,
@@ -22,11 +21,12 @@ const getArtistaActivo = async (usuarioId) => {
 // =========================================================
 export const getRedesSociales = async (req, res) => {
   try {
-    const artista = await getArtistaActivo(req.user.id_usuario);
+    const db = pools[req.user.rol] || pool;
+    const artista = await getArtistaActivo(db, req.user.id_usuario);
     if (!artista)
       return res.status(403).json({ message: 'Artista no encontrado o inactivo' });
 
-    const result = await pool.query(`
+    const result = await db.query(`
       SELECT id_red, red_social, url, usuario
       FROM artistas_redes_sociales
       WHERE id_artista = $1 AND activo = TRUE
@@ -42,11 +42,11 @@ export const getRedesSociales = async (req, res) => {
 
 // =========================================================
 // POST /api/artista-portal/redes-sociales
-// Body: { red_social, url, usuario? }
 // =========================================================
 export const agregarRedSocial = async (req, res) => {
   try {
-    const artista = await getArtistaActivo(req.user.id_usuario);
+    const db = pools[req.user.rol] || pool;
+    const artista = await getArtistaActivo(db, req.user.id_usuario);
     if (!artista)
       return res.status(403).json({ message: 'Artista no encontrado o inactivo' });
 
@@ -58,8 +58,7 @@ export const agregarRedSocial = async (req, res) => {
     if (!REDES_VALIDAS.includes(red_social))
       return res.status(400).json({ message: `red_social inválida. Válidas: ${REDES_VALIDAS.join(', ')}` });
 
-    // Solo una entrada por red social por artista
-    const existe = await pool.query(`
+    const existe = await db.query(`
       SELECT id_red FROM artistas_redes_sociales
       WHERE id_artista = $1 AND red_social = $2 AND activo = TRUE
       LIMIT 1
@@ -68,7 +67,7 @@ export const agregarRedSocial = async (req, res) => {
     if (existe.rows.length > 0)
       return res.status(409).json({ message: `Ya tienes registrada una cuenta de ${red_social}` });
 
-    const result = await pool.query(`
+    const result = await db.query(`
       INSERT INTO artistas_redes_sociales (id_artista, red_social, url, usuario)
       VALUES ($1, $2, $3, $4)
       RETURNING id_red, red_social, url, usuario
@@ -84,11 +83,11 @@ export const agregarRedSocial = async (req, res) => {
 
 // =========================================================
 // PUT /api/artista-portal/redes-sociales/:id
-// Body: { url, usuario? }
 // =========================================================
 export const actualizarRedSocial = async (req, res) => {
   try {
-    const artista = await getArtistaActivo(req.user.id_usuario);
+    const db = pools[req.user.rol] || pool;
+    const artista = await getArtistaActivo(db, req.user.id_usuario);
     if (!artista)
       return res.status(403).json({ message: 'Artista no encontrado o inactivo' });
 
@@ -98,7 +97,7 @@ export const actualizarRedSocial = async (req, res) => {
     if (!url)
       return res.status(400).json({ message: 'url es obligatoria' });
 
-    const result = await pool.query(`
+    const result = await db.query(`
       UPDATE artistas_redes_sociales
       SET url = $1, usuario = $2, fecha_actualizacion = NOW()
       WHERE id_red = $3 AND id_artista = $4 AND activo = TRUE
@@ -118,17 +117,17 @@ export const actualizarRedSocial = async (req, res) => {
 
 // =========================================================
 // DELETE /api/artista-portal/redes-sociales/:id
-// Soft delete — activo = FALSE
 // =========================================================
 export const eliminarRedSocial = async (req, res) => {
   try {
-    const artista = await getArtistaActivo(req.user.id_usuario);
+    const db = pools[req.user.rol] || pool;
+    const artista = await getArtistaActivo(db, req.user.id_usuario);
     if (!artista)
       return res.status(403).json({ message: 'Artista no encontrado o inactivo' });
 
     const { id } = req.params;
 
-    const result = await pool.query(`
+    const result = await db.query(`
       UPDATE artistas_redes_sociales
       SET activo = FALSE
       WHERE id_red = $1 AND id_artista = $2 AND activo = TRUE

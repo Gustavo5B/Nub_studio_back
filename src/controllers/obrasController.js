@@ -1,4 +1,4 @@
-import { pool } from "../config/db.js";
+import { pool, pools } from "../config/db.js";
 import logger from "../config/logger.js";
 import { sendObraAprobadaEmail, sendObraRechazadaEmail } from '../services/emailService.js';
 
@@ -7,6 +7,8 @@ import { sendObraAprobadaEmail, sendObraRechazadaEmail } from '../services/email
 // =========================================================
 export const listarObras = async (req, res) => {
   try {
+    const db = pools[req.user?.rol] || pool;
+
     const {
       page = 1, limit = 12, categoria, artista,
       precio_min, precio_max, destacadas, ordenar = 'recientes',
@@ -72,9 +74,9 @@ export const listarObras = async (req, res) => {
     `;
 
     queryParams.push(parseInt(limit), parseInt(offset));
-    const result = await pool.query(query, queryParams);
+    const result = await db.query(query, queryParams);
 
-    const countResult = await pool.query(
+    const countResult = await db.query(
       `SELECT COUNT(DISTINCT o.id_obra) AS total
        FROM obras o
        LEFT JOIN obras_tamaños ot ON o.id_obra = ot.id_obra AND ot.activo = TRUE
@@ -105,25 +107,25 @@ export const listarObras = async (req, res) => {
 // =========================================================
 export const obtenerObraPorId = async (req, res) => {
   try {
+    const db = pools[req.user?.rol] || pool;
     const { id } = req.params;
 
-    // ✅ Corrección en obtenerObraPorId
-const resultObra = await pool.query(`
-  SELECT o.*, a.nombre_completo AS artista_nombre, a.nombre_artistico AS artista_alias,
-    a.biografia AS artista_biografia, a.foto_perfil AS artista_foto,
-    c.nombre AS categoria_nombre, c.slug AS categoria_slug
-  FROM obras o
-  INNER JOIN artistas a ON o.id_artista = a.id_artista
-  INNER JOIN categorias c ON o.id_categoria = c.id_categoria
-  WHERE o.id_obra = $1 AND o.eliminada IS NOT TRUE LIMIT 1
-`, [id]);
+    const resultObra = await db.query(`
+      SELECT o.*, a.nombre_completo AS artista_nombre, a.nombre_artistico AS artista_alias,
+        a.biografia AS artista_biografia, a.foto_perfil AS artista_foto,
+        c.nombre AS categoria_nombre, c.slug AS categoria_slug
+      FROM obras o
+      INNER JOIN artistas a ON o.id_artista = a.id_artista
+      INNER JOIN categorias c ON o.id_categoria = c.id_categoria
+      WHERE o.id_obra = $1 AND o.eliminada IS NOT TRUE LIMIT 1
+    `, [id]);
 
     if (resultObra.rows.length === 0)
       return res.status(404).json({ success: false, message: "Obra no encontrada" });
 
     const obra = resultObra.rows[0];
 
-    const resultTamaños = await pool.query(`
+    const resultTamaños = await db.query(`
       SELECT ot.id AS id_obra_tamaño, ot.precio_base, ot.cantidad_disponible,
         t.id_tamaño, t.nombre AS tamaño_nombre, t.ancho_cm, t.alto_cm
       FROM obras_tamaños ot
@@ -134,7 +136,7 @@ const resultObra = await pool.query(`
 
     const tamaños = resultTamaños.rows;
     for (let tamaño of tamaños) {
-      const resultMarcos = await pool.query(`
+      const resultMarcos = await db.query(`
         SELECT om.id, om.precio_total, tm.id_tipo_marco,
           tm.nombre AS marco_nombre, tm.descripcion AS marco_descripcion,
           tm.precio_adicional, tm.imagen AS marco_imagen
@@ -146,15 +148,15 @@ const resultObra = await pool.query(`
       tamaño.marcos = resultMarcos.rows;
     }
 
-    const resultImagenes = await pool.query(
+    const resultImagenes = await db.query(
       `SELECT id_imagen, url_imagen, orden, es_principal FROM imagenes_obras WHERE id_obra = $1 AND activa = TRUE ORDER BY es_principal DESC, orden ASC`,
       [id]
     );
-    const resultEtiquetas = await pool.query(
+    const resultEtiquetas = await db.query(
       `SELECT e.id_etiqueta, e.nombre, e.slug FROM obras_etiquetas oe INNER JOIN etiquetas e ON oe.id_etiqueta = e.id_etiqueta WHERE oe.id_obra = $1 AND e.activa = TRUE`,
       [id]
     );
-    const resultRelacionadas = await pool.query(`
+    const resultRelacionadas = await db.query(`
       SELECT o.id_obra, o.titulo, o.slug, o.imagen_principal,
         a.nombre_artistico AS artista_alias, MIN(ot.precio_base) AS precio_minimo
       FROM obras o
@@ -164,7 +166,7 @@ const resultObra = await pool.query(`
       GROUP BY o.id_obra, a.nombre_artistico ORDER BY RANDOM() LIMIT 4
     `, [id, obra.id_categoria, obra.id_artista]);
 
-    await pool.query('UPDATE obras SET vistas = vistas + 1 WHERE id_obra = $1', [id]);
+    await db.query('UPDATE obras SET vistas = vistas + 1 WHERE id_obra = $1', [id]);
 
     res.json({
       success: true,
@@ -187,8 +189,9 @@ const resultObra = await pool.query(`
 // =========================================================
 export const obtenerObraPorSlug = async (req, res) => {
   try {
+    const db = pools[req.user?.rol] || pool;
     const { slug } = req.params;
-    const result = await pool.query('SELECT id_obra FROM obras WHERE slug = $1 AND activa = TRUE LIMIT 1', [slug]);
+    const result = await db.query('SELECT id_obra FROM obras WHERE slug = $1 AND activa = TRUE LIMIT 1', [slug]);
     if (result.rows.length === 0)
       return res.status(404).json({ success: false, message: "Obra no encontrada" });
     req.params.id = result.rows[0].id_obra;
@@ -204,6 +207,7 @@ export const obtenerObraPorSlug = async (req, res) => {
 // =========================================================
 export const buscarObras = async (req, res) => {
   try {
+    const db = pools[req.user?.rol] || pool;
     const { q, page = 1, limit = 12 } = req.query;
     if (!q || q.trim().length < 2)
       return res.status(400).json({ success: false, message: "La busqueda debe tener al menos 2 caracteres" });
@@ -211,7 +215,7 @@ export const buscarObras = async (req, res) => {
     const offset = (page - 1) * limit;
     const searchTerm = `%${q}%`;
 
-    const result = await pool.query(`
+    const result = await db.query(`
       SELECT o.id_obra, o.titulo, o.descripcion, o.slug, o.imagen_principal,
         o.precio_base,
         a.nombre_completo AS artista_nombre, a.nombre_artistico AS artista_alias,
@@ -225,7 +229,7 @@ export const buscarObras = async (req, res) => {
       ORDER BY o.fecha_creacion DESC LIMIT $2 OFFSET $3
     `, [searchTerm, parseInt(limit), parseInt(offset)]);
 
-    const countResult = await pool.query(`
+    const countResult = await db.query(`
       SELECT COUNT(DISTINCT o.id_obra) as total FROM obras o
       INNER JOIN artistas a ON o.id_artista = a.id_artista
       INNER JOIN categorias c ON o.id_categoria = c.id_categoria
@@ -247,19 +251,20 @@ export const buscarObras = async (req, res) => {
 };
 
 // =========================================================
-// FILTROS RAPIDOS
+// FILTROS RAPIDOS — delegan a listarObras (req se pasa completo)
 // =========================================================
-export const obtenerObrasPorCategoria = async (req, res) => { req.query.categoria = req.params.id; return listarObras(req, res); };
-export const obtenerObrasPorArtista   = async (req, res) => { req.query.artista   = req.params.id; return listarObras(req, res); };
+export const obtenerObrasPorCategoria = async (req, res) => { req.query.categoria  = req.params.id;    return listarObras(req, res); };
+export const obtenerObrasPorArtista   = async (req, res) => { req.query.artista    = req.params.id;    return listarObras(req, res); };
 export const obtenerObrasDestacadas   = async (req, res) => { req.query.destacadas = 'true'; req.query.limit = req.query.limit || 8; return listarObras(req, res); };
 
 export const obtenerObrasPorEtiqueta = async (req, res) => {
   try {
+    const db = pools[req.user?.rol] || pool;
     const { slug } = req.params;
     const { page = 1, limit = 12 } = req.query;
     const offset = (page - 1) * limit;
 
-    const resultEtiqueta = await pool.query(
+    const resultEtiqueta = await db.query(
       'SELECT id_etiqueta, nombre FROM etiquetas WHERE slug = $1 AND activa = TRUE',
       [slug]
     );
@@ -268,7 +273,7 @@ export const obtenerObrasPorEtiqueta = async (req, res) => {
 
     const etiqueta = resultEtiqueta.rows[0];
 
-    const result = await pool.query(`
+    const result = await db.query(`
       SELECT o.id_obra, o.titulo, o.slug, o.imagen_principal, o.precio_base,
         a.nombre_artistico AS artista_alias, c.nombre AS categoria_nombre,
         MIN(ot.precio_base) AS precio_minimo
@@ -282,7 +287,7 @@ export const obtenerObrasPorEtiqueta = async (req, res) => {
       ORDER BY o.fecha_creacion DESC LIMIT $2 OFFSET $3
     `, [etiqueta.id_etiqueta, parseInt(limit), parseInt(offset)]);
 
-    const countResult = await pool.query(
+    const countResult = await db.query(
       'SELECT COUNT(DISTINCT o.id_obra) as total FROM obras o INNER JOIN obras_etiquetas oe ON o.id_obra = oe.id_obra WHERE oe.id_etiqueta = $1 AND o.activa = TRUE',
       [etiqueta.id_etiqueta]
     );
@@ -306,6 +311,7 @@ export const obtenerObrasPorEtiqueta = async (req, res) => {
 // =========================================================
 export const crearObra = async (req, res) => {
   try {
+    const db = pools[req.user?.rol] || pool;
     const {
       titulo, descripcion,
       id_categoria, id_artista, id_tecnica,
@@ -326,10 +332,10 @@ export const crearObra = async (req, res) => {
       .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
       .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
 
-    const slugExiste = await pool.query('SELECT id_obra FROM obras WHERE slug = $1 LIMIT 1', [slug]);
+    const slugExiste = await db.query('SELECT id_obra FROM obras WHERE slug = $1 LIMIT 1', [slug]);
     if (slugExiste.rows.length > 0) slug = `${slug}-${Date.now()}`;
 
-    const result = await pool.query(`
+    const result = await db.query(`
       INSERT INTO obras (
         titulo, slug, descripcion,
         id_categoria, id_artista, id_tecnica,
@@ -364,6 +370,7 @@ export const crearObra = async (req, res) => {
 // =========================================================
 export const actualizarObra = async (req, res) => {
   try {
+    const db = pools[req.user?.rol] || pool;
     const { id } = req.params;
     const {
       titulo, descripcion, id_categoria, id_artista, id_tecnica,
@@ -401,7 +408,7 @@ export const actualizarObra = async (req, res) => {
     query += ` WHERE id_obra=$${params.length + 1} RETURNING id_obra, titulo, estado, activa`;
     params.push(id);
 
-    const result = await pool.query(query, params);
+    const result = await db.query(query, params);
 
     if (result.rows.length === 0)
       return res.status(404).json({ success: false, message: 'Obra no encontrada' });
@@ -420,10 +427,11 @@ export const actualizarObra = async (req, res) => {
 // =========================================================
 export const eliminarObra = async (req, res) => {
   try {
+    const db = pools[req.user?.rol] || pool;
     const { id } = req.params;
     const id_usuario = req.user?.id_usuario || 1;
 
-    await pool.query(`
+    await db.query(`
       UPDATE obras SET eliminada=TRUE, activa=FALSE,
         fecha_eliminacion=CURRENT_TIMESTAMP, eliminado_por=$2
       WHERE id_obra=$1
@@ -438,11 +446,11 @@ export const eliminarObra = async (req, res) => {
 };
 
 // =========================================================
-// CAMBIAR ESTADO DE OBRA (admin only) — endpoint dedicado
-// Separado del PUT general para auditoría y seguridad
+// CAMBIAR ESTADO DE OBRA (admin only)
 // =========================================================
 export const cambiarEstadoObra = async (req, res) => {
   try {
+    const db = pools[req.user?.rol] || pool;
     const { id } = req.params;
     const { estado, motivo_rechazo } = req.body;
     const id_admin = req.user?.id_usuario;
@@ -453,7 +461,7 @@ export const cambiarEstadoObra = async (req, res) => {
 
     const activa = estado === "publicada";
 
-    const result = await pool.query(`
+    const result = await db.query(`
       UPDATE obras
       SET estado = $1,
           activa = $2,
@@ -472,14 +480,13 @@ export const cambiarEstadoObra = async (req, res) => {
       + (motivo_rechazo ? ` | motivo="${motivo_rechazo}"` : "")
     );
 
-    // Responder al admin de inmediato
     res.json({
       success: true,
       message: `Obra ${estado === "publicada" ? "publicada" : estado} correctamente`,
       data: obra,
     });
 
-    // Email en background — fire and forget
+    // Email en background — usa pool base porque req ya no está disponible
     if (estado === "publicada" || estado === "rechazada") {
       pool.query(
         `SELECT correo, nombre_completo, nombre_artistico

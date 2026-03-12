@@ -1,5 +1,5 @@
 import crypto from 'crypto';
-import { pool } from "../config/db.js";
+import { pool, pools } from "../config/db.js";
 import logger from "../config/logger.js";
 import {
   sendArtistaAprobadoEmail,
@@ -8,7 +8,7 @@ import {
 } from '../services/emailService.js';
 
 // ─────────────────────────────────────────────────────────────
-// HELPERS
+// HELPERS — usan pool base (no tienen req, son internos)
 // ─────────────────────────────────────────────────────────────
 
 const generarMatricula = async () => {
@@ -28,7 +28,6 @@ const generarMatricula = async () => {
   return matricula;
 };
 
-// Token de activación con 48 horas de vigencia
 const generarTokenActivacion = () => ({
   token:      crypto.randomBytes(32).toString('hex'),
   expiracion: new Date(Date.now() + 48 * 60 * 60 * 1000),
@@ -40,7 +39,9 @@ const generarTokenActivacion = () => ({
 // =========================================================
 export const listarArtistas = async (req, res) => {
   try {
-    const result = await pool.query(`
+    const db = pools[req.user?.rol] || pool;
+
+    const result = await db.query(`
       SELECT
         a.id_artista, a.nombre_completo, a.nombre_artistico,
         a.biografia, a.foto_perfil, a.correo, a.telefono,
@@ -71,9 +72,10 @@ export const listarArtistas = async (req, res) => {
 // =========================================================
 export const obtenerArtistaPorId = async (req, res) => {
   try {
+    const db = pools[req.user?.rol] || pool;
     const { id } = req.params;
 
-    const resultArtista = await pool.query(`
+    const resultArtista = await db.query(`
       SELECT a.*, c.nombre AS categoria_nombre,
         COUNT(o.id_obra)                                                          AS total_obras,
         COUNT(o.id_obra) FILTER (WHERE o.estado = 'aprobada' AND o.activa = TRUE) AS obras_publicadas,
@@ -92,7 +94,7 @@ export const obtenerArtistaPorId = async (req, res) => {
 
     const artista = resultArtista.rows[0];
 
-    const resultObras = await pool.query(`
+    const resultObras = await db.query(`
       SELECT o.id_obra, o.titulo, o.slug, o.imagen_principal,
         o.anio_creacion, o.estado, o.activa, o.precio_base,
         c.nombre AS categoria_nombre
@@ -112,15 +114,11 @@ export const obtenerArtistaPorId = async (req, res) => {
 // =========================================================
 // CREAR ARTISTA — admin crea un artista
 // POST /api/artistas
-//
-// Flujo de acceso:
-//   Con correo  → crea usuario sin contraseña + token
-//                 → email "Crea tu contraseña" (48h)
-//                 → artista activa en /activar-cuenta?token=xxx
-//   Sin correo  → solo crea artista, sin acceso al portal
 // =========================================================
 export const crearArtista = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
+
     const {
       nombre_completo, nombre_artistico, biografia,
       correo, telefono,
@@ -132,30 +130,28 @@ export const crearArtista = async (req, res) => {
     if (!nombre_completo)
       return res.status(400).json({ success: false, message: "El nombre completo es obligatorio" });
 
-    // ── Verificar correo único ──────────────────────────────
     if (correo) {
-      const existeArtista = await pool.query(
+      const existeArtista = await db.query(
         'SELECT id_artista FROM artistas WHERE correo = $1 AND eliminado = FALSE LIMIT 1', [correo]
       );
       if (existeArtista.rows.length > 0)
         return res.status(400).json({ success: false, message: "Ya existe un artista con ese correo" });
 
-      const existeUsuario = await pool.query(
+      const existeUsuario = await db.query(
         'SELECT id_usuario FROM usuarios WHERE correo = $1 LIMIT 1', [correo]
       );
       if (existeUsuario.rows.length > 0)
         return res.status(400).json({ success: false, message: "El correo ya está registrado en el sistema" });
     }
 
-    // ── Crear usuario sin contraseña (si tiene correo) ──────
-    let id_usuario       = null;
-    let tokenActivacion  = null;
+    let id_usuario      = null;
+    let tokenActivacion = null;
 
     if (correo) {
       const { token, expiracion } = generarTokenActivacion();
       tokenActivacion = token;
 
-      const resUsuario = await pool.query(
+      const resUsuario = await db.query(
         `INSERT INTO usuarios
            (nombre_completo, correo, contraseña_hash, rol, estado, activo,
             verificado, token_verificacion, token_expiracion)
@@ -166,11 +162,9 @@ export const crearArtista = async (req, res) => {
       id_usuario = resUsuario.rows[0].id_usuario;
     }
 
-    // ── Generar matrícula ───────────────────────────────────
     const matricula = await generarMatricula();
 
-    // ── Insertar artista ────────────────────────────────────
-    const result = await pool.query(`
+    const result = await db.query(`
       INSERT INTO artistas (
         id_usuario, nombre_completo, nombre_artistico, biografia,
         foto_perfil, correo, telefono, matricula,
@@ -195,7 +189,6 @@ export const crearArtista = async (req, res) => {
     const { id_artista, matricula: mat } = result.rows[0];
     logger.info(`Artista creado: id ${id_artista} mat ${mat}${id_usuario ? ' usuario=' + id_usuario : ''}`);
 
-    // ── Email de activación (fire and forget) ───────────────
     if (correo && tokenActivacion) {
       sendActivacionCuentaEmail(correo, nombre_completo, tokenActivacion).catch(err =>
         logger.error(`Error email activación artista ${id_artista}: ${err.message}`)
@@ -224,7 +217,9 @@ export const crearArtista = async (req, res) => {
 // =========================================================
 export const actualizarArtista = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const { id } = req.params;
+
     const {
       nombre_completo, nombre_artistico, biografia,
       correo, telefono,
@@ -233,7 +228,7 @@ export const actualizarArtista = async (req, res) => {
 
     const foto_perfil = req.file?.path || req.body.foto_perfil || null;
 
-    await pool.query(`
+    await db.query(`
       UPDATE artistas SET
         nombre_completo        = $1,
         nombre_artistico       = $2,
@@ -272,9 +267,10 @@ export const actualizarArtista = async (req, res) => {
 // =========================================================
 export const eliminarArtista = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const { id } = req.params;
 
-    await pool.query(`
+    await db.query(`
       UPDATE artistas SET eliminado = TRUE, activo = FALSE
       WHERE id_artista = $1
     `, [id]);
@@ -289,21 +285,10 @@ export const eliminarArtista = async (req, res) => {
 // =========================================================
 // CAMBIAR ESTADO DE ARTISTA — admin only
 // PATCH /api/artistas/:id/estado
-//
-// estado = 'activo':
-//   Caso A — artista sin contraseña (creado por admin)
-//     → regenera token → email "Crea tu contraseña"
-//   Caso B — artista con contraseña (registro público aprobado)
-//     → email "Fuiste aprobado, ya puedes ingresar"
-//
-// estado = 'rechazado':
-//   → email con motivo opcional
-//
-// otros estados (inactivo, suspendido, pendiente):
-//   → solo actualiza DB, sin email
 // =========================================================
 export const cambiarEstadoArtista = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const { id }             = req.params;
     const { estado, motivo } = req.body;
     const id_admin           = req.user?.id_usuario;
@@ -312,8 +297,7 @@ export const cambiarEstadoArtista = async (req, res) => {
     if (!estadosValidos.includes(estado))
       return res.status(400).json({ success: false, message: "Estado inválido" });
 
-    // ── Obtener artista + usuario vinculado ─────────────────
-    const artResult = await pool.query(`
+    const artResult = await db.query(`
       SELECT
         a.id_artista,
         a.nombre_completo   AS artista_nombre,
@@ -335,8 +319,7 @@ export const cambiarEstadoArtista = async (req, res) => {
 
     const artista = artResult.rows[0];
 
-    // ── Actualizar artistas ─────────────────────────────────
-    await pool.query(`
+    await db.query(`
       UPDATE artistas
       SET estado = $1, activo = $2
       WHERE id_artista = $3 AND eliminado = FALSE
@@ -347,7 +330,6 @@ export const cambiarEstadoArtista = async (req, res) => {
       + (motivo ? ` | motivo="${motivo}"` : '')
     );
 
-    // ── Responder inmediatamente ────────────────────────────
     res.json({
       success: true,
       message: `Artista ${estado === 'activo' ? 'aprobado' : estado} correctamente`,
@@ -361,12 +343,10 @@ export const cambiarEstadoArtista = async (req, res) => {
     if (!correoDestino) return;
 
     if (estado === 'activo') {
-
       if (artista.id_usuario && !artista.contraseña_hash) {
-        // Caso A: sin contraseña — regenerar token y enviar link
         const { token, expiracion } = generarTokenActivacion();
 
-        await pool.query(`
+        await db.query(`
           UPDATE usuarios
           SET token_verificacion = $1, token_expiracion = $2
           WHERE id_usuario = $3
@@ -375,14 +355,11 @@ export const cambiarEstadoArtista = async (req, res) => {
         sendActivacionCuentaEmail(correoDestino, nombreDestino, token).catch(err =>
           logger.error(`Error email activación artista ${id}: ${err.message}`)
         );
-
       } else {
-        // Caso B: registro público — ya tiene contraseña, solo notificar
         sendArtistaAprobadoEmail(correoDestino, nombreDestino).catch(err =>
           logger.error(`Error email aprobación artista ${id}: ${err.message}`)
         );
       }
-
     } else if (estado === 'rechazado') {
       sendArtistaRechazadoEmail(correoDestino, nombreDestino, motivo || null).catch(err =>
         logger.error(`Error email rechazo artista ${id}: ${err.message}`)

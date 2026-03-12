@@ -1,4 +1,4 @@
-import { pool } from "../config/db.js";
+import { pool, pools } from "../config/db.js";
 import { generateCode, sendGmail2FACode } from "../services/emailService.js";
 import logger from "../config/logger.js";
 
@@ -40,6 +40,7 @@ const maskEmail = (email) => {
 
 // =========================================================
 // 1. CONFIGURAR GMAIL-2FA
+// pool base — no hay sesión todavía
 // =========================================================
 export const configurarGmail2FA = async (req, res) => {
   try {
@@ -90,6 +91,7 @@ export const configurarGmail2FA = async (req, res) => {
 
 // =========================================================
 // 2. VERIFICAR CODIGO Y ACTIVAR GMAIL-2FA
+// pool base — no hay sesión todavía
 // =========================================================
 export const verificarGmail2FA = async (req, res) => {
   try {
@@ -135,6 +137,7 @@ export const verificarGmail2FA = async (req, res) => {
 
 // =========================================================
 // 3. ENVIAR CODIGO AL INICIAR SESION
+// pool base — no hay sesión todavía
 // =========================================================
 export const enviarCodigoLoginGmail = async (req, res) => {
   try {
@@ -181,6 +184,7 @@ export const enviarCodigoLoginGmail = async (req, res) => {
 
 // =========================================================
 // 4. VERIFICAR CODIGO DURANTE LOGIN
+// pool base — no hay sesión todavía
 // =========================================================
 export const verificarCodigoLoginGmail = async (req, res) => {
   try {
@@ -250,16 +254,17 @@ export const verificarCodigoLoginGmail = async (req, res) => {
 };
 
 // =========================================================
-// 5. DESACTIVAR GMAIL-2FA
+// 5. DESACTIVAR GMAIL-2FA — sí tiene req.user
 // =========================================================
 export const desactivarGmail2FA = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const userId = req.user?.id_usuario;
 
     if (!userId)
       return res.status(401).json({ success: false, message: "No autorizado" });
 
-    const result = await pool.query(
+    const result = await db.query(
       `UPDATE usuarios SET requiere_2fa = FALSE, secret_2fa = NULL WHERE id_usuario = $1`,
       [userId]
     );
@@ -277,16 +282,17 @@ export const desactivarGmail2FA = async (req, res) => {
 };
 
 // =========================================================
-// 6. VERIFICAR ESTADO DE GMAIL-2FA
+// 6. VERIFICAR ESTADO DE GMAIL-2FA — sí tiene req.user
 // =========================================================
 export const estadoGmail2FA = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const userId = req.user?.id_usuario;
 
     if (!userId)
       return res.status(401).json({ success: false, message: "No autorizado" });
 
-    const result = await pool.query(
+    const result = await db.query(
       `SELECT requiere_2fa FROM usuarios WHERE id_usuario = $1`,
       [userId]
     );

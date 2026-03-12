@@ -1,4 +1,4 @@
-import { pool } from '../config/db.js';
+import { pool, pools } from '../config/db.js';
 import logger from '../config/logger.js';
 
 // =========================================================
@@ -7,7 +7,9 @@ import logger from '../config/logger.js';
 // =========================================================
 export const listarEstados = async (req, res) => {
   try {
-    const result = await pool.query(`
+    const db = pools[req.user?.rol] || pool;
+
+    const result = await db.query(`
       SELECT id_estado, nombre, codigo, abreviatura
       FROM estados_mexico
       WHERE activo = TRUE

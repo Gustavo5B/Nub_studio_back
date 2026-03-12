@@ -1,9 +1,10 @@
-import { pool } from "../config/db.js";
+import { pool, pools } from "../config/db.js";
 import logger from "../config/logger.js";
 
 // LISTAR TECNICAS (con filtro opcional por categoria)
 export const listarTecnicas = async (req, res) => {
   try {
+    const db = pools[req.user?.rol] || pool;
     const { categoria } = req.query;
     const params = [];
     let whereExtra = '';
@@ -13,7 +14,7 @@ export const listarTecnicas = async (req, res) => {
       whereExtra = `AND t.id_categoria = $1`;
     }
 
-    const result = await pool.query(`
+    const result = await db.query(`
       SELECT 
         t.id_tecnica, t.id_categoria, t.nombre, t.descripcion,
         c.nombre AS categoria_nombre
@@ -36,9 +37,10 @@ export const listarTecnicas = async (req, res) => {
 // OBTENER TECNICA POR ID
 export const obtenerTecnicaPorId = async (req, res) => {
   try {
+    const db = pools[req.user?.rol] || pool;
     const { id } = req.params;
 
-    const result = await pool.query(
+    const result = await db.query(
       `SELECT t.*, c.nombre AS categoria_nombre
        FROM tecnicas t
        LEFT JOIN categorias c ON t.id_categoria = c.id_categoria

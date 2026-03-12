@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import dotenv from "dotenv";
-import { pool } from "../config/db.js";
+import { pool, pools } from "../config/db.js";
 import {
   generateCode,
   sendRecoveryCode,
@@ -53,7 +53,6 @@ const generateToken = (user) => {
   );
 };
 
-// Token de activación con 48 horas de vigencia
 const generarTokenActivacion = () => ({
   token: crypto.randomBytes(32).toString('hex'),
   expiracion: new Date(Date.now() + 48 * 60 * 60 * 1000),
@@ -65,6 +64,7 @@ const calcularTiempoBloqueo = (bloqueosTotales) => {
   return 60;
 };
 
+// pool base — no tiene req todavía
 const registrarHistorialLogin = async (usuario, tipo, razon = null) => {
   try {
     await pool.query(
@@ -78,6 +78,7 @@ const registrarHistorialLogin = async (usuario, tipo, razon = null) => {
 
 // =========================================================
 // REGISTRO (clientes normales)
+// pool base — no hay sesión todavía
 // =========================================================
 export const register = async (req, res) => {
   const { nombre, correo, contrasena } = req.body;
@@ -115,6 +116,7 @@ export const register = async (req, res) => {
 
 // =========================================================
 // LOGIN
+// pool base — no hay sesión todavía
 // =========================================================
 export const login = async (req, res) => {
   try {
@@ -131,7 +133,6 @@ export const login = async (req, res) => {
 
     const user = result.rows[0];
 
-    // ── Sin contraseña: artista creado por admin, no ha activado cuenta ──
     if (!user.contraseña_hash) {
       return res.status(403).json({
         message: "Tu cuenta aún no ha sido activada. Revisa tu correo para crear tu contraseña.",
@@ -140,7 +141,6 @@ export const login = async (req, res) => {
       });
     }
 
-    // ── Bloqueo por intentos fallidos ──
     if (user.bloqueado_hasta) {
       const ahora = new Date();
       const desbloqueo = new Date(user.bloqueado_hasta);
@@ -230,6 +230,7 @@ export const login = async (req, res) => {
 
 // =========================================================
 // LOGIN CON 2FA TOTP
+// pool base — aún no hay sesión válida
 // =========================================================
 export const loginWith2FA = async (req, res) => {
   try {
@@ -254,6 +255,7 @@ export const loginWith2FA = async (req, res) => {
 
 // =========================================================
 // VERIFICAR CODIGO GMAIL 2FA
+// pool base — aún no hay sesión válida
 // =========================================================
 export const verifyLoginCode = async (req, res) => {
   try {
@@ -276,10 +278,11 @@ export const verifyLoginCode = async (req, res) => {
 };
 
 // =========================================================
-// REVOCAR OTRAS SESIONES
+// REVOCAR OTRAS SESIONES — sí tiene req.user
 // =========================================================
 export const closeOtherSessions = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const userId = req.user.id_usuario;
     const currentToken = req.headers.authorization?.split(' ')[1];
     if (!currentToken) return res.status(400).json({ message: "No se encontro token actual" });
@@ -293,7 +296,7 @@ export const closeOtherSessions = async (req, res) => {
 };
 
 // =========================================================
-// VERIFICAR SESION
+// VERIFICAR SESION — sí tiene req.user
 // =========================================================
 export const checkSession = async (req, res) => {
   try {
@@ -306,9 +309,7 @@ export const checkSession = async (req, res) => {
 
 // =========================================================
 // REGISTRO PÚBLICO DE ARTISTA
-// Artista llena datos + contraseña
-// → usuario estado='pendiente' (espera verificación email)
-// → artista estado='pendiente' (espera aprobación admin)
+// pool base — no hay sesión todavía
 // =========================================================
 export const registroArtista = async (req, res) => {
   try {
@@ -326,7 +327,6 @@ export const registroArtista = async (req, res) => {
     if (existeUsuario.rows.length > 0)
       return res.status(400).json({ message: "El correo ya esta registrado" });
 
-    // ── VALIDACIÓN NOMBRE ARTÍSTICO ──────────────────────────
     if (nombre_artistico && nombre_artistico.trim()) {
       const existeNombre = await pool.query(
         "SELECT id_artista FROM artistas WHERE nombre_artistico = $1 AND eliminado = FALSE LIMIT 1",
@@ -339,7 +339,6 @@ export const registroArtista = async (req, res) => {
         });
       }
     }
-    // ────────────────────────────────────────────────────────
 
     const hash = await bcrypt.hash(contrasena, 12);
     const { token: tokenVerif, expiracion: tokenExp } = generarTokenActivacion();
@@ -379,9 +378,7 @@ export const registroArtista = async (req, res) => {
 
 // =========================================================
 // VERIFICAR EMAIL — registro público
-// POST /api/auth/verificar-email  { token }
-// El artista hizo clic en el link → su usuario queda activo
-// pero artista sigue pendiente de aprobación admin
+// pool base — no hay sesión todavía
 // =========================================================
 export const verificarEmailArtista = async (req, res) => {
   try {
@@ -400,7 +397,6 @@ export const verificarEmailArtista = async (req, res) => {
     if (user.token_expiracion && new Date() > new Date(user.token_expiracion))
       return res.status(400).json({ message: "El enlace ha expirado. Solicita uno nuevo.", expired: true, correo: user.correo });
 
-    // Activar usuario — artista aún espera aprobación admin
     await pool.query(
       `UPDATE usuarios SET verificado = TRUE, estado = 'activo', token_verificacion = NULL, token_expiracion = NULL WHERE id_usuario = $1`,
       [user.id_usuario]
@@ -422,9 +418,7 @@ export const verificarEmailArtista = async (req, res) => {
 
 // =========================================================
 // ACTIVAR CUENTA — artista creado por admin
-// POST /api/auth/activar-cuenta  { token, password }
-// Admin creó al artista sin contraseña → llega email con link
-// → artista define su contraseña y queda logueado directo
+// pool base — no hay sesión todavía
 // =========================================================
 export const activarCuenta = async (req, res) => {
   try {
@@ -450,24 +444,20 @@ export const activarCuenta = async (req, res) => {
     const hash = await bcrypt.hash(password, 12);
 
     await pool.query(
-      `UPDATE usuarios
-       SET contraseña_hash = $1, verificado = TRUE, estado = 'activo',
-           token_verificacion = NULL, token_expiracion = NULL
-       WHERE id_usuario = $2`,
+      `UPDATE usuarios SET contraseña_hash = $1, verificado = TRUE, estado = 'activo',
+           token_verificacion = NULL, token_expiracion = NULL WHERE id_usuario = $2`,
       [hash, user.id_usuario]
     );
 
     logger.info(`Cuenta activada: usuario ${user.id_usuario} ${maskEmail(user.correo)}`);
 
-    // Obtener artista_estado
     let artista_estado = null;
     if (user.rol === 'artista') {
       const ar = await pool.query('SELECT estado FROM artistas WHERE id_usuario = $1 LIMIT 1', [user.id_usuario]);
       if (ar.rows.length > 0) artista_estado = ar.rows[0].estado;
     }
 
-    // Loguear directo — no tiene que volver a la pantalla de login
-    user.estado = 'activo'; // actualizar para el token
+    user.estado = 'activo';
     const jwtToken = generateToken(user);
     await saveActiveSession(user.id_usuario, jwtToken, req);
     await registrarHistorialLogin(user, 'LOGIN_EXITOSO', 'Activación de cuenta');
@@ -487,8 +477,8 @@ export const activarCuenta = async (req, res) => {
 };
 
 // =========================================================
-// REENVIAR ENLACE (expiró o no llegó)
-// POST /api/auth/reenviar-activacion  { correo }
+// REENVIAR ENLACE
+// pool base — no hay sesión todavía
 // =========================================================
 export const reenviarActivacion = async (req, res) => {
   try {
@@ -497,7 +487,6 @@ export const reenviarActivacion = async (req, res) => {
 
     const result = await pool.query("SELECT * FROM usuarios WHERE correo = $1 LIMIT 1", [correo]);
 
-    // Respuesta genérica por seguridad
     if (result.rows.length === 0)
       return res.json({ success: true, message: "Si el correo existe, recibirás el enlace en breve." });
 
@@ -509,8 +498,6 @@ export const reenviarActivacion = async (req, res) => {
     const { token, expiracion } = generarTokenActivacion();
     await pool.query(`UPDATE usuarios SET token_verificacion = $1, token_expiracion = $2 WHERE id_usuario = $3`, [token, expiracion, user.id_usuario]);
 
-    // Sin contraseña = creado por admin → link para crear contraseña
-    // Con contraseña  = registro público → link para verificar email
     if (!user.contraseña_hash) {
       sendActivacionCuentaEmail(user.correo, user.nombre_completo, token).catch(() => {});
     } else {

@@ -1,4 +1,4 @@
-import { pool } from "../config/db.js";
+import { pool, pools } from "../config/db.js";
 import { eliminarImagen } from "../config/cloudinaryConfig.js";
 import logger from "../config/logger.js";
 
@@ -7,6 +7,7 @@ import logger from "../config/logger.js";
 // =========================================================
 export const subirImagenPrincipal = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const { id_obra } = req.body;
 
     if (!req.file)
@@ -18,23 +19,23 @@ export const subirImagenPrincipal = async (req, res) => {
     const imageUrl = req.file.path;
     const publicId = req.file.public_id;
 
-    await pool.query(
+    await db.query(
       'UPDATE obras SET imagen_principal = $1 WHERE id_obra = $2',
       [imageUrl, id_obra]
     );
 
-    const imagenExistente = await pool.query(
+    const imagenExistente = await db.query(
       'SELECT id_imagen FROM imagenes_obras WHERE id_obra = $1 AND es_principal = TRUE',
       [id_obra]
     );
 
     if (imagenExistente.rows.length > 0) {
-      await pool.query(
+      await db.query(
         'UPDATE imagenes_obras SET url_imagen = $1 WHERE id_imagen = $2',
         [imageUrl, imagenExistente.rows[0].id_imagen]
       );
     } else {
-      await pool.query(
+      await db.query(
         'INSERT INTO imagenes_obras (id_obra, url_imagen, orden, es_principal, activa) VALUES ($1, $2, 1, TRUE, TRUE)',
         [id_obra, imageUrl]
       );
@@ -54,6 +55,7 @@ export const subirImagenPrincipal = async (req, res) => {
 // =========================================================
 export const subirImagenesGaleria = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const { id_obra } = req.body;
 
     if (!req.files || req.files.length === 0)
@@ -62,7 +64,7 @@ export const subirImagenesGaleria = async (req, res) => {
     if (!id_obra)
       return res.status(400).json({ success: false, message: 'El ID de la obra es obligatorio' });
 
-    const maxOrden = await pool.query(
+    const maxOrden = await db.query(
       'SELECT COALESCE(MAX(orden), 0) as max_orden FROM imagenes_obras WHERE id_obra = $1',
       [id_obra]
     );
@@ -71,7 +73,7 @@ export const subirImagenesGaleria = async (req, res) => {
     const imagenesSubidas = [];
 
     for (const file of req.files) {
-      await pool.query(
+      await db.query(
         'INSERT INTO imagenes_obras (id_obra, url_imagen, orden, es_principal, activa) VALUES ($1, $2, $3, FALSE, TRUE)',
         [id_obra, file.path, ordenInicial]
       );
@@ -93,9 +95,10 @@ export const subirImagenesGaleria = async (req, res) => {
 // =========================================================
 export const eliminarImagenObra = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const { id_imagen } = req.params;
 
-    const imagen = await pool.query(
+    const imagen = await db.query(
       'SELECT url_imagen, es_principal FROM imagenes_obras WHERE id_imagen = $1',
       [id_imagen]
     );
@@ -111,7 +114,7 @@ export const eliminarImagenObra = async (req, res) => {
     const publicId = `nub-studio/obras/${filename.split('.')[0]}`;
 
     await eliminarImagen(publicId);
-    await pool.query('DELETE FROM imagenes_obras WHERE id_imagen = $1', [id_imagen]);
+    await db.query('DELETE FROM imagenes_obras WHERE id_imagen = $1', [id_imagen]);
 
     logger.info(`Imagen eliminada: id ${id_imagen}`);
     res.json({ success: true, message: 'Imagen eliminada exitosamente' });
@@ -127,13 +130,14 @@ export const eliminarImagenObra = async (req, res) => {
 // =========================================================
 export const reordenarImagenes = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const { id_obra, ordenNuevo } = req.body;
 
     if (!id_obra || !ordenNuevo || !Array.isArray(ordenNuevo))
       return res.status(400).json({ success: false, message: 'Datos invalidos' });
 
     for (let i = 0; i < ordenNuevo.length; i++) {
-      await pool.query(
+      await db.query(
         'UPDATE imagenes_obras SET orden = $1 WHERE id_imagen = $2 AND id_obra = $3',
         [i + 1, ordenNuevo[i], id_obra]
       );

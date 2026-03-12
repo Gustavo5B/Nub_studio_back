@@ -1,4 +1,4 @@
-import { pool } from "../config/db.js";
+import { pool, pools } from "../config/db.js";
 import logger from "../config/logger.js";
 
 // =========================================================
@@ -6,6 +6,8 @@ import logger from "../config/logger.js";
 // =========================================================
 export const getDashboardStats = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
+
     const [
       obrasResult,
       artistasResult,
@@ -15,31 +17,31 @@ export const getDashboardStats = async (req, res) => {
       visitasResult
     ] = await Promise.all([
 
-      pool.query(`
+      db.query(`
         SELECT COUNT(*) as total 
         FROM obras 
         WHERE eliminada IS NOT TRUE
       `),
 
-      pool.query(`
+      db.query(`
         SELECT COUNT(*) as total 
         FROM artistas 
         WHERE estado = 'activo'
       `),
 
-      pool.query(`
+      db.query(`
         SELECT COUNT(*) as total 
         FROM categorias
       `),
 
-      pool.query(`
+      db.query(`
         SELECT estado, COUNT(*) as total 
         FROM obras 
         WHERE eliminada IS NOT TRUE
         GROUP BY estado
       `),
 
-      pool.query(`
+      db.query(`
         SELECT 
           o.id_obra, o.titulo, o.imagen_principal, 
           o.estado, o.fecha_creacion,
@@ -54,7 +56,7 @@ export const getDashboardStats = async (req, res) => {
         LIMIT 5
       `),
 
-      pool.query(`
+      db.query(`
         SELECT COALESCE(SUM(vistas), 0) as total 
         FROM obras 
         WHERE eliminada IS NOT TRUE

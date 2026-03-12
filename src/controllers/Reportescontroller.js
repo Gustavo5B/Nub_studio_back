@@ -1,10 +1,10 @@
 // controllers/reportesController.js
-import { pool }         from "../config/db.js";
+import { pool, pools }   from "../config/db.js";
 import logger           from "../config/logger.js";
 import ExcelJS          from "exceljs";
-import fs               from "fs";
 import path             from "path";
 import { fileURLToPath } from "url";
+import https            from "https";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -23,8 +23,6 @@ const BRAND = {
   greenNum: "FF16A34A",
   border:   "FFDDCCBB",
 };
-
-import https from "https";
 
 async function cargarLogo() {
   return new Promise((resolve) => {
@@ -140,7 +138,7 @@ function addTotalsRow(ws, totalsCols, label = "TOTALES") {
   totRow.getCell(1).fill  = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A0F2E" } };
 
   for (const [col, formula] of Object.entries(totalsCols)) {
-    const colNum = parseInt(col);  // ← ESTE ES EL FIX
+    const colNum = parseInt(col);
     const cell = totRow.getCell(colNum);
     cell.value  = { formula: `${formula}(${ws.getColumn(colNum).letter}2:${ws.getColumn(colNum).letter}${lastData})` };
     cell.numFmt = '"$"#,##0.00';
@@ -168,14 +166,16 @@ async function sendXlsx(wb, res, filename) {
 // ═════════════════════════════════════════════════════════════════════════════
 export const getKPIs = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
+
     const [ingresos, vendidas, ticket, comPend, artActivos, obrasActivas] =
       await Promise.all([
-        pool.query(`SELECT COALESCE(SUM(total),0)::numeric AS valor FROM ventas WHERE estado != 'cancelado'`),
-        pool.query(`SELECT COUNT(*)::int AS valor FROM ventas WHERE estado != 'cancelado'`),
-        pool.query(`SELECT COALESCE(AVG(total),0)::numeric AS valor FROM ventas WHERE estado != 'cancelado'`),
-        pool.query(`SELECT COALESCE(SUM(monto_comision),0)::numeric AS valor FROM comisiones WHERE estado = 'pendiente'`),
-        pool.query(`SELECT COUNT(*)::int AS valor FROM artistas WHERE activo = TRUE AND eliminado IS NOT TRUE`),
-        pool.query(`SELECT COUNT(*)::int AS valor FROM obras WHERE estado = 'publicada' AND activa = TRUE AND eliminada IS NOT TRUE`),
+        db.query(`SELECT COALESCE(SUM(total),0)::numeric AS valor FROM ventas WHERE estado != 'cancelado'`),
+        db.query(`SELECT COUNT(*)::int AS valor FROM ventas WHERE estado != 'cancelado'`),
+        db.query(`SELECT COALESCE(AVG(total),0)::numeric AS valor FROM ventas WHERE estado != 'cancelado'`),
+        db.query(`SELECT COALESCE(SUM(monto_comision),0)::numeric AS valor FROM comisiones WHERE estado = 'pendiente'`),
+        db.query(`SELECT COUNT(*)::int AS valor FROM artistas WHERE activo = TRUE AND eliminado IS NOT TRUE`),
+        db.query(`SELECT COUNT(*)::int AS valor FROM obras WHERE estado = 'publicada' AND activa = TRUE AND eliminada IS NOT TRUE`),
       ]);
 
     res.json({
@@ -200,7 +200,9 @@ export const getKPIs = async (req, res) => {
 // ═════════════════════════════════════════════════════════════════════════════
 export const getVentasPorMes = async (req, res) => {
   try {
-    const result = await pool.query(`
+    const db = pools[req.user.rol] || pool;
+
+    const result = await db.query(`
       SELECT
         TO_CHAR(fecha_venta, 'Mon')       AS mes,
         EXTRACT(MONTH FROM fecha_venta)   AS mes_num,
@@ -224,8 +226,10 @@ export const getVentasPorMes = async (req, res) => {
 // ═════════════════════════════════════════════════════════════════════════════
 export const getIngresosVsComisiones = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
+
     const [ventas, comisiones] = await Promise.all([
-      pool.query(`
+      db.query(`
         SELECT
           TO_CHAR(fecha_venta, 'Mon')                    AS mes,
           EXTRACT(MONTH FROM fecha_venta)                AS mes_num,
@@ -237,7 +241,7 @@ export const getIngresosVsComisiones = async (req, res) => {
           AND estado != 'cancelado'
         GROUP BY mes, mes_num ORDER BY mes_num ASC
       `),
-      pool.query(`
+      db.query(`
         SELECT
           TO_CHAR(fecha_calculo, 'Mon')                     AS mes,
           EXTRACT(MONTH FROM fecha_calculo)                 AS mes_num,
@@ -283,7 +287,9 @@ export const getIngresosVsComisiones = async (req, res) => {
 // ═════════════════════════════════════════════════════════════════════════════
 export const getTopObras = async (req, res) => {
   try {
-    const result = await pool.query(`
+    const db = pools[req.user.rol] || pool;
+
+    const result = await db.query(`
       SELECT
         o.id_obra, o.titulo, o.imagen_principal,
         a.nombre_artistico                 AS artista,
@@ -308,7 +314,9 @@ export const getTopObras = async (req, res) => {
 // ═════════════════════════════════════════════════════════════════════════════
 export const getTopArtistas = async (req, res) => {
   try {
-    const result = await pool.query(`
+    const db = pools[req.user.rol] || pool;
+
+    const result = await db.query(`
       SELECT
         a.id_artista, a.nombre_completo, a.nombre_artistico, a.foto_perfil,
         a.porcentaje_comision,
@@ -335,13 +343,14 @@ export const getTopArtistas = async (req, res) => {
 // ═════════════════════════════════════════════════════════════════════════════
 export const exportarVentas = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
     const { desde, hasta } = req.query;
     const params = [];
     let filtro   = "";
     if (desde) { params.push(desde); filtro += ` AND v.fecha_venta >= $${params.length}`; }
     if (hasta) { params.push(hasta); filtro += ` AND v.fecha_venta <= $${params.length}`; }
 
-    const result = await pool.query(`
+    const result = await db.query(`
       SELECT
         v.id_venta,
         TO_CHAR(v.fecha_venta, 'DD/MM/YYYY HH24:MI') AS fecha,
@@ -406,7 +415,9 @@ export const exportarVentas = async (req, res) => {
 // ═════════════════════════════════════════════════════════════════════════════
 export const exportarFinanciero = async (req, res) => {
   try {
-    const result = await pool.query(`
+    const db = pools[req.user.rol] || pool;
+
+    const result = await db.query(`
       SELECT
         TO_CHAR(fecha_venta, 'Mon YYYY')               AS periodo,
         EXTRACT(YEAR  FROM fecha_venta)::int           AS anio,
@@ -462,14 +473,12 @@ export const exportarFinanciero = async (req, res) => {
 // ═════════════════════════════════════════════════════════════════════════════
 export const exportarArtistas = async (req, res) => {
   try {
-    const result = await pool.query(`
+    const db = pools[req.user.rol] || pool;
+
+    const result = await db.query(`
       SELECT
-        a.nombre_completo,
-        a.nombre_artistico,
-        a.correo,
-        a.ciudad,
-        a.porcentaje_comision,
-        a.estado,
+        a.nombre_completo, a.nombre_artistico, a.correo, a.ciudad,
+        a.porcentaje_comision, a.estado,
         TO_CHAR(a.fecha_registro, 'DD/MM/YYYY')                                                       AS fecha_registro,
         COUNT(DISTINCT o.id_obra) FILTER (WHERE o.activa = TRUE AND o.estado = 'publicada')::int       AS obras_activas,
         COUNT(DISTINCT v.id_venta)::int                                                                AS ventas_totales,
@@ -530,7 +539,9 @@ export const exportarArtistas = async (req, res) => {
 // ═════════════════════════════════════════════════════════════════════════════
 export const exportarCatalogoObras = async (req, res) => {
   try {
-    const result = await pool.query(`
+    const db = pools[req.user.rol] || pool;
+
+    const result = await db.query(`
       SELECT
         o.id_obra, o.titulo,
         a.nombre_artistico                                    AS artista,
@@ -609,7 +620,7 @@ export const exportarCatalogoObras = async (req, res) => {
       { header: "Precio Promedio", key: "precio_prom", width: 16, style: { numFmt: '"$"#,##0.00' } },
     ];
 
-    const resArtistas = await pool.query(`
+    const resArtistas = await db.query(`
       SELECT
         a.nombre_artistico AS artista,
         COUNT(*)::int AS total,
@@ -643,11 +654,13 @@ export const exportarCatalogoObras = async (req, res) => {
 // ═════════════════════════════════════════════════════════════════════════════
 export const exportarObrasPlantilla = async (req, res) => {
   try {
+    const db = pools[req.user.rol] || pool;
+
     const [artistas, categorias, tecnicas, obras] = await Promise.all([
-      pool.query(`SELECT nombre_artistico, nombre_completo FROM artistas WHERE eliminado IS NOT TRUE ORDER BY nombre_artistico`),
-      pool.query(`SELECT nombre FROM categorias ORDER BY nombre`),
-      pool.query(`SELECT nombre FROM tecnicas WHERE activa = TRUE ORDER BY nombre`),
-      pool.query(`
+      db.query(`SELECT nombre_artistico, nombre_completo FROM artistas WHERE eliminado IS NOT TRUE ORDER BY nombre_artistico`),
+      db.query(`SELECT nombre FROM categorias ORDER BY nombre`),
+      db.query(`SELECT nombre FROM tecnicas WHERE activa = TRUE ORDER BY nombre`),
+      db.query(`
         SELECT
           o.id_obra, o.titulo,
           a.nombre_artistico                                     AS artista,
@@ -680,23 +693,23 @@ export const exportarObrasPlantilla = async (req, res) => {
 
     const wsObras = wb.addWorksheet("Obras");
     wsObras.columns = [
-  { header: "ID Obra",            key: "id_obra",          width: 10 },
-  { header: "Título",             key: "titulo",           width: 44 },
-  { header: "Artista",            key: "artista",          width: 28 },
-  { header: "Categoría",          key: "categoria",        width: 22 },
-  { header: "Técnica",            key: "tecnica",          width: 22 },
-  { header: "Año de Creación",    key: "anio_creacion",    width: 16 },
-  { header: "Descripción",        key: "descripcion",      width: 50 },
-  { header: "Precio Base (MXN)",  key: "precio_base",      width: 18, style: { numFmt: "#,##0.00" } },
-  { header: "Alto (cm)",          key: "alto_cm",          width: 12 },
-  { header: "Ancho (cm)",         key: "ancho_cm",         width: 12 },
-  { header: "Profundidad (cm)",   key: "profundidad_cm",   width: 16 },
-  { header: "Permite Marco",      key: "permite_marco",    width: 15 },
-  { header: "Con Certificado",    key: "con_certificado",  width: 17 },
-  { header: "Estado",             key: "estado",           width: 14 },
-  { header: "Destacada",          key: "destacada",        width: 12 },
-  { header: "URL Imagen",         key: "imagen_principal", width: 50 },
-];
+      { header: "ID Obra",            key: "id_obra",          width: 10 },
+      { header: "Título",             key: "titulo",           width: 44 },
+      { header: "Artista",            key: "artista",          width: 28 },
+      { header: "Categoría",          key: "categoria",        width: 22 },
+      { header: "Técnica",            key: "tecnica",          width: 22 },
+      { header: "Año de Creación",    key: "anio_creacion",    width: 16 },
+      { header: "Descripción",        key: "descripcion",      width: 50 },
+      { header: "Precio Base (MXN)",  key: "precio_base",      width: 18, style: { numFmt: "#,##0.00" } },
+      { header: "Alto (cm)",          key: "alto_cm",          width: 12 },
+      { header: "Ancho (cm)",         key: "ancho_cm",         width: 12 },
+      { header: "Profundidad (cm)",   key: "profundidad_cm",   width: 16 },
+      { header: "Permite Marco",      key: "permite_marco",    width: 15 },
+      { header: "Con Certificado",    key: "con_certificado",  width: 17 },
+      { header: "Estado",             key: "estado",           width: 14 },
+      { header: "Destacada",          key: "destacada",        width: 12 },
+      { header: "URL Imagen",         key: "imagen_principal", width: 50 },
+    ];
 
     applyHeaderStyle(wsObras, BRAND.orange);
     obras.rows.forEach(r => wsObras.addRow(r));
@@ -800,6 +813,7 @@ export const exportarObrasPlantilla = async (req, res) => {
 export const importarObras = async (req, res) => {
   if (!req.file) return res.status(400).json({ success: false, message: "No se recibió ningún archivo" });
 
+  const db         = pools[req.user.rol] || pool;
   const id_usuario = req.user?.id_usuario ?? 1;
 
   try {
@@ -810,9 +824,9 @@ export const importarObras = async (req, res) => {
     if (!ws) return res.status(400).json({ success: false, message: "El Excel no contiene la hoja 'Obras'" });
 
     const [artistas, categorias, tecnicas] = await Promise.all([
-      pool.query(`SELECT id_artista, nombre_artistico, nombre_completo FROM artistas WHERE eliminado IS NOT TRUE`),
-      pool.query(`SELECT id_categoria, nombre FROM categorias`),
-      pool.query(`SELECT id_tecnica, nombre FROM tecnicas WHERE activa = TRUE`),
+      db.query(`SELECT id_artista, nombre_artistico, nombre_completo FROM artistas WHERE eliminado IS NOT TRUE`),
+      db.query(`SELECT id_categoria, nombre FROM categorias`),
+      db.query(`SELECT id_tecnica, nombre FROM tecnicas WHERE activa = TRUE`),
     ]);
 
     const mapArtista   = new Map(artistas.rows.map(r => [(r.nombre_artistico || r.nombre_completo).toLowerCase().trim(), r.id_artista]));
@@ -887,7 +901,7 @@ export const importarObras = async (req, res) => {
 
       try {
         if (idObra) {
-          const upd = await pool.query(`
+          const upd = await db.query(`
             UPDATE obras SET
               titulo=$1, id_artista=$2, id_categoria=$3, id_tecnica=$4,
               anio_creacion=$5, descripcion=$6, precio_base=$7,
@@ -915,10 +929,10 @@ export const importarObras = async (req, res) => {
           let slug = datos.titulo.toLowerCase().trim()
             .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
             .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
-          const sc = await pool.query("SELECT id_obra FROM obras WHERE slug = $1 LIMIT 1", [slug]);
+          const sc = await db.query("SELECT id_obra FROM obras WHERE slug = $1 LIMIT 1", [slug]);
           if (sc.rows.length > 0) slug = `${slug}-${Date.now()}`;
 
-          const ins = await pool.query(`
+          const ins = await db.query(`
             INSERT INTO obras (
               titulo, slug, descripcion,
               id_categoria, id_artista, id_tecnica,
@@ -962,20 +976,17 @@ export const importarObras = async (req, res) => {
 };
 
 // ═════════════════════════════════════════════════════════════════════════════
-// EXPORTAR PLANTILLA ARTISTAS .xlsx   ✅ sin pais
+// EXPORTAR PLANTILLA ARTISTAS .xlsx
 // ═════════════════════════════════════════════════════════════════════════════
 export const exportarArtistasPlantilla = async (req, res) => {
   try {
-    const artistas = await pool.query(`
+    const db = pools[req.user.rol] || pool;
+
+    const artistas = await db.query(`
       SELECT
-        a.id_artista,
-        a.nombre_completo,
-        a.nombre_artistico,
-        a.correo,
-        a.telefono,
-        a.ciudad,
-        a.porcentaje_comision,
-        a.estado,
+        a.id_artista, a.nombre_completo, a.nombre_artistico,
+        a.correo, a.telefono, a.ciudad,
+        a.porcentaje_comision, a.estado,
         CASE WHEN a.activo THEN 'Sí' ELSE 'No' END AS activo,
         a.biografia
       FROM artistas a
@@ -992,17 +1003,17 @@ export const exportarArtistasPlantilla = async (req, res) => {
 
     const wsA = wb.addWorksheet("Artistas");
     wsA.columns = [
-  { header: "ID Artista",          key: "id_artista",          width: 12 },
-  { header: "Nombre Completo",     key: "nombre_completo",     width: 34 },
-  { header: "Nombre Artístico",    key: "nombre_artistico",    width: 32 },
-  { header: "Correo",              key: "correo",              width: 34 },
-  { header: "Teléfono",            key: "telefono",            width: 18 },
-  { header: "Ciudad",              key: "ciudad",              width: 22 },
-  { header: "% Comisión",          key: "porcentaje_comision", width: 16 },
-  { header: "Estado",              key: "estado",              width: 16 },
-  { header: "Activo",              key: "activo",              width: 12 },
-  { header: "Biografía",           key: "biografia",           width: 60 },
-];
+      { header: "ID Artista",          key: "id_artista",          width: 12 },
+      { header: "Nombre Completo",     key: "nombre_completo",     width: 34 },
+      { header: "Nombre Artístico",    key: "nombre_artistico",    width: 32 },
+      { header: "Correo",              key: "correo",              width: 34 },
+      { header: "Teléfono",            key: "telefono",            width: 18 },
+      { header: "Ciudad",              key: "ciudad",              width: 22 },
+      { header: "% Comisión",          key: "porcentaje_comision", width: 16 },
+      { header: "Estado",              key: "estado",              width: 16 },
+      { header: "Activo",              key: "activo",              width: 12 },
+      { header: "Biografía",           key: "biografia",           width: 60 },
+    ];
 
     applyHeaderStyle(wsA, BRAND.pink);
     artistas.rows.forEach(r => wsA.addRow(r));
@@ -1062,11 +1073,12 @@ export const exportarArtistasPlantilla = async (req, res) => {
 };
 
 // ═════════════════════════════════════════════════════════════════════════════
-// IMPORTAR ARTISTAS .xlsx   ✅ sin pais — COLS renumerados
+// IMPORTAR ARTISTAS .xlsx
 // ═════════════════════════════════════════════════════════════════════════════
 export const importarArtistas = async (req, res) => {
   if (!req.file) return res.status(400).json({ success: false, message: "No se recibió ningún archivo" });
 
+  const db         = pools[req.user.rol] || pool;
   const id_usuario = req.user?.id_usuario ?? 1;
 
   try {
@@ -1134,7 +1146,7 @@ export const importarArtistas = async (req, res) => {
 
       try {
         if (idArtista) {
-          const conflicto = await pool.query(
+          const conflicto = await db.query(
             `SELECT id_artista FROM artistas WHERE correo = $1 AND id_artista != $2 AND eliminado IS NOT TRUE LIMIT 1`,
             [datos.correo, idArtista],
           );
@@ -1143,7 +1155,7 @@ export const importarArtistas = async (req, res) => {
             rowInfo.accion = "error"; resultados.push(rowInfo); continue;
           }
 
-          const upd = await pool.query(`
+          const upd = await db.query(`
             UPDATE artistas SET
               nombre_completo=$1, nombre_artistico=$2, correo=$3,
               telefono=$4, ciudad=$5,
@@ -1164,7 +1176,7 @@ export const importarArtistas = async (req, res) => {
             rowInfo.accion = "actualizada"; rowInfo.id_artista = idArtista;
           }
         } else {
-          const existe = await pool.query(
+          const existe = await db.query(
             `SELECT id_artista FROM artistas WHERE correo = $1 AND eliminado IS NOT TRUE LIMIT 1`,
             [datos.correo],
           );
@@ -1173,7 +1185,7 @@ export const importarArtistas = async (req, res) => {
             rowInfo.accion = "error"; resultados.push(rowInfo); continue;
           }
 
-          const ins = await pool.query(`
+          const ins = await db.query(`
             INSERT INTO artistas (
               nombre_completo, nombre_artistico, correo,
               telefono, ciudad,
