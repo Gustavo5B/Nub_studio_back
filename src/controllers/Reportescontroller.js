@@ -8,7 +8,6 @@ import https            from "https";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
-// ─── Paleta de marca ──────────────────────────────────────────────────────────
 const BRAND = {
   orange:   "FFFF840E",
   purple:   "FF8D4CCD",
@@ -39,43 +38,32 @@ async function cargarLogo() {
 async function crearPortada(wb, titulo, subtitulo, accentHex = BRAND.orange) {
   const ws = wb.addWorksheet("Portada");
   ws.views = [{ showGridLines: false }];
-
   const logoBuffer = await cargarLogo();
   if (logoBuffer) {
     const logoId = wb.addImage({ buffer: logoBuffer, extension: "png" });
     ws.addImage(logoId, { tl: { col: 1, row: 1 }, ext: { width: 220, height: 72 } });
   }
-
   for (let i = 1; i <= 7; i++) ws.addRow([]);
-
   const lineRow = ws.addRow(["", ""]);
   lineRow.height = 4;
   lineRow.getCell(2).fill = { type: "pattern", pattern: "solid", fgColor: { argb: accentHex } };
-
   ws.addRow([]);
-
   const titleRow = ws.addRow(["", titulo]);
   titleRow.height = 36;
   titleRow.getCell(2).font = { bold: true, size: 22, color: { argb: BRAND.cream }, name: "Calibri" };
   titleRow.getCell(2).alignment = { vertical: "middle" };
-
   const subRow = ws.addRow(["", subtitulo]);
   subRow.height = 20;
   subRow.getCell(2).font = { size: 12, color: { argb: BRAND.creamSub }, italic: true };
-
   ws.addRow([]);
-
   const fecha = new Date().toLocaleString("es-MX", {
     day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit",
   });
   const dateRow = ws.addRow(["", `Generado el ${fecha}`]);
   dateRow.getCell(2).font = { size: 10, color: { argb: BRAND.gray } };
-
   ws.addRow([]);
-
   const firmRow = ws.addRow(["", "Nu-B Studio · Galería Altar · Panel Administrativo"]);
   firmRow.getCell(2).font = { size: 11, color: { argb: accentHex }, bold: true };
-
   for (let r = 1; r <= 30; r++) {
     const row = ws.getRow(r);
     for (let c = 1; c <= 10; c++) {
@@ -85,7 +73,6 @@ async function crearPortada(wb, titulo, subtitulo, accentHex = BRAND.orange) {
       }
     }
   }
-
   ws.columns = [{ width: 3 }, { width: 70 }];
   return ws;
 }
@@ -104,12 +91,10 @@ function applyHeaderStyle(ws, accentHex = BRAND.orange) {
 function applyRowStyles(ws, firstDataRow = 2, lastRow = null, numCols = null) {
   const end  = lastRow ?? ws.lastRow?.number ?? firstDataRow;
   const cols = numCols ?? (ws.columns?.length || 10);
-
   for (let r = firstDataRow; r <= end; r++) {
     const row   = ws.getRow(r);
     const isAlt = (r - firstDataRow) % 2 === 1;
     row.height  = 18;
-
     for (let c = 1; c <= cols; c++) {
       const cell = row.getCell(c);
       cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: isAlt ? BRAND.rowAlt : BRAND.dark } };
@@ -132,11 +117,9 @@ function addTotalsRow(ws, totalsCols, label = "TOTALES") {
   const lastData = Math.max(ws.lastRow?.number ?? 1, 2);
   const totRow   = ws.addRow([]);
   totRow.height  = 22;
-
   totRow.getCell(1).value = label;
   totRow.getCell(1).font  = { bold: true, color: { argb: BRAND.orange }, size: 11 };
   totRow.getCell(1).fill  = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A0F2E" } };
-
   for (const [col, formula] of Object.entries(totalsCols)) {
     const colNum = parseInt(col);
     const cell = totRow.getCell(colNum);
@@ -161,13 +144,12 @@ async function sendXlsx(wb, res, filename) {
   res.end();
 }
 
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // KPIs
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 export const getKPIs = async (req, res) => {
   try {
     const db = pools[req.user.rol] || pool;
-
     const [ingresos, vendidas, ticket, comPend, artActivos, obrasActivas] =
       await Promise.all([
         db.query(`SELECT COALESCE(SUM(total),0)::numeric AS valor FROM ventas WHERE estado != 'cancelado'`),
@@ -177,7 +159,6 @@ export const getKPIs = async (req, res) => {
         db.query(`SELECT COUNT(*)::int AS valor FROM artistas WHERE activo = TRUE AND eliminado IS NOT TRUE`),
         db.query(`SELECT COUNT(*)::int AS valor FROM obras WHERE estado = 'publicada' AND activa = TRUE AND eliminada IS NOT TRUE`),
       ]);
-
     res.json({
       success: true,
       data: {
@@ -195,13 +176,12 @@ export const getKPIs = async (req, res) => {
   }
 };
 
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // VENTAS POR MES
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 export const getVentasPorMes = async (req, res) => {
   try {
     const db = pools[req.user.rol] || pool;
-
     const result = await db.query(`
       SELECT
         TO_CHAR(fecha_venta, 'Mon')       AS mes,
@@ -221,13 +201,12 @@ export const getVentasPorMes = async (req, res) => {
   }
 };
 
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // INGRESOS VS COMISIONES
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 export const getIngresosVsComisiones = async (req, res) => {
   try {
     const db = pools[req.user.rol] || pool;
-
     const [ventas, comisiones] = await Promise.all([
       db.query(`
         SELECT
@@ -253,7 +232,6 @@ export const getIngresosVsComisiones = async (req, res) => {
         GROUP BY mes, mes_num ORDER BY mes_num ASC
       `),
     ]);
-
     const map = {};
     ventas.rows.forEach(r => {
       map[r.mes_num] = {
@@ -273,7 +251,6 @@ export const getIngresosVsComisiones = async (req, res) => {
         };
       }
     });
-
     const data = Object.entries(map).sort(([a], [b]) => Number(a) - Number(b)).map(([, v]) => v);
     res.json({ success: true, data });
   } catch (error) {
@@ -282,13 +259,12 @@ export const getIngresosVsComisiones = async (req, res) => {
   }
 };
 
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // TOP OBRAS
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 export const getTopObras = async (req, res) => {
   try {
     const db = pools[req.user.rol] || pool;
-
     const result = await db.query(`
       SELECT
         o.id_obra, o.titulo, o.imagen_principal,
@@ -309,13 +285,12 @@ export const getTopObras = async (req, res) => {
   }
 };
 
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // TOP ARTISTAS
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 export const getTopArtistas = async (req, res) => {
   try {
     const db = pools[req.user.rol] || pool;
-
     const result = await db.query(`
       SELECT
         a.id_artista, a.nombre_completo, a.nombre_artistico, a.foto_perfil,
@@ -338,9 +313,9 @@ export const getTopArtistas = async (req, res) => {
   }
 };
 
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // EXPORTAR VENTAS .xlsx
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 export const exportarVentas = async (req, res) => {
   try {
     const db = pools[req.user.rol] || pool;
@@ -349,7 +324,6 @@ export const exportarVentas = async (req, res) => {
     let filtro   = "";
     if (desde) { params.push(desde); filtro += ` AND v.fecha_venta >= $${params.length}`; }
     if (hasta) { params.push(hasta); filtro += ` AND v.fecha_venta <= $${params.length}`; }
-
     const result = await db.query(`
       SELECT
         v.id_venta,
@@ -370,14 +344,11 @@ export const exportarVentas = async (req, res) => {
       WHERE v.estado != 'cancelado' ${filtro}
       ORDER BY v.fecha_venta DESC
     `, params);
-
     const wb = new ExcelJS.Workbook();
     wb.creator  = "Nu-B Studio · Galería Altar";
     wb.modified = new Date();
-
     await crearPortada(wb, "Reporte de Ventas",
       `${result.rows.length} transacciones · ${new Date().getFullYear()}`, BRAND.orange);
-
     const ws = wb.addWorksheet("Ventas");
     ws.columns = [
       { header: "ID Venta",    key: "id_venta",      width: 10 },
@@ -395,13 +366,11 @@ export const exportarVentas = async (req, res) => {
       { header: "Est. Envío",  key: "estado_envio",   width: 14 },
       { header: "Método Pago", key: "metodo_pago",    width: 20 },
     ];
-
     applyHeaderStyle(ws, BRAND.orange);
     result.rows.forEach(r => ws.addRow(r));
     applyRowStyles(ws, 2, ws.lastRow?.number, ws.columns.length);
     addTotalsRow(ws, { 7: "SUM", 8: "SUM", 9: "SUM", 10: "SUM" });
     configSheet(ws);
-
     const fecha = new Date().toISOString().split("T")[0];
     await sendXlsx(wb, res, `galeria-altar-ventas-${fecha}.xlsx`);
   } catch (error) {
@@ -410,13 +379,12 @@ export const exportarVentas = async (req, res) => {
   }
 };
 
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // EXPORTAR FINANCIERO .xlsx
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 export const exportarFinanciero = async (req, res) => {
   try {
     const db = pools[req.user.rol] || pool;
-
     const result = await db.query(`
       SELECT
         TO_CHAR(fecha_venta, 'Mon YYYY')               AS periodo,
@@ -434,14 +402,11 @@ export const exportarFinanciero = async (req, res) => {
       GROUP BY periodo, anio, mes_num
       ORDER BY anio DESC, mes_num DESC
     `);
-
     const wb = new ExcelJS.Workbook();
     wb.creator  = "Nu-B Studio · Galería Altar";
     wb.modified = new Date();
-
     await crearPortada(wb, "Reporte Financiero",
       "Ingresos · Comisiones · Neto artistas por período", BRAND.purple);
-
     const ws = wb.addWorksheet("Financiero");
     ws.columns = [
       { header: "Período",             key: "periodo",             width: 16 },
@@ -453,13 +418,11 @@ export const exportarFinanciero = async (req, res) => {
       { header: "Comisión Plataforma", key: "comision_plataforma", width: 22, style: { numFmt: '"$"#,##0.00' } },
       { header: "Neto Artistas",       key: "neto_artistas",       width: 18, style: { numFmt: '"$"#,##0.00' } },
     ];
-
     applyHeaderStyle(ws, BRAND.purple);
     result.rows.forEach(r => ws.addRow(r));
     applyRowStyles(ws, 2, ws.lastRow?.number, ws.columns.length);
     addTotalsRow(ws, { 3: "SUM", 4: "SUM", 5: "SUM", 6: "SUM", 7: "SUM", 8: "SUM" });
     configSheet(ws);
-
     const fecha = new Date().toISOString().split("T")[0];
     await sendXlsx(wb, res, `galeria-altar-financiero-${fecha}.xlsx`);
   } catch (error) {
@@ -468,13 +431,12 @@ export const exportarFinanciero = async (req, res) => {
   }
 };
 
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // EXPORTAR ARTISTAS .xlsx
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 export const exportarArtistas = async (req, res) => {
   try {
     const db = pools[req.user.rol] || pool;
-
     const result = await db.query(`
       SELECT
         a.nombre_completo, a.nombre_artistico, a.correo, a.ciudad,
@@ -495,14 +457,11 @@ export const exportarArtistas = async (req, res) => {
                a.porcentaje_comision, a.estado, a.fecha_registro
       ORDER BY comisiones_totales DESC
     `);
-
     const wb = new ExcelJS.Workbook();
     wb.creator  = "Nu-B Studio · Galería Altar";
     wb.modified = new Date();
-
     await crearPortada(wb, "Reporte de Artistas",
       `${result.rows.length} artistas · ventas y comisiones`, BRAND.pink);
-
     const ws = wb.addWorksheet("Artistas");
     ws.columns = [
       { header: "Nombre Completo",  key: "nombre_completo",       width: 28 },
@@ -519,13 +478,11 @@ export const exportarArtistas = async (req, res) => {
       { header: "Com. Pendientes",  key: "comisiones_pendientes", width: 18, style: { numFmt: '"$"#,##0.00' } },
       { header: "Neto Acumulado",   key: "neto_acumulado",        width: 18, style: { numFmt: '"$"#,##0.00' } },
     ];
-
     applyHeaderStyle(ws, BRAND.pink);
     result.rows.forEach(r => ws.addRow(r));
     applyRowStyles(ws, 2, ws.lastRow?.number, ws.columns.length);
     addTotalsRow(ws, { 10: "SUM", 11: "SUM", 12: "SUM", 13: "SUM" });
     configSheet(ws);
-
     const fecha = new Date().toISOString().split("T")[0];
     await sendXlsx(wb, res, `galeria-altar-artistas-${fecha}.xlsx`);
   } catch (error) {
@@ -534,13 +491,12 @@ export const exportarArtistas = async (req, res) => {
   }
 };
 
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // EXPORTAR CATÁLOGO DE OBRAS .xlsx
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 export const exportarCatalogoObras = async (req, res) => {
   try {
     const db = pools[req.user.rol] || pool;
-
     const result = await db.query(`
       SELECT
         o.id_obra, o.titulo,
@@ -566,14 +522,11 @@ export const exportarCatalogoObras = async (req, res) => {
       WHERE o.eliminada IS NOT TRUE
       ORDER BY o.fecha_creacion DESC
     `);
-
     const wb = new ExcelJS.Workbook();
     wb.creator  = "Nu-B Studio · Galería Altar";
     wb.modified = new Date();
-
     await crearPortada(wb, "Catálogo de Obras",
       `${result.rows.length} obras · Nu-B Studio · Galería Altar`, BRAND.orange);
-
     const ws = wb.addWorksheet("Catálogo");
     ws.columns = [
       { header: "ID",          key: "id_obra",          width: 8  },
@@ -595,7 +548,6 @@ export const exportarCatalogoObras = async (req, res) => {
       { header: "Alta",        key: "fecha_alta",       width: 14 },
       { header: "URL Imagen",  key: "imagen_principal", width: 50 },
     ];
-
     applyHeaderStyle(ws, BRAND.orange);
     result.rows.forEach(r => {
       const row = ws.addRow(r);
@@ -605,10 +557,8 @@ export const exportarCatalogoObras = async (req, res) => {
         cell.font  = { color: { argb: "FF79AAF5" }, underline: true, size: 10 };
       }
     });
-
     applyRowStyles(ws, 2, ws.lastRow?.number, ws.columns.length);
     configSheet(ws);
-
     const wsRes = wb.addWorksheet("Por Artista");
     wsRes.columns = [
       { header: "Artista",         key: "artista",     width: 30 },
@@ -619,7 +569,6 @@ export const exportarCatalogoObras = async (req, res) => {
       { header: "Precio Máx.",     key: "precio_max",  width: 14, style: { numFmt: '"$"#,##0.00' } },
       { header: "Precio Promedio", key: "precio_prom", width: 16, style: { numFmt: '"$"#,##0.00' } },
     ];
-
     const resArtistas = await db.query(`
       SELECT
         a.nombre_artistico AS artista,
@@ -635,12 +584,10 @@ export const exportarCatalogoObras = async (req, res) => {
       GROUP BY a.nombre_artistico
       ORDER BY total DESC
     `);
-
     applyHeaderStyle(wsRes, BRAND.orange);
     resArtistas.rows.forEach(r => wsRes.addRow(r));
     applyRowStyles(wsRes, 2, wsRes.lastRow?.number, wsRes.columns.length);
     configSheet(wsRes);
-
     const fecha = new Date().toISOString().split("T")[0];
     await sendXlsx(wb, res, `galeria-altar-catalogo-${fecha}.xlsx`);
   } catch (error) {
@@ -649,13 +596,12 @@ export const exportarCatalogoObras = async (req, res) => {
   }
 };
 
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // EXPORTAR PLANTILLA OBRAS .xlsx
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 export const exportarObrasPlantilla = async (req, res) => {
   try {
     const db = pools[req.user.rol] || pool;
-
     const [artistas, categorias, tecnicas, obras] = await Promise.all([
       db.query(`SELECT nombre_artistico, nombre_completo FROM artistas WHERE eliminado IS NOT TRUE ORDER BY nombre_artistico`),
       db.query(`SELECT nombre FROM categorias ORDER BY nombre`),
@@ -683,14 +629,11 @@ export const exportarObrasPlantilla = async (req, res) => {
         ORDER BY o.fecha_creacion DESC
       `),
     ]);
-
     const wb = new ExcelJS.Workbook();
     wb.creator  = "Nu-B Studio · Galería Altar";
     wb.modified = new Date();
-
     await crearPortada(wb, "Plantilla de Importación · Obras",
       "Completa los campos y sube el archivo desde el Panel Admin", BRAND.orange);
-
     const wsObras = wb.addWorksheet("Obras");
     wsObras.columns = [
       { header: "ID Obra",            key: "id_obra",          width: 10 },
@@ -710,10 +653,8 @@ export const exportarObrasPlantilla = async (req, res) => {
       { header: "Destacada",          key: "destacada",        width: 12 },
       { header: "URL Imagen",         key: "imagen_principal", width: 50 },
     ];
-
     applyHeaderStyle(wsObras, BRAND.orange);
     obras.rows.forEach(r => wsObras.addRow(r));
-
     if (obras.rows.length === 0) {
       const hint = wsObras.addRow([
         "", "← Vacío = nueva obra", "← Ver hoja Catálogos", "← Ver hoja Catálogos",
@@ -723,9 +664,7 @@ export const exportarObrasPlantilla = async (req, res) => {
       hint.font   = { italic: true, color: { argb: BRAND.gray }, size: 9 };
       hint.height = 15;
     }
-
     applyRowStyles(wsObras, 2, wsObras.lastRow?.number, wsObras.columns.length);
-
     const lastFormatted = wsObras.lastRow?.number ?? 1;
     for (let r = lastFormatted + 1; r <= 200; r++) {
       const row = wsObras.getRow(r);
@@ -742,7 +681,6 @@ export const exportarObrasPlantilla = async (req, res) => {
         };
       }
     }
-
     const maxDropdownRows = 1000;
     for (let r = 2; r <= maxDropdownRows; r++) {
       wsObras.getCell(`C${r}`).dataValidation = {
@@ -764,16 +702,14 @@ export const exportarObrasPlantilla = async (req, res) => {
         error: "Selecciona una técnica de la lista",
       };
     }
-
     wsObras.views = [{ state: "frozen", ySplit: 1, showGridLines: false }];
-
+    wsObras.getColumn(1).hidden = true; // ← ID oculto en obras
     const wsCat = wb.addWorksheet("Catálogos");
     wsCat.columns = [
       { header: "Artistas (nombre_artistico)", key: "artista",   width: 34 },
       { header: "Categorías válidas",          key: "categoria", width: 26 },
       { header: "Técnicas válidas",            key: "tecnica",   width: 26 },
     ];
-
     const hdr = wsCat.getRow(1);
     hdr.height = 22;
     hdr.eachCell(cell => {
@@ -781,7 +717,6 @@ export const exportarObrasPlantilla = async (req, res) => {
       cell.font      = { bold: true, color: { argb: BRAND.orange }, size: 11 };
       cell.alignment = { vertical: "middle", horizontal: "center" };
     });
-
     const maxRows = Math.max(artistas.rows.length, categorias.rows.length, tecnicas.rows.length);
     for (let i = 0; i < maxRows; i++) {
       const row = wsCat.addRow({
@@ -795,10 +730,8 @@ export const exportarObrasPlantilla = async (req, res) => {
         cell.border = { bottom: { style: "hair", color: { argb: BRAND.border } } };
       });
     }
-
     wsCat.views = [{ state: "frozen", ySplit: 1, showGridLines: false }];
     try { await wsCat.protect("nub-studio-ro", { selectLockedCells: true, selectUnlockedCells: true }); } catch (_) {}
-
     const fecha = new Date().toISOString().split("T")[0];
     await sendXlsx(wb, res, `galeria-altar-obras-plantilla-${fecha}.xlsx`);
   } catch (error) {
@@ -807,32 +740,26 @@ export const exportarObrasPlantilla = async (req, res) => {
   }
 };
 
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // IMPORTAR OBRAS .xlsx
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 export const importarObras = async (req, res) => {
   if (!req.file) return res.status(400).json({ success: false, message: "No se recibió ningún archivo" });
-
   const db         = pools[req.user.rol] || pool;
   const id_usuario = req.user?.id_usuario ?? 1;
-
   try {
     const wb = new ExcelJS.Workbook();
     await wb.xlsx.load(req.file.buffer);
-
     const ws = wb.getWorksheet("Obras") || wb.worksheets[0];
     if (!ws) return res.status(400).json({ success: false, message: "El Excel no contiene la hoja 'Obras'" });
-
     const [artistas, categorias, tecnicas] = await Promise.all([
       db.query(`SELECT id_artista, nombre_artistico, nombre_completo FROM artistas WHERE eliminado IS NOT TRUE`),
       db.query(`SELECT id_categoria, nombre FROM categorias`),
       db.query(`SELECT id_tecnica, nombre FROM tecnicas WHERE activa = TRUE`),
     ]);
-
     const mapArtista   = new Map(artistas.rows.map(r => [(r.nombre_artistico || r.nombre_completo).toLowerCase().trim(), r.id_artista]));
     const mapCategoria = new Map(categorias.rows.map(r => [r.nombre.toLowerCase().trim(), r.id_categoria]));
     const mapTecnica   = new Map(tecnicas.rows.map(r => [r.nombre.toLowerCase().trim(), r.id_tecnica]));
-
     const COLS = {
       id_obra: 1, titulo: 2, artista: 3, categoria: 4, tecnica: 5,
       anio_creacion: 6, descripcion: 7, precio_base: 8,
@@ -840,7 +767,6 @@ export const importarObras = async (req, res) => {
       permite_marco: 12, con_certificado: 13, estado: 14,
       destacada: 15, imagen_principal: 16,
     };
-
     const getCell = (row, col) => {
       const v = row.getCell(col).value;
       if (v === null || v === undefined)        return null;
@@ -849,39 +775,29 @@ export const importarObras = async (req, res) => {
       if (typeof v === "object" && v.text      !== undefined) return v.text;
       return v;
     };
-
     const toBoolean = (val, def = true) => {
       if (val === null || val === undefined) return def;
       return ["sí", "si", "yes", "true", "1"].includes(String(val).toLowerCase().trim());
     };
     const toNum = (val) => { const n = parseFloat(val); return isNaN(n) ? null : n; };
-
     const ESTADOS_VALIDOS = ["pendiente", "publicada", "rechazada", "agotada"];
     const resultados = [];
-
-    for (let rowNum = 2; rowNum <= ws.rowCount; rowNum++) {
+    for (let rowNum = 3; rowNum <= ws.rowCount; rowNum++) {
       const row    = ws.getRow(rowNum);
       const titulo = String(getCell(row, COLS.titulo) ?? "").trim();
       if (!titulo) continue;
-
       const rowInfo = { fila: rowNum, titulo, accion: null, errores: [] };
-
       const artistaRaw   = String(getCell(row, COLS.artista)   ?? "").trim();
       const categoriaRaw = String(getCell(row, COLS.categoria) ?? "").trim();
       const tecnicaRaw   = String(getCell(row, COLS.tecnica)   ?? "").trim();
-
       const id_artista   = mapArtista.get(artistaRaw.toLowerCase());
       const id_categoria = mapCategoria.get(categoriaRaw.toLowerCase());
       const id_tecnica   = tecnicaRaw ? (mapTecnica.get(tecnicaRaw.toLowerCase()) ?? null) : null;
-
       if (!id_artista)   rowInfo.errores.push(`Artista "${artistaRaw}" no encontrado`);
       if (!id_categoria) rowInfo.errores.push(`Categoría "${categoriaRaw}" no encontrada`);
-
       if (rowInfo.errores.length > 0) { rowInfo.accion = "error"; resultados.push(rowInfo); continue; }
-
       const estadoRaw = String(getCell(row, COLS.estado) ?? "").toLowerCase().trim();
       const estado    = ESTADOS_VALIDOS.includes(estadoRaw) ? estadoRaw : "pendiente";
-
       const datos = {
         titulo, id_artista, id_categoria, id_tecnica,
         anio_creacion:           toNum(getCell(row, COLS.anio_creacion)),
@@ -896,9 +812,7 @@ export const importarObras = async (req, res) => {
         destacada:               toBoolean(getCell(row, COLS.destacada), false),
         imagen_principal:        String(getCell(row, COLS.imagen_principal) ?? "").trim() || null,
       };
-
       const idObra = toNum(getCell(row, COLS.id_obra));
-
       try {
         if (idObra) {
           const upd = await db.query(`
@@ -931,7 +845,6 @@ export const importarObras = async (req, res) => {
             .replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
           const sc = await db.query("SELECT id_obra FROM obras WHERE slug = $1 LIMIT 1", [slug]);
           if (sc.rows.length > 0) slug = `${slug}-${Date.now()}`;
-
           const ins = await db.query(`
             INSERT INTO obras (
               titulo, slug, descripcion,
@@ -956,17 +869,14 @@ export const importarObras = async (req, res) => {
         rowInfo.errores.push(`Error BD: ${dbErr.message}`);
         rowInfo.accion = "error";
       }
-
       resultados.push(rowInfo);
     }
-
     const resumen = {
       total:        resultados.length,
       insertadas:   resultados.filter(r => r.accion === "insertada").length,
       actualizadas: resultados.filter(r => r.accion === "actualizada").length,
       errores:      resultados.filter(r => r.accion === "error").length,
     };
-
     logger.info(`[importarObras] ${resumen.insertadas} insertadas, ${resumen.actualizadas} actualizadas, ${resumen.errores} errores | admin=${id_usuario}`);
     return res.json({ success: true, resumen, detalle: resultados });
   } catch (error) {
@@ -975,13 +885,12 @@ export const importarObras = async (req, res) => {
   }
 };
 
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // EXPORTAR PLANTILLA ARTISTAS .xlsx
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 export const exportarArtistasPlantilla = async (req, res) => {
   try {
     const db = pools[req.user.rol] || pool;
-
     const artistas = await db.query(`
       SELECT
         a.id_artista, a.nombre_completo, a.nombre_artistico,
@@ -993,14 +902,11 @@ export const exportarArtistasPlantilla = async (req, res) => {
       WHERE a.eliminado IS NOT TRUE
       ORDER BY a.nombre_completo ASC
     `);
-
     const wb = new ExcelJS.Workbook();
     wb.creator  = "Nu-B Studio · Galería Altar";
     wb.modified = new Date();
-
     await crearPortada(wb, "Plantilla de Importación · Artistas",
       "Completa los campos y sube el archivo desde el Panel Admin", BRAND.pink);
-
     const wsA = wb.addWorksheet("Artistas");
     wsA.columns = [
       { header: "ID Artista",          key: "id_artista",          width: 12 },
@@ -1014,10 +920,8 @@ export const exportarArtistasPlantilla = async (req, res) => {
       { header: "Activo",              key: "activo",              width: 12 },
       { header: "Biografía",           key: "biografia",           width: 60 },
     ];
-
     applyHeaderStyle(wsA, BRAND.pink);
     artistas.rows.forEach(r => wsA.addRow(r));
-
     if (artistas.rows.length === 0) {
       const hint = wsA.addRow([
         "← Vacío = nuevo", "Apellido Nombre*", "Nombre artístico",
@@ -1027,17 +931,15 @@ export const exportarArtistasPlantilla = async (req, res) => {
       hint.font   = { italic: true, color: { argb: BRAND.gray }, size: 9 };
       hint.height = 15;
     }
-
     applyRowStyles(wsA, 2, wsA.lastRow?.number, wsA.columns.length);
     wsA.views = [{ state: "frozen", ySplit: 1, showGridLines: false }];
-
+    wsA.getColumn(1).hidden = true; // ← ID oculto en artistas
     const wsRef = wb.addWorksheet("Referencia");
     wsRef.columns = [
       { header: "Valores de 'estado'", key: "estado", width: 28 },
       { header: "Valores de 'activo'", key: "activo", width: 20 },
       { header: "Notas importantes",   key: "nota",   width: 56 },
     ];
-
     const refHdr = wsRef.getRow(1);
     refHdr.height = 22;
     refHdr.eachCell(cell => {
@@ -1045,7 +947,6 @@ export const exportarArtistasPlantilla = async (req, res) => {
       cell.font      = { bold: true, color: { argb: BRAND.pink }, size: 11 };
       cell.alignment = { vertical: "middle", horizontal: "center" };
     });
-
     const refRows = [
       { estado: "activo",    activo: "Sí", nota: "id_artista vacío = crear nuevo · con valor = actualizar existente" },
       { estado: "inactivo",  activo: "No", nota: "nombre_completo y correo son campos obligatorios (*)"              },
@@ -1060,10 +961,8 @@ export const exportarArtistasPlantilla = async (req, res) => {
         cell.font = { color: { argb: BRAND.cream }, size: 10 };
       });
     });
-
     wsRef.views = [{ showGridLines: false }];
     try { await wsRef.protect("nub-studio-ro", { selectLockedCells: true, selectUnlockedCells: true }); } catch (_) {}
-
     const fecha = new Date().toISOString().split("T")[0];
     await sendXlsx(wb, res, `galeria-altar-artistas-plantilla-${fecha}.xlsx`);
   } catch (error) {
@@ -1072,28 +971,23 @@ export const exportarArtistasPlantilla = async (req, res) => {
   }
 };
 
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 // IMPORTAR ARTISTAS .xlsx
-// ═════════════════════════════════════════════════════════════════════════════
+// ═══════════════════════════════════════════════════════════════════════
 export const importarArtistas = async (req, res) => {
   if (!req.file) return res.status(400).json({ success: false, message: "No se recibió ningún archivo" });
-
   const db         = pools[req.user.rol] || pool;
   const id_usuario = req.user?.id_usuario ?? 1;
-
   try {
     const wb = new ExcelJS.Workbook();
     await wb.xlsx.load(req.file.buffer);
-
     const ws = wb.getWorksheet("Artistas") || wb.worksheets[0];
     if (!ws) return res.status(400).json({ success: false, message: "El Excel no contiene la hoja 'Artistas'" });
-
     const COLS = {
       id_artista: 1, nombre_completo: 2, nombre_artistico: 3, correo: 4,
       telefono: 5, ciudad: 6, porcentaje_comision: 7,
       estado: 8, activo: 9, biografia: 10,
     };
-
     const getCell = (row, col) => {
       const v = row.getCell(col).value;
       if (v === null || v === undefined)        return null;
@@ -1102,34 +996,26 @@ export const importarArtistas = async (req, res) => {
       if (typeof v === "object" && v.text      !== undefined) return v.text;
       return v;
     };
-
     const toBoolean = (val, def = true) =>
       val === null || val === undefined ? def
       : ["sí", "si", "yes", "true", "1"].includes(String(val).toLowerCase().trim());
     const toNum = (val) => { const n = parseFloat(val); return isNaN(n) ? null : n; };
     const toStr = (val) => { const s = String(val ?? "").trim(); return s === "" ? null : s; };
-
     const ESTADOS_VALIDOS = ["activo", "inactivo", "pendiente"];
     const resultados      = [];
-
-    for (let rowNum = 2; rowNum <= ws.rowCount; rowNum++) {
+    for (let rowNum = 3; rowNum <= ws.rowCount; rowNum++) {
       const row            = ws.getRow(rowNum);
       const nombreCompleto = toStr(getCell(row, COLS.nombre_completo));
       if (!nombreCompleto) continue;
-
       const rowInfo = { fila: rowNum, titulo: nombreCompleto, accion: null, errores: [] };
       const correo  = toStr(getCell(row, COLS.correo));
       if (!correo) rowInfo.errores.push("El correo es obligatorio");
-
       const porcentaje = toNum(getCell(row, COLS.porcentaje_comision));
       if (porcentaje !== null && (porcentaje < 0 || porcentaje > 100))
         rowInfo.errores.push("porcentaje_comision debe ser entre 0 y 100");
-
       if (rowInfo.errores.length > 0) { rowInfo.accion = "error"; resultados.push(rowInfo); continue; }
-
       const estadoRaw = toStr(getCell(row, COLS.estado))?.toLowerCase() ?? "";
       const estado    = ESTADOS_VALIDOS.includes(estadoRaw) ? estadoRaw : "activo";
-
       const datos = {
         nombre_completo:     nombreCompleto,
         nombre_artistico:    toStr(getCell(row, COLS.nombre_artistico)),
@@ -1141,9 +1027,7 @@ export const importarArtistas = async (req, res) => {
         activo:              toBoolean(getCell(row, COLS.activo), true),
         biografia:           toStr(getCell(row, COLS.biografia)),
       };
-
       const idArtista = toNum(getCell(row, COLS.id_artista));
-
       try {
         if (idArtista) {
           const conflicto = await db.query(
@@ -1154,7 +1038,6 @@ export const importarArtistas = async (req, res) => {
             rowInfo.errores.push(`El correo "${datos.correo}" ya está en uso`);
             rowInfo.accion = "error"; resultados.push(rowInfo); continue;
           }
-
           const upd = await db.query(`
             UPDATE artistas SET
               nombre_completo=$1, nombre_artistico=$2, correo=$3,
@@ -1168,7 +1051,6 @@ export const importarArtistas = async (req, res) => {
             datos.porcentaje_comision, datos.estado, datos.activo,
             datos.biografia, idArtista,
           ]);
-
           if (!upd.rows.length) {
             rowInfo.errores.push(`id_artista ${idArtista} no existe`);
             rowInfo.accion = "error";
@@ -1184,7 +1066,6 @@ export const importarArtistas = async (req, res) => {
             rowInfo.errores.push(`El correo "${datos.correo}" ya está registrado`);
             rowInfo.accion = "error"; resultados.push(rowInfo); continue;
           }
-
           const ins = await db.query(`
             INSERT INTO artistas (
               nombre_completo, nombre_artistico, correo,
@@ -1205,21 +1086,317 @@ export const importarArtistas = async (req, res) => {
         rowInfo.errores.push(`Error BD: ${dbErr.message}`);
         rowInfo.accion = "error";
       }
-
       resultados.push(rowInfo);
     }
-
     const resumen = {
       total:        resultados.length,
       insertadas:   resultados.filter(r => r.accion === "insertada").length,
       actualizadas: resultados.filter(r => r.accion === "actualizada").length,
       errores:      resultados.filter(r => r.accion === "error").length,
     };
-
     logger.info(`[importarArtistas] ${resumen.insertadas} insertados, ${resumen.actualizadas} actualizados, ${resumen.errores} errores | admin=${id_usuario}`);
     return res.json({ success: true, resumen, detalle: resultados });
   } catch (error) {
     logger.error(`Error en importarArtistas: ${error.message}`);
     return res.status(500).json({ success: false, message: "Error al procesar el archivo: " + error.message });
+  }
+};
+// ═══════════════════════════════════════════════════════════════════════
+// EXPORTAR PLANTILLA VACÍA OBRAS .xlsx  (solo encabezados + catálogos)
+// ═══════════════════════════════════════════════════════════════════════
+export const exportarObrasPlantillaVacia = async (req, res) => {
+  try {
+    const db = pools[req.user.rol] || pool;
+
+    // Catálogos dinámicos — siempre frescos desde la BD
+    const [artistas, categorias, tecnicas] = await Promise.all([
+      db.query(`SELECT nombre_artistico, nombre_completo FROM artistas WHERE eliminado IS NOT TRUE ORDER BY nombre_artistico`),
+      db.query(`SELECT nombre FROM categorias ORDER BY nombre`),
+      db.query(`SELECT nombre FROM tecnicas WHERE activa = TRUE ORDER BY nombre`),
+    ]);
+
+    const wb = new ExcelJS.Workbook();
+    wb.creator  = "Nu-B Studio · Galería Altar";
+    wb.modified = new Date();
+    await crearPortada(wb,
+      "Plantilla Vacía · Obras",
+      "Rellena los campos y sube el archivo desde el Panel Admin",
+      BRAND.orange
+    );
+
+    // ── Hoja Obras ──────────────────────────────────────────────────
+    const wsObras = wb.addWorksheet("Obras");
+    wsObras.columns = [
+      { header: "ID Obra *",            key: "id_obra",          width: 12 },
+      { header: "Título *",             key: "titulo",           width: 44 },
+      { header: "Artista *",            key: "artista",          width: 28 },
+      { header: "Categoría *",          key: "categoria",        width: 22 },
+      { header: "Técnica",              key: "tecnica",          width: 22 },
+      { header: "Año de Creación",      key: "anio_creacion",    width: 16 },
+      { header: "Descripción",          key: "descripcion",      width: 50 },
+      { header: "Precio Base (MXN) *",  key: "precio_base",      width: 18, style: { numFmt: "#,##0.00" } },
+      { header: "Alto (cm)",            key: "alto_cm",          width: 12 },
+      { header: "Ancho (cm)",           key: "ancho_cm",         width: 12 },
+      { header: "Profundidad (cm)",     key: "profundidad_cm",   width: 16 },
+      { header: "Permite Marco",        key: "permite_marco",    width: 15 },
+      { header: "Con Certificado",      key: "con_certificado",  width: 17 },
+      { header: "Estado",               key: "estado",           width: 14 },
+      { header: "Destacada",            key: "destacada",        width: 12 },
+      { header: "URL Imagen",           key: "imagen_principal", width: 50 },
+    ];
+    applyHeaderStyle(wsObras, BRAND.orange);
+
+    // Fila de ayuda con hints por columna
+    const hint = wsObras.addRow([
+      "Vacío=nueva / ID=actualizar",
+      "Ej: Amanecer en el bosque",
+      "← Ver hoja Catálogos",
+      "← Ver hoja Catálogos",
+      "← Ver hoja Catálogos (opcional)",
+      "Ej: 2024",
+      "Descripción libre...",
+      "Sin símbolo $, ej: 1500",
+      "Ej: 60",
+      "Ej: 40",
+      "Ej: 2 (opcional)",
+      "Sí o No",
+      "Sí o No",
+      "pendiente / publicada",
+      "Sí o No",
+      "URL o vacío",
+    ]);
+    hint.font   = { italic: true, color: { argb: BRAND.gray }, size: 9 };
+    hint.height = 16;
+    hint.eachCell(cell => {
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A1530" } };
+    });
+
+    // Filas vacías pre-formateadas (200 filas listas para escribir)
+    for (let r = 3; r <= 202; r++) {
+      const row = wsObras.getRow(r);
+      row.height = 18;
+      for (let c = 1; c <= wsObras.columns.length; c++) {
+        const cell = row.getCell(c);
+        const isAlt = (r - 3) % 2 === 1;
+        cell.fill   = { type: "pattern", pattern: "solid", fgColor: { argb: isAlt ? BRAND.rowAlt : BRAND.dark } };
+        cell.font   = { color: { argb: BRAND.cream }, size: 10 };
+        cell.border = {
+          top:    { style: "hair", color: { argb: BRAND.border } },
+          bottom: { style: "hair", color: { argb: BRAND.border } },
+          left:   { style: "hair", color: { argb: BRAND.border } },
+          right:  { style: "hair", color: { argb: BRAND.border } },
+        };
+      }
+    }
+
+    // Dropdowns dinámicos desde Catálogos (filas 2 a 1000)
+    const maxDropdown = 1000;
+    for (let r = 2; r <= maxDropdown; r++) {
+      wsObras.getCell(`C${r}`).dataValidation = {
+        type: "list", allowBlank: true,
+        formulae: [`Catálogos!$A$2:$A$${artistas.rows.length + 1}`],
+        showErrorMessage: true, errorTitle: "Artista inválido",
+        error: "Selecciona un artista de la lista Catálogos",
+      };
+      wsObras.getCell(`D${r}`).dataValidation = {
+        type: "list", allowBlank: true,
+        formulae: [`Catálogos!$B$2:$B$${categorias.rows.length + 1}`],
+        showErrorMessage: true, errorTitle: "Categoría inválida",
+        error: "Selecciona una categoría de la lista Catálogos",
+      };
+      wsObras.getCell(`E${r}`).dataValidation = {
+        type: "list", allowBlank: true,
+        formulae: [`Catálogos!$C$2:$C$${tecnicas.rows.length + 1}`],
+        showErrorMessage: true, errorTitle: "Técnica inválida",
+        error: "Selecciona una técnica de la lista Catálogos",
+      };
+      wsObras.getCell(`L${r}`).dataValidation = {
+        type: "list", allowBlank: true,
+        formulae: ['"Sí,No"'],
+      };
+      wsObras.getCell(`M${r}`).dataValidation = {
+        type: "list", allowBlank: true,
+        formulae: ['"Sí,No"'],
+      };
+      wsObras.getCell(`N${r}`).dataValidation = {
+        type: "list", allowBlank: true,
+        formulae: ['"pendiente,publicada,rechazada,agotada"'],
+        showErrorMessage: true, errorTitle: "Estado inválido",
+        error: "Valores permitidos: pendiente, publicada, rechazada, agotada",
+      };
+      wsObras.getCell(`O${r}`).dataValidation = {
+        type: "list", allowBlank: true,
+        formulae: ['"Sí,No"'],
+      };
+    }
+
+    wsObras.views = [{ state: "frozen", ySplit: 1, showGridLines: false }];
+    wsObras.getColumn(1).hidden = true; // ID oculto
+
+    // ── Hoja Catálogos (dinámica) ────────────────────────────────────
+    const wsCat = wb.addWorksheet("Catálogos");
+    wsCat.columns = [
+      { header: "Artistas (nombre_artistico)", key: "artista",   width: 34 },
+      { header: "Categorías válidas",          key: "categoria", width: 26 },
+      { header: "Técnicas válidas",            key: "tecnica",   width: 26 },
+    ];
+    const hdr = wsCat.getRow(1);
+    hdr.height = 22;
+    hdr.eachCell(cell => {
+      cell.fill      = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A0F2E" } };
+      cell.font      = { bold: true, color: { argb: BRAND.orange }, size: 11 };
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+    });
+    const maxRows = Math.max(artistas.rows.length, categorias.rows.length, tecnicas.rows.length);
+    for (let i = 0; i < maxRows; i++) {
+      const row = wsCat.addRow({
+        artista:   artistas.rows[i]?.nombre_artistico || artistas.rows[i]?.nombre_completo || "",
+        categoria: categorias.rows[i]?.nombre || "",
+        tecnica:   tecnicas.rows[i]?.nombre  || "",
+      });
+      row.eachCell(cell => {
+        cell.fill   = { type: "pattern", pattern: "solid", fgColor: { argb: i % 2 === 0 ? BRAND.dark : BRAND.rowAlt } };
+        cell.font   = { color: { argb: BRAND.cream }, size: 10 };
+        cell.border = { bottom: { style: "hair", color: { argb: BRAND.border } } };
+      });
+    }
+    wsCat.views = [{ state: "frozen", ySplit: 1, showGridLines: false }];
+    try { await wsCat.protect("nub-studio-ro", { selectLockedCells: true, selectUnlockedCells: true }); } catch (_) {}
+
+    const fecha = new Date().toISOString().split("T")[0];
+    await sendXlsx(wb, res, `galeria-altar-obras-plantilla-vacia-${fecha}.xlsx`);
+  } catch (error) {
+    logger.error(`Error en exportarObrasPlantillaVacia: ${error.message}`);
+    res.status(500).json({ success: false, message: "Error al exportar plantilla vacía de obras" });
+  }
+};
+
+// ═══════════════════════════════════════════════════════════════════════
+// EXPORTAR PLANTILLA VACÍA ARTISTAS .xlsx  (solo encabezados + referencia)
+// ═══════════════════════════════════════════════════════════════════════
+export const exportarArtistasPlantillaVacia = async (req, res) => {
+  try {
+    const wb = new ExcelJS.Workbook();
+    wb.creator  = "Nu-B Studio · Galería Altar";
+    wb.modified = new Date();
+    await crearPortada(wb,
+      "Plantilla Vacía · Artistas",
+      "Rellena los campos y sube el archivo desde el Panel Admin",
+      BRAND.pink
+    );
+
+    // ── Hoja Artistas ────────────────────────────────────────────────
+    const wsA = wb.addWorksheet("Artistas");
+    wsA.columns = [
+      { header: "ID Artista *",         key: "id_artista",          width: 14 },
+      { header: "Nombre Completo *",    key: "nombre_completo",     width: 34 },
+      { header: "Nombre Artístico",     key: "nombre_artistico",    width: 32 },
+      { header: "Correo *",             key: "correo",              width: 34 },
+      { header: "Teléfono",             key: "telefono",            width: 18 },
+      { header: "Ciudad",               key: "ciudad",              width: 22 },
+      { header: "% Comisión",           key: "porcentaje_comision", width: 16 },
+      { header: "Estado",               key: "estado",              width: 16 },
+      { header: "Activo",               key: "activo",              width: 12 },
+      { header: "Biografía",            key: "biografia",           width: 60 },
+    ];
+    applyHeaderStyle(wsA, BRAND.pink);
+
+    // Fila de ayuda
+    const hint = wsA.addRow([
+      "Vacío=nuevo / ID=actualizar",
+      "Ej: García López María",
+      "Ej: María García",
+      "correo@ejemplo.com",
+      "+52 55 0000 0000",
+      "Ciudad de México",
+      "30",
+      "activo / inactivo / pendiente",
+      "Sí o No",
+      "Texto libre...",
+    ]);
+    hint.font   = { italic: true, color: { argb: BRAND.gray }, size: 9 };
+    hint.height = 16;
+    hint.eachCell(cell => {
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A1530" } };
+    });
+
+    // Filas vacías pre-formateadas (200)
+    for (let r = 3; r <= 202; r++) {
+      const row = wsA.getRow(r);
+      row.height = 18;
+      for (let c = 1; c <= wsA.columns.length; c++) {
+        const cell = row.getCell(c);
+        const isAlt = (r - 3) % 2 === 1;
+        cell.fill   = { type: "pattern", pattern: "solid", fgColor: { argb: isAlt ? BRAND.rowAlt : BRAND.dark } };
+        cell.font   = { color: { argb: BRAND.cream }, size: 10 };
+        cell.border = {
+          top:    { style: "hair", color: { argb: BRAND.border } },
+          bottom: { style: "hair", color: { argb: BRAND.border } },
+          left:   { style: "hair", color: { argb: BRAND.border } },
+          right:  { style: "hair", color: { argb: BRAND.border } },
+        };
+      }
+    }
+
+    // Dropdowns fijos en Estado y Activo
+    for (let r = 2; r <= 1000; r++) {
+      wsA.getCell(`H${r}`).dataValidation = {
+        type: "list", allowBlank: true,
+        formulae: ['"activo,inactivo,pendiente"'],
+        showErrorMessage: true, errorTitle: "Estado inválido",
+        error: "Valores permitidos: activo, inactivo, pendiente",
+      };
+      wsA.getCell(`I${r}`).dataValidation = {
+        type: "list", allowBlank: true,
+        formulae: ['"Sí,No"'],
+      };
+    }
+
+    wsA.views = [{ state: "frozen", ySplit: 1, showGridLines: false }];
+    wsA.getColumn(1).hidden = true;
+
+    // ── Hoja Referencia ──────────────────────────────────────────────
+    const wsRef = wb.addWorksheet("Referencia");
+    wsRef.columns = [
+      { header: "Campo",              key: "campo",       width: 24 },
+      { header: "Obligatorio",        key: "obligatorio", width: 14 },
+      { header: "Valores permitidos", key: "valores",     width: 36 },
+      { header: "Notas",              key: "nota",        width: 56 },
+    ];
+    const refHdr = wsRef.getRow(1);
+    refHdr.height = 22;
+    refHdr.eachCell(cell => {
+      cell.fill      = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A0F2E" } };
+      cell.font      = { bold: true, color: { argb: BRAND.pink }, size: 11 };
+      cell.alignment = { vertical: "middle", horizontal: "center" };
+    });
+    const refRows = [
+      { campo: "ID Artista",         obligatorio: "No",  valores: "Número entero",                  nota: "Vacío = crear nuevo · Con valor = actualizar existente" },
+      { campo: "Nombre Completo",    obligatorio: "Sí",  valores: "Texto libre",                    nota: "Formato sugerido: Apellido Nombre" },
+      { campo: "Nombre Artístico",   obligatorio: "No",  valores: "Texto libre",                    nota: "Si se omite, se usa el nombre completo" },
+      { campo: "Correo",             obligatorio: "Sí",  valores: "correo@dominio.com",              nota: "Debe ser único en el sistema" },
+      { campo: "Teléfono",           obligatorio: "No",  valores: "+52 55 0000 0000",               nota: "Incluye lada internacional" },
+      { campo: "Ciudad",             obligatorio: "No",  valores: "Texto libre",                    nota: "Ej: Ciudad de México, Guadalajara" },
+      { campo: "% Comisión",         obligatorio: "No",  valores: "0 – 100",                        nota: "Sin símbolo %. Default: 30" },
+      { campo: "Estado",             obligatorio: "No",  valores: "activo / inactivo / pendiente",  nota: "Default: activo" },
+      { campo: "Activo",             obligatorio: "No",  valores: "Sí / No",                        nota: "Default: Sí" },
+      { campo: "Biografía",          obligatorio: "No",  valores: "Texto libre",                    nota: "Puede quedar vacío" },
+    ];
+    refRows.forEach((r, i) => {
+      const row = wsRef.addRow(r);
+      row.eachCell(cell => {
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: i % 2 === 0 ? BRAND.dark : BRAND.rowAlt } };
+        cell.font = { color: { argb: BRAND.cream }, size: 10 };
+        cell.border = { bottom: { style: "hair", color: { argb: BRAND.border } } };
+      });
+    });
+    wsRef.views = [{ showGridLines: false }];
+    try { await wsRef.protect("nub-studio-ro", { selectLockedCells: true, selectUnlockedCells: true }); } catch (_) {}
+
+    const fecha = new Date().toISOString().split("T")[0];
+    await sendXlsx(wb, res, `galeria-altar-artistas-plantilla-vacia-${fecha}.xlsx`);
+  } catch (error) {
+    logger.error(`Error en exportarArtistasPlantillaVacia: ${error.message}`);
+    res.status(500).json({ success: false, message: "Error al exportar plantilla vacía de artistas" });
   }
 };

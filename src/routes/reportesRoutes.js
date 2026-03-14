@@ -16,6 +16,8 @@ import {
   exportarArtistasPlantilla,
   importarObras,
   importarArtistas,
+  exportarObrasPlantillaVacia,
+  exportarArtistasPlantillaVacia,
 } from "../controllers/Reportescontroller.js";
 
 const router = Router();
@@ -48,6 +50,9 @@ router.get("/exportar/artistas",            exportarArtistas);
 router.get("/exportar/catalogo-obras",      exportarCatalogoObras);
 router.get("/exportar/obras-plantilla",     exportarObrasPlantilla);
 router.get("/exportar/artistas-plantilla",  exportarArtistasPlantilla);
+// ✅ Después:
+router.get("/exportar/obras-plantilla-vacia",    exportarObrasPlantillaVacia);
+router.get("/exportar/artistas-plantilla-vacia", exportarArtistasPlantillaVacia);
 
 // ── Importaciones xlsx ───────────────────────────────────
 router.post("/importar/obras",     upload.single("archivo"), importarObras);
