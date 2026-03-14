@@ -283,6 +283,12 @@ async function construirSQL(client, tablasSeleccionadas, label = "Respaldo compl
 //   Sin body / tablas vacío  → backup COMPLETO de toda la base
 //   Con tablas               → backup SELECTIVO solo de esas tablas
 // ══════════════════════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════════════════════════
+// REEMPLAZA la función generarBackup completa en backupController.js
+// Único cambio: en vez de enviar el archivo como descarga,
+// devuelve JSON con la URL de Supabase Storage
+// ══════════════════════════════════════════════════════════════════════════════
+
 async function generarBackup(req, res) {
   const t0      = Date.now();
   const adminId = req.user?.id_usuario ?? req.user?.sub ?? null;
@@ -290,17 +296,16 @@ async function generarBackup(req, res) {
 
   const client = await pool.connect();
   try {
-    // resolverTablas respeta orden topológico y aplica el filtro si viene
     const tablasABackup = await resolverTablas(client, tablasBody);
     if (!tablasABackup.length)
       return res.status(400).json({ success: false, message: "No se encontraron tablas válidas" });
 
     const esSelectivo = Array.isArray(tablasBody) && tablasBody.length > 0;
-    const label  = esSelectivo
+    const label   = esSelectivo
       ? `Respaldo selectivo (${tablasABackup.length} tablas)`
       : "Respaldo completo";
-    const ahora  = new Date();
-    const ts     = ahora.toISOString().replace(/[:.]/g, "-").slice(0, 19);
+    const ahora   = new Date();
+    const ts      = ahora.toISOString().replace(/[:.]/g, "-").slice(0, 19);
     const archivo = esSelectivo
       ? `nub-studio-backup-selectivo-${ts}.sql`
       : `nub-studio-backup-${ts}.sql`;
@@ -309,27 +314,53 @@ async function generarBackup(req, res) {
     const ms  = Date.now() - t0;
     const buf = Buffer.from(sql, "utf8");
 
+    // ── Subir a Supabase Storage (obligatorio ahora) ──────────────────────────
     let urlArchivo = null;
-    try { urlArchivo = await subirAStorage(archivo, buf); console.log(`[backup] Subido: ${archivo}`); }
-    catch (err) { console.warn("[backup] No se pudo subir:", err.message); }
+    try {
+      urlArchivo = await subirAStorage(archivo, buf);
+      console.log(`[backup] Subido a Storage: ${archivo}`);
+    } catch (err) {
+      console.error("[backup] Error al subir a Storage:", err.message);
+      return res.status(500).json({
+        success: false,
+        message: "El backup se generó pero no se pudo subir a Storage",
+        error: err.message,
+      });
+    }
 
-    await guardarHistorial(client, adminId, { tablas: tablasOk, filas: filasTotal, bytes, ms, md5, archivo, url: urlArchivo });
+    await guardarHistorial(client, adminId, {
+      tablas: tablasOk, filas: filasTotal,
+      bytes, ms, md5, archivo, url: urlArchivo,
+    });
 
-    // Limpieza automática solo en backups completos
-    if (!esSelectivo) await limpiarBackupsAntiguos(client);
+    // Limpieza automática (completos y selectivos)
+    await limpiarBackupsAntiguos(client);
 
-    res.setHeader("Content-Type",        "application/sql");
-    res.setHeader("Content-Disposition", `attachment; filename="${archivo}"`);
-    res.setHeader("Content-Length",      buf.length);
-    res.setHeader("X-Backup-Checksum",   md5);
-    res.setHeader("X-Backup-Tables",     tablasOk);
-    res.setHeader("X-Backup-Rows",       filasTotal);
-    res.setHeader("X-Backup-Duration",   ms);
-    if (urlArchivo) res.setHeader("X-Backup-Url", urlArchivo);
-    return res.status(200).send(buf);
+    // ── Respuesta JSON — sin descarga local ───────────────────────────────────
+    return res.status(200).json({
+      success: true,
+      message: esSelectivo
+        ? `Backup selectivo generado (${tablasOk} tablas, ${filasTotal.toLocaleString()} filas)`
+        : `Backup completo generado (${tablasOk} tablas, ${filasTotal.toLocaleString()} filas)`,
+      data: {
+        archivo,
+        url:     urlArchivo,
+        tablas:  tablasOk,
+        filas:   filasTotal,
+        bytes,
+        ms,
+        md5,
+        selectivo: esSelectivo,
+      },
+    });
+
   } catch (err) {
     console.error("Error backup:", err);
-    return res.status(500).json({ success: false, message: "Error al generar el respaldo", error: err.message });
+    return res.status(500).json({
+      success: false,
+      message: "Error al generar el respaldo",
+      error: err.message,
+    });
   } finally { client.release(); }
 }
 
@@ -392,20 +423,45 @@ async function ensureConfigCronTable() {
 
 let cronJob = null;
 
+// ── REEMPLAZA calcularProximoCron en backupController.js ─────────────────────
+// El problema: prox.setHours(hora) usa la hora del servidor (UTC)
+// pero el usuario la ingresa en hora México (UTC-6 / UTC-5 con DST)
+// La corrección: obtener el offset real en el momento del cálculo
+
 function calcularProximoCron(frecuencia, hora, diaSemana) {
-  const ahora = new Date(), prox = new Date();
-  prox.setHours(hora, 0, 0, 0);
+  // Obtener el offset real de México en este momento (respeta DST automáticamente)
+  // México Central es UTC-6 en invierno, UTC-5 en verano
+  const ahoraEnMexico = new Date(
+    new Date().toLocaleString("en-US", { timeZone: "America/Mexico_City" })
+  );
+  const ahoraUTC    = new Date();
+  const offsetHoras = Math.round((ahoraUTC - ahoraEnMexico) / 3600000);
+  // offsetHoras será 6 (invierno) o 5 (verano)
+
+  // hora ingresada por el admin es en tiempo México → convertir a UTC para el Date
+  const horaUTC = hora + offsetHoras;
+
+  const ahora = new Date();
+  const prox  = new Date();
+  prox.setHours(horaUTC, 0, 0, 0);
+
   if (frecuencia === "diario") {
     if (prox <= ahora) prox.setDate(prox.getDate() + 1);
+
   } else if (frecuencia === "semanal") {
-    const hoy  = ahora.getDay();
-    let diff   = (diaSemana - hoy + 7) % 7;
+    const hoy = ahora.getDay();
+    let diff  = (diaSemana - hoy + 7) % 7;
     if (diff === 0 && prox <= ahora) diff = 7;
     prox.setDate(prox.getDate() + diff);
+
   } else if (frecuencia === "mensual") {
     prox.setDate(1);
-    if (prox <= ahora) { prox.setMonth(prox.getMonth() + 1); prox.setDate(1); }
+    if (prox <= ahora) {
+      prox.setMonth(prox.getMonth() + 1);
+      prox.setDate(1);
+    }
   }
+
   return prox;
 }
 
