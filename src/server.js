@@ -1,7 +1,6 @@
 // =========================================================
 // 📦 IMPORTACIONES
 // =========================================================
-import tecnicasRoutes      from "./routes/tecnicasRoutes.js";
 import express             from 'express';
 import cors                from 'cors';
 import cron                from 'node-cron';
@@ -20,7 +19,9 @@ import statsRoutes         from "./routes/statsRoutes.js";
 import artistaPortalRoutes from './routes/artistaPortalRoutes.js';
 import adminRoutes         from './routes/adminRoutes.js';
 import reportesRoutes      from './routes/reportesRoutes.js';
-import estadosRoutes from       './routes/estadosRoutes.js';
+import estadosRoutes       from './routes/estadosRoutes.js';
+import tecnicasRoutes      from "./routes/tecnicasRoutes.js";
+import monitoreoRoutes from './routes/monitoreoRoutes.js';
 import { testConnection }                                      from './config/db.js';
 import { cleanupExpiredCodes, sendRecoveryCode, generateCode } from './services/emailService.js';
 import { cleanupExpiredSessions }                              from './services/sessionService.js';
@@ -54,7 +55,7 @@ app.use(helmet({
 }));
 
 // =========================================================
-// CORS  (una sola vez, con exposedHeaders para backups)
+// CORS
 // =========================================================
 const allowedOrigins = [
   process.env.FRONTEND_URL,
@@ -95,19 +96,21 @@ app.use(preventSQLInjection);
 app.use('/api/auth',           authRoutes);
 app.use('/api/recovery',       recoveryRoutes);
 app.use('/api/2fa',            twoFactorRoutes);
-app.use("/api/gmail-2fa",      gmail2faRoutes);
-app.use('/api/gmail2fa',       gmail2faRoutes);
+app.use('/api/gmail-2fa',      gmail2faRoutes);
 app.use('/api/imagenes',       imagenesRoutes);
 app.use('/api/obras',          obrasRoutes);
 app.use('/api/categorias',     categoriasRoutes);
 app.use('/api/artistas',       artistasRoutes);
 app.use('/api/etiquetas',      etiquetasRoutes);
 app.use('/api/artista-portal', artistaPortalRoutes);
-app.use("/api/tecnicas",       tecnicasRoutes);
-app.use("/api/stats",          statsRoutes);
-app.use("/api/admin",          adminRoutes);
-app.use("/api/reportes",       reportesRoutes);
-app.use('/api/estados', estadosRoutes);
+app.use('/api/tecnicas',       tecnicasRoutes);
+app.use('/api/stats',          statsRoutes);
+app.use('/api/admin/monitoreo', monitoreoRoutes);
+app.use('/api/admin',          adminRoutes);
+app.use('/api/reportes',       reportesRoutes);
+app.use('/api/estados',        estadosRoutes);
+
+
 // =========================================================
 // RUTA DE PRUEBA
 // =========================================================
@@ -116,7 +119,12 @@ app.get('/', (req, res) => {
     message:  'Backend AUTH activo y corriendo correctamente.',
     database: 'PostgreSQL',
     cors:     allowedOrigins,
-    security: { xss:'enabled', sqlInjection:'enabled', csrf:'not-needed (JWT-based)', helmet:'enabled' },
+    security: {
+      xss:          'enabled',
+      sqlInjection: 'enabled',
+      csrf:         'not-needed (JWT-based)',
+      helmet:       'enabled',
+    },
     timestamp: new Date().toISOString(),
   });
 });
@@ -166,7 +174,6 @@ app.listen(PORT, async () => {
     logger.error(`Error en la conexion PostgreSQL: ${error.message}`);
   }
 
-  // Restaurar cron de backups automáticos si estaba activo en BD
   try {
     await iniciarCron();
     logger.info('Cron de backups inicializado.');
