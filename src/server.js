@@ -22,6 +22,8 @@ import reportesRoutes      from './routes/reportesRoutes.js';
 import estadosRoutes       from './routes/estadosRoutes.js';
 import tecnicasRoutes      from "./routes/tecnicasRoutes.js";
 import monitoreoRoutes from './routes/monitoreoRoutes.js';
+import estadisticasRoutes from './routes/estadisticasRoutes.js';
+
 import { testConnection }                                      from './config/db.js';
 import { cleanupExpiredCodes, sendRecoveryCode, generateCode } from './services/emailService.js';
 import { cleanupExpiredSessions }                              from './services/sessionService.js';
@@ -109,7 +111,7 @@ app.use('/api/admin/monitoreo', monitoreoRoutes);
 app.use('/api/admin',          adminRoutes);
 app.use('/api/reportes',       reportesRoutes);
 app.use('/api/estados',        estadosRoutes);
-
+app.use('/api/estadisticas', estadisticasRoutes);
 
 // =========================================================
 // RUTA DE PRUEBA

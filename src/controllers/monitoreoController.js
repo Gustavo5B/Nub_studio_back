@@ -267,11 +267,11 @@ export async function getAlertas(req, res) {
     `);
     const cacheRatio = parseFloat(cache[0]?.ratio ?? "100");
     if (cacheRatio < 95)
-      alertas.push({ nivel:"critico", tipo:"cache", titulo:"Cache hit ratio bajo",
-        descripcion:`El ratio es ${cacheRatio}% (recomendado >99%). Considera aumentar shared_buffers.`, valor:cacheRatio });
+      alertas.push({ nivel:"critico", tipo:"cache", titulo:"Caché ineficiente",
+        descripcion:`El ratio es ${cacheRatio}% — el ${(100-cacheRatio).toFixed(1)}% de las lecturas van a disco. Recomendado >99%. En Neon free tier es normal por la RAM limitada; en producción se resuelve aumentando shared_buffers.`, valor:cacheRatio });
     else if (cacheRatio < 99)
-      alertas.push({ nivel:"advertencia", tipo:"cache", titulo:"Cache hit ratio mejorable",
-        descripcion:`El ratio es ${cacheRatio}%. Lo óptimo es >99%.`, valor:cacheRatio });
+      alertas.push({ nivel:"advertencia", tipo:"cache", titulo:"Eficiencia de caché mejorable",
+        descripcion:`El ratio es ${cacheRatio}% — el ${(100-cacheRatio).toFixed(1)}% de lecturas van a disco. Lo óptimo es >99%. Considera aumentar shared_buffers.`, valor:cacheRatio });
 
     const conex    = await safeQuery(client, `SELECT count(*) AS activas FROM pg_stat_activity WHERE datname = current_database()`);
     const maxConex = await safeQuery(client, `SHOW max_connections`);
