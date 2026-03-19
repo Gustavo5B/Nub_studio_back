@@ -10,7 +10,7 @@ import {
   sendActivacionCuentaEmail,
   sendVerificacionEmailArtista,
 } from "../services/emailService.js";
-import { saveActiveSession, revokeOtherSessions } from '../services/sessionService.js';
+import { saveActiveSession, revokeOtherSessions, removeSession } from '../services/sessionService.js';
 import crypto from 'crypto';
 import logger from '../config/logger.js';
 dotenv.config();
@@ -292,6 +292,21 @@ export const closeOtherSessions = async (req, res) => {
   } catch (error) {
     logger.error(`Error al revocar sesiones: ${error.message}`);
     res.status(500).json({ message: "Error al cerrar otras sesiones" });
+  }
+};
+
+// =========================================================
+// LOGOUT — invalida la sesión en sesiones_activas
+// =========================================================
+export const logout = async (req, res) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (token) await removeSession(token);
+    logger.info(`Logout: usuario ${req.user.id_usuario}`);
+    res.json({ message: 'Sesión cerrada correctamente' });
+  } catch (error) {
+    logger.error(`Error en logout: ${error.message}`);
+    res.status(500).json({ message: 'Error al cerrar sesión' });
   }
 };
 

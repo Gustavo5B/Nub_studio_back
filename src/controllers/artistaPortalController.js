@@ -171,7 +171,7 @@ export const getMisObras = async (req, res) => {
     const obras = result.rows;
     const stats = {
       total:      obras.length,
-      publicadas: obras.filter(o => o.estado === 'aprobada').length,
+      publicadas: obras.filter(o => o.estado === 'publicada').length,
       pendientes: obras.filter(o => o.estado === 'pendiente').length,
       rechazadas: obras.filter(o => o.estado === 'rechazada').length,
     };

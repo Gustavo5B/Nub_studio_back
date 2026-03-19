@@ -3,6 +3,7 @@ import {
   login,
   loginWith2FA,
   verifyLoginCode,
+  logout,
   closeOtherSessions,
   checkSession,
   registroArtista,
@@ -37,6 +38,7 @@ router.post("/login-2fa",         loginWith2FA);
 router.post("/verify-login-code", verifyLoginCode);
 
 // ── Sesiones (requieren autenticación) ──────────────────────
+router.post("/logout",               authenticateToken, logout);
 router.post("/close-other-sessions", authenticateToken, closeOtherSessions);
 router.get("/check-session",         authenticateToken, checkSession);
 
