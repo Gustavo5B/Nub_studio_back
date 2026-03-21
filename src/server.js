@@ -67,11 +67,12 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: function (origin, callback) {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    logger.warn(`Bloqueado por CORS: ${origin}`);
-    return callback(new Error('Origen no permitido por CORS'), false);
-  },
+  if (!origin) return callback(null, true);
+  if (allowedOrigins.includes(origin)) return callback(null, true);
+  logger.warn(`Bloqueado por CORS: ${origin}`);
+  // En lugar de error, devolvemos false explícitamente
+  return callback(new Error('Origen no autorizado por CORS'));
+},
   credentials:    true,
   methods:        ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -84,6 +85,19 @@ app.use(cors({
     'X-Backup-Url',
   ],
 }));
+app.use((err, req, res, next) => {
+  if (err.message === 'Origen no autorizado por CORS') {
+    return res.status(403).json({
+      error: 'Acceso denegado',
+      message: 'Origen no autorizado por política CORS',
+      origin: req.headers.origin || 'desconocido',
+    });
+  }
+  next(err);
+});
+
+
+
 
 // =========================================================
 // MIDDLEWARES GLOBALES
