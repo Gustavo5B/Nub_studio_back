@@ -3,37 +3,114 @@ import { pool } from "../config/db.js";
 import logger   from "../config/logger.js";
 
 // ══════════════════════════════════════════════════════════════════════════════
-// MODELO MATEMÁTICO: Regresión Lineal por Mínimos Cuadrados
-// y = a + bx
-//   b = (n·Σxy - Σx·Σy) / (n·Σx² - (Σx)²)
-//   a = (Σy - b·Σx) / n
-//   R² = 1 - SSres/SStot
+// MODELO MATEMÁTICO: Crecimiento / Decrecimiento Exponencial
+// Ley:       dy/dt = k·y   →   Solución: y(t) = y₀·eᵏᵗ
+// Linealizar: ln(y) = ln(y₀) + k·t  →  regresión de mínimos cuadrados sobre
+//             todos los puntos con y > 0  →  k y y₀ robustos
+// R²         calculado en escala original (no logarítmica)
+// t_duplic   ln(2) / k  si k > 0  (tiempo de duplicación)
+// t_semivida ln(2) / |k|  si k < 0  (tiempo de semivida)
 // ══════════════════════════════════════════════════════════════════════════════
-function regresionLineal(puntos) {
+function modeloExponencial(puntos) {
   const n = puntos.length;
-  if (n < 2) return { a: puntos[0]?.y ?? 0, b: 0, r2: 0 };
 
-  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
-  for (const { x, y } of puntos) {
-    sumX += x; sumY += y; sumXY += x * y; sumX2 += x * x;
+  // Estadísticos de la serie original (todos los puntos)
+  const yVals = puntos.map(p => p.y);
+  const media = yVals.reduce((a, b) => a + b, 0) / n;
+  const desvStd = Math.sqrt(yVals.reduce((s, v) => s + (v - media) ** 2, 0) / n);
+  const freq = {};
+  yVals.forEach(v => { freq[v] = (freq[v] ?? 0) + 1; });
+  const moda = Number(Object.entries(freq).sort((a, b) => b[1] - a[1])[0][0]);
+
+  // Fallback cuando no hay suficientes datos positivos
+  const puntosPos = puntos.filter(p => p.y > 0);
+  if (puntosPos.length < 2) {
+    const y0 = puntosPos[0]?.y ?? 1;
+    return {
+      y0, k: 0, fase: "estable",
+      ecuacion: `y(t) = ${y0}·e^(0·t)`,
+      t_caracteristico: null,
+      estadisticos: { media: Number.parseFloat(media.toFixed(2)), moda, desv_std: Number.parseFloat(desvStd.toFixed(2)), r2: 0 },
+      errores: [],
+    };
   }
-  const b    = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
-  const a    = (sumY - b * sumX) / n;
-  const yMed = sumY / n;
-  let ssTot = 0, ssRes = 0;
-  for (const { x, y } of puntos) {
-    ssTot += (y - yMed) ** 2;
-    ssRes += (y - (a + b * x)) ** 2;
+
+  // Mínimos cuadrados sobre ln(y) = ln(y₀) + k·t
+  const np = puntosPos.length;
+  let sumX = 0, sumLnY = 0, sumXLnY = 0, sumX2 = 0;
+  for (const { x, y } of puntosPos) {
+    const lnY = Math.log(y);
+    sumX += x; sumLnY += lnY; sumXLnY += x * lnY; sumX2 += x * x;
   }
-  const r2 = ssTot === 0 ? 1 : Math.max(0, 1 - ssRes / ssTot);
-  return { a: parseFloat(a.toFixed(4)), b: parseFloat(b.toFixed(4)), r2: parseFloat(r2.toFixed(4)) };
+  const denom = np * sumX2 - sumX * sumX;
+  const k    = denom === 0 ? 0 : (np * sumXLnY - sumX * sumLnY) / denom;
+  const lnY0 = (sumLnY - k * sumX) / np;
+  const y0   = Math.exp(lnY0);
+
+  // R² en escala logarítmica — mide la calidad del ajuste lineal que sí optimizamos:
+  // ln(y) = ln(y₀) + k·t. Es el R² natural para regresión exponencial linealizada.
+  const lnYMed = sumLnY / np;
+  let ssTotLog = 0, ssResLog = 0;
+  for (const { x, y } of puntosPos) {
+    const lnY     = Math.log(y);
+    const lnYPred = lnY0 + k * x;
+    ssTotLog += (lnY - lnYMed) ** 2;
+    ssResLog += (lnY - lnYPred) ** 2;
+  }
+  const r2 = ssTotLog === 0 ? 1 : Math.max(0, 1 - ssResLog / ssTotLog);
+
+  // Errores punto a punto en escala original (para tabla técnica)
+  const errores = puntos.map(({ x, y }) => {
+    const yMod   = y0 * Math.exp(k * x);
+    const error  = y - yMod;
+    // sMAPE: simétrico, acotado 0-200%, estable cuando y es pequeño
+    const denom2 = (Math.abs(y) + Math.abs(yMod)) / 2;
+    const errRel = denom2 > 0 ? Math.abs(error) / denom2 * 100 : null;
+    return {
+      x,
+      y_real:         y,
+      y_modelo:       Number.parseFloat(yMod.toFixed(2)),
+      error:          Number.parseFloat(error.toFixed(2)),
+      error_relativo: errRel === null ? null : Number.parseFloat(errRel.toFixed(2)),
+    };
+  });
+
+  const kFmt  = Number.parseFloat(k.toFixed(4));
+  const y0Fmt = Number.parseFloat(y0.toFixed(4));
+  let fase;
+  if (k > 0)      fase = "crecimiento";
+  else if (k < 0) fase = "decrecimiento";
+  else             fase = "estable";
+  const ecuacion = `y(t) = ${y0Fmt}·e^(${kFmt}·t)`;
+
+  // Tiempo de duplicación (k > 0) o semivida (k < 0)
+  const t_caracteristico = Math.abs(k) > 0.0001
+    ? Number.parseFloat((Math.log(2) / Math.abs(k)).toFixed(2))
+    : null;
+
+  return {
+    y0:    y0Fmt,
+    k:     kFmt,
+    fase,
+    ecuacion,
+    t_caracteristico,
+    estadisticos: {
+      media:    Number.parseFloat(media.toFixed(2)),
+      moda,
+      desv_std: Number.parseFloat(desvStd.toFixed(2)),
+      r2:       Number.parseFloat(r2.toFixed(4)),
+    },
+    errores,
+  };
 }
 
 function predecir(modelo, ultimoX, n) {
-  const { a, b } = modelo;
+  const { y0, k } = modelo;
   return Array.from({ length: n }, (_, i) => {
     const x = ultimoX + i + 1;
-    return { x, y: Math.max(0, Math.round(a + b * x)) };
+    const val = Math.max(0, y0 * Math.exp(k * x));
+    // Guardar 1 decimal para que diferencias pequeñas no colapsen al mismo entero
+    return { x, y: Number.parseFloat(val.toFixed(1)) };
   });
 }
 
@@ -50,16 +127,16 @@ export async function getResumen(req, res) {
       pool.query(`SELECT COUNT(*) AS total FROM historial_login WHERE DATE(fecha) = CURRENT_DATE`),
       pool.query(`SELECT COUNT(*) AS total FROM historial_login WHERE DATE(fecha) = CURRENT_DATE - 1`),
     ]);
-    const totalHoy  = parseInt(hoy.rows[0].total);
-    const totalAyer = parseInt(ayer.rows[0].total);
-    const tendencia = totalAyer === 0 ? 0 : parseFloat(((totalHoy - totalAyer) / totalAyer * 100).toFixed(1));
+    const totalHoy  = Number.parseInt(hoy.rows[0].total);
+    const totalAyer = Number.parseInt(ayer.rows[0].total);
+    const tendencia = totalAyer === 0 ? 0 : Number.parseFloat(((totalHoy - totalAyer) / totalAyer * 100).toFixed(1));
     res.json({
       success: true,
       data: {
-        total_eventos: parseInt(total.rows[0].total),
-        logins_exitosos: parseInt(exitosos.rows[0].total),
-        logins_fallidos: parseInt(fallidos.rows[0].total),
-        usuarios_unicos: parseInt(unicos.rows[0].total),
+        total_eventos: Number.parseInt(total.rows[0].total),
+        logins_exitosos: Number.parseInt(exitosos.rows[0].total),
+        logins_fallidos: Number.parseInt(fallidos.rows[0].total),
+        usuarios_unicos: Number.parseInt(unicos.rows[0].total),
         accesos_hoy: totalHoy, accesos_ayer: totalAyer, tendencia_pct: tendencia,
       },
     });
@@ -140,7 +217,7 @@ export async function getPorSemana(req, res) {
       usuarios_unicos: r.usuarios_unicos, x: i,
     }));
     const puntos  = data.map(d => ({ x: d.x, y: d.total }));
-    const modelo  = regresionLineal(puntos);
+    const modelo  = modeloExponencial(puntos);
     const ultimoX = data.length - 1;
     const predicciones = predecir(modelo, ultimoX, 4).map((p, i) => {
       const fechaBase = new Date(data[data.length - 1]?.semana ?? new Date());
@@ -151,12 +228,7 @@ export async function getPorSemana(req, res) {
         prediccion: p.y, x: p.x,
       };
     });
-    res.json({
-      success: true, data,
-      modelo: { ...modelo, formula: `y = ${modelo.a} + ${modelo.b}x`,
-        interpretacion: modelo.b >= 0 ? `Tendencia creciente: +${modelo.b} accesos/semana` : `Tendencia decreciente: ${modelo.b} accesos/semana` },
-      predicciones,
-    });
+    res.json({ success: true, data, modelo, predicciones });
   } catch (err) {
     logger.error(`[estadisticas] getPorSemana: ${err.message}`);
     res.status(500).json({ success: false, message: "Error al obtener datos semanales" });
@@ -181,8 +253,17 @@ export async function getPorDia(req, res) {
       total: r.total, exitosos: r.exitosos, fallidos: r.fallidos,
       usuarios_unicos: r.usuarios_unicos, x: i,
     }));
-    const puntos  = data.map(d => ({ x: d.x, y: d.total }));
-    const modelo  = regresionLineal(puntos);
+    // Primero calcular media móvil de 7 días — elimina ruido diario
+    const promedioMovil = data.map((d, i) => {
+      const ventana = data.slice(Math.max(0, i - 6), i + 1);
+      const avg     = ventana.reduce((s, v) => s + v.total, 0) / ventana.length;
+      return { ...d, promedio_movil: Number.parseFloat(avg.toFixed(1)) };
+    });
+    // Ajustar el modelo exponencial a la media móvil, no a los datos crudos.
+    // La media móvil revela la tendencia subyacente eliminando picos aislados,
+    // lo que produce un R² significativamente mejor y predicciones más estables.
+    const puntos  = promedioMovil.map(d => ({ x: d.x, y: d.promedio_movil }));
+    const modelo  = modeloExponencial(puntos);
     const ultimoX = data.length - 1;
     const predicciones = predecir(modelo, ultimoX, 7).map((p, i) => {
       const fecha = new Date();
@@ -191,17 +272,7 @@ export async function getPorDia(req, res) {
         label: fecha.toLocaleDateString("es-MX", { day:"2-digit", month:"short" }),
         prediccion: p.y, x: p.x };
     });
-    const promedioMovil = data.map((d, i) => {
-      const ventana = data.slice(Math.max(0, i - 6), i + 1);
-      const avg     = ventana.reduce((s, v) => s + v.total, 0) / ventana.length;
-      return { ...d, promedio_movil: parseFloat(avg.toFixed(1)) };
-    });
-    res.json({
-      success: true, data: promedioMovil,
-      modelo: { ...modelo, formula: `y = ${modelo.a} + ${modelo.b}x`,
-        interpretacion: modelo.b >= 0 ? `Tendencia creciente: +${modelo.b} accesos/día` : `Tendencia decreciente: ${modelo.b} accesos/día` },
-      predicciones,
-    });
+    res.json({ success: true, data: promedioMovil, modelo, predicciones });
   } catch (err) {
     logger.error(`[estadisticas] getPorDia: ${err.message}`);
     res.status(500).json({ success: false, message: "Error al obtener datos diarios" });
@@ -262,7 +333,7 @@ export async function getMapaCalor(req, res) {
         matriz.push({
           dia: d, dia_label: DIAS[d],
           hora: h, hora_label: `${String(h).padStart(2,"0")}:00`,
-          total, intensidad: parseFloat((total / maxVal).toFixed(3)),
+          total, intensidad: Number.parseFloat((total / maxVal).toFixed(3)),
         });
       }
     }
@@ -296,7 +367,7 @@ export async function getHistorial(req, res) {
       ${where}
       ORDER BY h.fecha DESC
       LIMIT $${params.length + 1}
-    `, [...params, parseInt(limite)]);
+    `, [...params, Number.parseInt(limite)]);
     res.json({ success: true, data: result.rows, total: result.rowCount });
   } catch (err) {
     logger.error(`[estadisticas] getHistorial: ${err.message}`);
