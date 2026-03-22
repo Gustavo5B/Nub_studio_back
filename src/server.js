@@ -39,7 +39,7 @@ import logger from "./config/logger.js";
 import { iniciarCron } from "./controllers/backupController.js";
 
 // =========================================================
-// MANEJO DE ERRORES NO CAPTURADOS  ← evita crash por pg
+// MANEJO DE ERRORES NO CAPTURADOS
 // =========================================================
 process.on("uncaughtException", (err) => {
   logger.error(`uncaughtException: ${err.message}`);
@@ -53,16 +53,49 @@ process.on("unhandledRejection", (reason) => {
 // =========================================================
 dotenv.config();
 const app = express();
+const isProd = process.env.NODE_ENV === "production";
 
 // =========================================================
-// HELMET
+// FIX ZAP #1 — HELMET COMPLETO
+// Corrige: CSP no configurada, Anti-Clickjacking, HSTS, X-Content-Type
 // =========================================================
+app.set("trust proxy", false);
+
 app.use(
   helmet({
-    contentSecurityPolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
+        imgSrc: ["'self'", "data:", "https://res.cloudinary.com"],
+        connectSrc: ["'self'"],
+        fontSrc: [
+          "'self'",
+          "https://fonts.googleapis.com",
+          "https://fonts.gstatic.com",
+        ],
+        objectSrc: ["'none'"],
+        frameAncestors: ["'none'"],
+      },
+    },
+    strictTransportSecurity: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+    hidePoweredBy: true,
     crossOriginEmbedderPolicy: false,
+    noSniff: true,
+    frameguard: { action: "deny" },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
   }),
 );
+
+// =========================================================
+// FIX ZAP #2 — OCULTAR VERSION DEL SERVIDOR
+// =========================================================
+app.disable("x-powered-by");
 
 // =========================================================
 // CORS
@@ -79,7 +112,6 @@ app.use(
       if (!origin) return callback(null, true);
       if (allowedOrigins.includes(origin)) return callback(null, true);
       logger.warn(`Bloqueado por CORS: ${origin}`);
-      // En lugar de error, devolvemos false explícitamente
       return callback(new Error("Origen no autorizado por CORS"));
     },
     credentials: true,
@@ -95,6 +127,7 @@ app.use(
     ],
   }),
 );
+
 app.use((err, req, res, next) => {
   if (err.message === "Origen no autorizado por CORS") {
     return res.status(403).json({
@@ -112,6 +145,22 @@ app.use((err, req, res, next) => {
 app.use(express.json({ limit: "10mb" }));
 app.use(sanitizeInput);
 app.use(preventSQLInjection);
+
+// =========================================================
+// FIX ZAP #3 — CABECERAS DE CACHE
+// Corrige: Reexaminar las Directivas de Control de Caché
+// =========================================================
+app.use((req, res, next) => {
+  if (req.path.startsWith("/api/auth") || req.path.startsWith("/api/admin")) {
+    res.setHeader(
+      "Cache-Control",
+      "no-store, no-cache, must-revalidate, private",
+    );
+    res.setHeader("Pragma", "no-cache");
+    res.setHeader("Expires", "0");
+  }
+  next();
+});
 
 // =========================================================
 // RUTAS
@@ -138,23 +187,29 @@ app.use("/api/municipios", municipiosRoutes);
 
 // =========================================================
 // RUTA DE PRUEBA
+// FIX ZAP #4 — No exponer info interna en produccion
 // =========================================================
 app.get("/", (req, res) => {
   res.json({
-    message: "Backend AUTH activo y corriendo correctamente.",
-    database: "PostgreSQL",
-    cors: allowedOrigins,
-    security: {
-      xss: "enabled",
-      sqlInjection: "enabled",
-      csrf: "not-needed (JWT-based)",
-      helmet: "enabled",
-    },
+    message: "Backend activo y corriendo correctamente.",
+    ...(isProd
+      ? {}
+      : {
+          database: "PostgreSQL",
+          cors: allowedOrigins,
+          security: {
+            xss: "enabled",
+            sqlInjection: "enabled",
+            csrf: "not-needed (JWT-based)",
+            helmet: "enabled",
+          },
+        }),
     timestamp: new Date().toISOString(),
   });
 });
 
 app.get("/api/test-email", async (req, res) => {
+  if (isProd) return res.status(404).json({ message: "Not found" });
   try {
     const testEmail = "tucorreo@gmail.com";
     const code = generateCode();
@@ -163,11 +218,20 @@ app.get("/api/test-email", async (req, res) => {
     res.json({ message: `Correo de prueba enviado a ${testEmail}`, code });
   } catch (error) {
     logger.error(`Error al enviar el correo de prueba: ${error.message}`);
-    res.status(500).json({
-      message: "Error al enviar correo de prueba",
-      error: error.message,
-    });
+    res.status(500).json({ message: "Error al enviar correo de prueba" });
   }
+});
+
+// =========================================================
+// FIX ZAP #5 — MANEJO GLOBAL DE ERRORES
+// Corrige: Divulgacion de error de aplicacion
+// =========================================================
+app.use((err, req, res, next) => {
+  logger.error(`Error no manejado: ${err.message}`);
+  res.status(err.status || 500).json({
+    error: "Error interno del servidor",
+    ...(isProd ? {} : { detail: err.message }),
+  });
 });
 
 // =========================================================
@@ -201,7 +265,9 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, async () => {
   logger.info(`Servidor corriendo en el puerto ${PORT}`);
   logger.info(`CORS habilitado para: ${allowedOrigins.join(", ")}`);
-  logger.info("Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet");
+  logger.info(
+    "Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS",
+  );
 
   try {
     await testConnection();
