@@ -2,6 +2,7 @@ import express from 'express';
 import multer  from 'multer';
 import {
   getMiPerfil, actualizarMiPerfil,
+  agregarFotoPersonal, eliminarFotoPersonal,
   getMisObras, nuevaObra,
   getObraById, actualizarObraArtista,
 } from '../controllers/artistaPortalController.js';
@@ -57,7 +58,12 @@ const sanitizeMultipart = (req, res, next) => {
 // ── Perfil ───────────────────────────────────────────────────
 router.get('/mi-perfil', authenticateToken, requireRole('artista'), getMiPerfil);
 router.put('/mi-perfil', authenticateToken, requireRole('artista'),
-  upload.single('foto'), sanitizeMultipart, actualizarMiPerfil);
+  upload.fields([{ name: 'foto_portada', maxCount: 1 }, { name: 'foto_logo', maxCount: 1 }]),
+  sanitizeMultipart, actualizarMiPerfil);
+
+// ── Fotos personales ─────────────────────────────────────────
+router.post('/fotos-personales',       authenticateToken, requireRole('artista'), upload.single('foto'), agregarFotoPersonal);
+router.delete('/fotos-personales/:id', authenticateToken, requireRole('artista'), eliminarFotoPersonal);
 
 // ── Obras ────────────────────────────────────────────────────
 router.get('/mis-obras',   authenticateToken, requireRole('artista'), getMisObras);

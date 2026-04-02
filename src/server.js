@@ -25,6 +25,7 @@ import monitoreoRoutes from "./routes/monitoreoRoutes.js";
 import estadisticasRoutes from "./routes/estadisticasRoutes.js";
 import sobreNosotrosRoutes from "./routes/sobreNosotrosRoutes.js";
 import municipiosRoutes from "./routes/municipiosRoutes.js";
+import coleccionesRoutes from "./routes/coleccionesRoutes.js";
 
 import { testConnection } from "./config/db.js";
 import {
@@ -184,6 +185,7 @@ app.use("/api/estados", estadosRoutes);
 app.use("/api/estadisticas", estadisticasRoutes);
 app.use("/api/sobre-nosotros", sobreNosotrosRoutes);
 app.use("/api/municipios", municipiosRoutes);
+app.use("/api/colecciones", coleccionesRoutes);
 
 // =========================================================
 // RUTA DE PRUEBA

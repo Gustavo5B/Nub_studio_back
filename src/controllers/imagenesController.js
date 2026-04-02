@@ -64,6 +64,30 @@ export const subirImagenesGaleria = async (req, res) => {
     if (!id_obra)
       return res.status(400).json({ success: false, message: 'El ID de la obra es obligatorio' });
 
+    // Verificar ownership si es artista
+    if (req.user.rol === 'artista') {
+      const ownerCheck = await db.query(
+        `SELECT o.id_obra FROM obras o
+         INNER JOIN artistas a ON o.id_artista = a.id_artista
+         WHERE o.id_obra = $1 AND a.id_usuario = $2 AND (o.eliminada IS NULL OR o.eliminada = FALSE)`,
+        [id_obra, req.user.id_usuario]
+      );
+      if (ownerCheck.rows.length === 0)
+        return res.status(403).json({ success: false, message: 'No tienes permiso para modificar esta obra' });
+    }
+
+    // Validar límite de 6 fotos en total
+    const countResult = await db.query(
+      'SELECT COUNT(*) AS total FROM imagenes_obras WHERE id_obra = $1 AND activa = TRUE',
+      [id_obra]
+    );
+    const totalActual = Number.parseInt(countResult.rows[0].total);
+    if (totalActual + req.files.length > 6)
+      return res.status(400).json({
+        success: false,
+        message: `Solo se permiten 6 fotos por obra. Actualmente tienes ${totalActual}, intentas agregar ${req.files.length}.`
+      });
+
     const maxOrden = await db.query(
       'SELECT COALESCE(MAX(orden), 0) as max_orden FROM imagenes_obras WHERE id_obra = $1',
       [id_obra]
