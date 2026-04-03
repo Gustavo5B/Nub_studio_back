@@ -3,14 +3,14 @@ import {
   listarArtistas, obtenerArtistaPorId,
   crearArtista, actualizarArtista, eliminarArtista, cambiarEstadoArtista
 } from "../controllers/artistasController.js";
-import { authenticateToken, requireRole } from '../middlewares/authMiddleware.js';
+import { authenticateToken, requireRole, optionalAuth } from '../middlewares/authMiddleware.js';
 import { upload } from '../config/cloudinaryConfig.js';
 
 const router = Router();
 
 // ── PÚBLICAS ──────────────────────────────────────────────
-router.get('/',    listarArtistas);
-router.get('/:id', obtenerArtistaPorId);
+router.get('/',    optionalAuth, listarArtistas);
+router.get('/:id', optionalAuth, obtenerArtistaPorId);
 
 // ── PROTEGIDAS (solo admin) ───────────────────────────────
 router.post('/',           authenticateToken, requireRole('admin'), upload.single('foto'), crearArtista);

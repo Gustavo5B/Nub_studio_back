@@ -41,6 +41,7 @@ export const listarArtistas = async (req, res) => {
   try {
     const db = pools[req.user?.rol] || pool;
 
+    const isAdmin = req.user?.rol === 'admin';
     const result = await db.query(`
       SELECT
         a.id_artista, a.nombre_completo, a.nombre_artistico,
@@ -54,7 +55,7 @@ export const listarArtistas = async (req, res) => {
       FROM artistas a
       LEFT JOIN categorias c ON a.id_categoria_principal = c.id_categoria
       LEFT JOIN obras o ON a.id_artista = o.id_artista
-      WHERE a.activo = TRUE AND a.eliminado = FALSE
+      WHERE ${isAdmin ? '' : 'a.activo = TRUE AND'} a.eliminado = FALSE
       GROUP BY a.id_artista, c.nombre
       ORDER BY a.nombre_completo ASC
     `);

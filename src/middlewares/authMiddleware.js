@@ -57,6 +57,39 @@ export const authenticateToken = async (req, res, next) => {
   }
 };
 
+// Middleware de auth opcional — no falla si no hay token, solo popula req.user si es válido
+export const optionalAuth = async (req, res, next) => {
+  try {
+    const authHeader = req.headers['authorization'];
+    const token = authHeader && authHeader.split(' ')[1];
+    if (!token) return next();
+
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET, {
+        algorithms: ['HS256'],
+        issuer: 'nub-studio',
+        audience: 'nub-users'
+      });
+    } catch {
+      return next(); // token inválido/expirado → ignorar, seguir como visitante
+    }
+
+    const sessionExists = await isSessionValid(token);
+    if (!sessionExists) return next();
+
+    req.user = {
+      id_usuario: parseInt(decoded.sub),
+      jti: decoded.jti,
+      rol: decoded.rol || 'cliente'
+    };
+    req.token = token;
+    next();
+  } catch {
+    next();
+  }
+};
+
 // Middleware de roles
 export const requireRole = (...roles) => {
   return (req, res, next) => {
