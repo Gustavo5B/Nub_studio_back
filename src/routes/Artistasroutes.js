@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { 
+import {
   listarArtistas, obtenerArtistaPorId,
   crearArtista, actualizarArtista, eliminarArtista, cambiarEstadoArtista
 } from "../controllers/artistasController.js";

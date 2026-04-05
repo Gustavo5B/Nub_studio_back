@@ -57,7 +57,17 @@ export const listarArtistas = async (req, res) => {
       LEFT JOIN obras o ON a.id_artista = o.id_artista
       WHERE ${isAdmin ? '' : 'a.activo = TRUE AND'} a.eliminado = FALSE
       GROUP BY a.id_artista, c.nombre
-      ORDER BY a.nombre_completo ASC
+      ORDER BY
+        a.activo DESC,
+        CASE a.estado
+          WHEN 'activo'     THEN 1
+          WHEN 'pendiente'  THEN 2
+          WHEN 'suspendido' THEN 3
+          WHEN 'inactivo'   THEN 4
+          WHEN 'rechazado'  THEN 5
+          ELSE 6
+        END,
+        a.nombre_completo ASC
     `);
 
     res.json({ success: true, data: result.rows });
@@ -73,8 +83,16 @@ export const listarArtistas = async (req, res) => {
 // =========================================================
 export const obtenerArtistaPorId = async (req, res) => {
   try {
-    const db = pools[req.user?.rol] || pool;
-    const { id } = req.params;
+    const { id }  = req.params;
+    const isAdmin = req.user?.rol === 'admin';
+
+    // Admin usa pool base (permisos completos); público usa pool por rol
+    const db = isAdmin ? pool : (pools[req.user?.rol] || pool);
+
+    // Admin ve todos los artistas sin importar activo; público solo los activos
+    const whereClause = isAdmin
+      ? 'WHERE a.id_artista = $1 AND a.eliminado = FALSE'
+      : 'WHERE a.id_artista = $1 AND a.activo = TRUE AND a.eliminado = FALSE';
 
     const resultArtista = await db.query(`
       SELECT a.*, c.nombre AS categoria_nombre,
@@ -85,7 +103,7 @@ export const obtenerArtistaPorId = async (req, res) => {
       FROM artistas a
       LEFT JOIN categorias c ON a.id_categoria_principal = c.id_categoria
       LEFT JOIN obras o ON a.id_artista = o.id_artista
-      WHERE a.id_artista = $1 AND a.activo = TRUE AND a.eliminado = FALSE
+      ${whereClause}
       GROUP BY a.id_artista, c.nombre
       LIMIT 1
     `, [id]);
@@ -95,7 +113,8 @@ export const obtenerArtistaPorId = async (req, res) => {
 
     const artista = resultArtista.rows[0];
 
-    const resultObras = await db.query(`
+    const dbObras = isAdmin ? pool : db;
+    const resultObras = await dbObras.query(`
       SELECT o.id_obra, o.titulo, o.slug, o.imagen_principal,
         o.anio_creacion, o.estado, o.activa, o.precio_base,
         c.nombre AS categoria_nombre
@@ -373,3 +392,4 @@ export const cambiarEstadoArtista = async (req, res) => {
       res.status(500).json({ success: false, message: "Error al cambiar estado" });
   }
 };
+

@@ -46,6 +46,16 @@ export const listarObras = async (req, res) => {
       case 'precio_asc':  orderBy = 'precio_minimo ASC NULLS LAST';   break;
       case 'precio_desc': orderBy = 'precio_minimo DESC NULLS LAST';  break;
       case 'nombre':      orderBy = 'o.titulo ASC';                   break;
+      case 'admin':
+        orderBy = `o.activa DESC,
+          CASE o.estado
+            WHEN 'publicada'  THEN 1
+            WHEN 'pendiente'  THEN 2
+            WHEN 'rechazada'  THEN 3
+            ELSE 4
+          END,
+          o.fecha_creacion DESC`;
+        break;
     }
 
     const query = `
