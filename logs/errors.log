@@ -1208,3 +1208,41 @@
 2026-04-05 18:55:24 [warn]: Auth: sesion revocada usuario 14
 2026-04-05 18:55:53 [error]: Error al verificar sesion: Connection terminated due to connection timeout
 2026-04-05 18:55:53 [warn]: Auth: sesion revocada usuario 14
+2026-04-06 10:42:06 [warn]: [monitoreo] query falló: relation "pg_stat_statements" does not exist
+2026-04-06 10:42:06 [warn]: [monitoreo] query falló: relation "pg_stat_statements" does not exist
+2026-04-06 10:42:07 [warn]: [monitoreo] query falló: relation "pg_stat_statements" does not exist
+2026-04-06 10:42:08 [warn]: [monitoreo] query falló: relation "pg_stat_statements" does not exist
+2026-04-06 11:22:01 [warn]: [monitoreo] query falló: relation "pg_stat_statements" does not exist
+2026-04-06 11:22:01 [warn]: [monitoreo] query falló: relation "pg_stat_statements" does not exist
+2026-04-06 11:22:02 [warn]: [monitoreo] query falló: relation "pg_stat_statements" does not exist
+2026-04-06 11:22:03 [warn]: [monitoreo] query falló: relation "pg_stat_statements" does not exist
+2026-04-06 11:22:07 [warn]: [monitoreo] query falló: relation "pg_stat_statements" does not exist
+2026-04-06 11:22:07 [warn]: [monitoreo] query falló: relation "pg_stat_statements" does not exist
+2026-04-06 11:22:08 [warn]: [monitoreo] query falló: relation "pg_stat_statements" does not exist
+2026-04-06 11:22:08 [warn]: [monitoreo] query falló: relation "pg_stat_statements" does not exist
+2026-04-06 14:15:53 [warn]: Auth: token invalido o manipulado
+2026-04-06 14:15:53 [warn]: Auth: token invalido o manipulado
+2026-04-06 14:15:53 [warn]: Auth: token invalido o manipulado
+2026-04-06 14:15:53 [warn]: Auth: token invalido o manipulado
+2026-04-06 14:15:54 [warn]: Auth: token no proporcionado
+2026-04-06 14:15:54 [warn]: Auth: token no proporcionado
+2026-04-06 14:15:56 [warn]: Auth: token no proporcionado
+2026-04-06 14:15:56 [warn]: Auth: token no proporcionado
+2026-04-06 14:15:56 [warn]: Auth: token no proporcionado
+2026-04-06 14:15:56 [warn]: Auth: token no proporcionado
+2026-04-06 14:16:52 [warn]: Auth: sesion revocada usuario 14
+2026-04-06 14:43:50 [error]: Error al verificar sesion: Connection terminated due to connection timeout
+2026-04-06 14:43:50 [warn]: Auth: sesion revocada usuario 14
+2026-04-06 14:43:54 [error]: Error al verificar sesion: Connection terminated due to connection timeout
+2026-04-06 14:43:54 [warn]: Auth: sesion revocada usuario 14
+2026-04-06 14:43:56 [error]: Error al listar artistas: Connection terminated due to connection timeout | Error: Connection terminated due to connection timeout
+    at C:\xampp\htdocs\ProtectoAltar\back_auth_mysql\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async listarArtistas (file:///C:/xampp/htdocs/ProtectoAltar/back_auth_mysql/src/controllers/artistasController.js:45:20)
+2026-04-06 14:43:56 [error]: Error al listar obras: Connection terminated due to connection timeout
+2026-04-06 14:44:00 [error]: Error al verificar sesion: Connection terminated due to connection timeout
+2026-04-06 14:44:00 [warn]: Auth: sesion revocada usuario 14
+2026-04-06 14:44:00 [error]: Error al listar artistas: Connection terminated due to connection timeout | Error: Connection terminated due to connection timeout
+    at C:\xampp\htdocs\ProtectoAltar\back_auth_mysql\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async listarArtistas (file:///C:/xampp/htdocs/ProtectoAltar/back_auth_mysql/src/controllers/artistasController.js:45:20)

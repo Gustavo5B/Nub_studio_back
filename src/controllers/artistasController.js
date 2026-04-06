@@ -86,10 +86,8 @@ export const obtenerArtistaPorId = async (req, res) => {
     const { id }  = req.params;
     const isAdmin = req.user?.rol === 'admin';
 
-    // Admin usa pool base (permisos completos); público usa pool por rol
     const db = isAdmin ? pool : (pools[req.user?.rol] || pool);
 
-    // Admin ve todos los artistas sin importar activo; público solo los activos
     const whereClause = isAdmin
       ? 'WHERE a.id_artista = $1 AND a.eliminado = FALSE'
       : 'WHERE a.id_artista = $1 AND a.activo = TRUE AND a.eliminado = FALSE';
@@ -124,7 +122,22 @@ export const obtenerArtistaPorId = async (req, res) => {
       ORDER BY o.fecha_creacion DESC
     `, [id]);
 
-    res.json({ success: true, data: { ...artista, obras: resultObras.rows } });
+    // 👇 AGREGAR ESTO - usa la misma variable 'db' que ya existe
+    const fotosPersonales = await db.query(`
+      SELECT id_foto, url_foto, es_principal, orden
+      FROM artistas_fotos_personales
+      WHERE id_artista = $1 AND activa = TRUE
+      ORDER BY es_principal DESC, orden ASC
+    `, [id]);
+
+    res.json({ 
+      success: true, 
+      data: { 
+        ...artista, 
+        obras: resultObras.rows,
+        fotos_personales: fotosPersonales.rows  // 👈 ESTO DEVUELVE LAS FOTOS
+      } 
+    });
   } catch (error) {
     logger.error(`Error al obtener artista: ${error.message} | ${error.stack}`);
     res.status(500).json({ success: false, message: "Error al obtener el artista" });
