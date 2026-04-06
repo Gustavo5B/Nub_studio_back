@@ -45,8 +45,8 @@ export const listarArtistas = async (req, res) => {
     const result = await db.query(`
       SELECT
         a.id_artista, a.nombre_completo, a.nombre_artistico,
-        a.biografia, a.foto_perfil, a.correo, a.telefono,
-        a.matricula, a.porcentaje_comision, a.estado,
+        a.biografia, a.foto_perfil, a.foto_portada, a.foto_logo,
+        a.correo, a.telefono, a.matricula, a.porcentaje_comision, a.estado,
         c.nombre AS categoria_nombre,
         COUNT(o.id_obra)                                                          AS total_obras,
         COUNT(o.id_obra) FILTER (WHERE o.estado = 'aprobada' AND o.activa = TRUE) AS obras_publicadas,
@@ -55,7 +55,7 @@ export const listarArtistas = async (req, res) => {
       FROM artistas a
       LEFT JOIN categorias c ON a.id_categoria_principal = c.id_categoria
       LEFT JOIN obras o ON a.id_artista = o.id_artista
-      WHERE ${isAdmin ? '' : 'a.activo = TRUE AND'} a.eliminado = FALSE
+      WHERE ${isAdmin ? '' : "a.activo = TRUE AND a.estado = 'activo' AND"} a.eliminado = FALSE
       GROUP BY a.id_artista, c.nombre
       ORDER BY
         a.activo DESC,

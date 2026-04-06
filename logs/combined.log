@@ -6539,3 +6539,109 @@
 2026-04-05 18:58:16 [info]: Auth exitosa: usuario 14 rol artista
 2026-04-05 18:58:19 [info]: Sesion valida: SI
 2026-04-05 18:58:19 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-06 09:54:58 [info]: Brevo API configurada correctamente
+2026-04-06 09:54:59 [info]: Servidor corriendo en el puerto 4000
+2026-04-06 09:54:59 [info]: CORS habilitado para: https://front-auth-eight.vercel.app, http://localhost:4200, http://localhost:5173
+2026-04-06 09:54:59 [info]: Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS
+2026-04-06 09:55:00 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 09:55:00 [info]: Conectado a PostgreSQL (neondb)
+2026-04-06 09:55:00 [info]: Host: ep-sweet-lake-ad4v82aj-pooler.c-2.us-east-1.aws.neon.tech:5432
+2026-04-06 09:55:00 [info]: Server time: Mon Apr 06 2026 09:55:00 GMT-0600 (hora estándar central)
+2026-04-06 09:55:00 [info]: Conexion PostgreSQL verificada correctamente.
+2026-04-06 09:55:01 [info]: Cron de backups inicializado.
+2026-04-06 09:55:09 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 09:55:15 [info]: Categorias listadas: 7
+2026-04-06 09:55:16 [info]: Categorias listadas: 7
+2026-04-06 09:55:49 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 09:55:57 [info]: Categorias listadas: 7
+2026-04-06 09:55:57 [info]: Categorias listadas: 7
+2026-04-06 09:56:23 [info]: Categorias listadas: 7
+2026-04-06 09:56:23 [info]: Categorias listadas: 7
+2026-04-06 09:56:33 [info]: Sesion valida: SI
+2026-04-06 09:56:33 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-06 09:56:34 [info]: Sesion valida: SI
+2026-04-06 09:56:34 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-06 09:56:35 [info]: Sesion valida: SI
+2026-04-06 09:56:35 [info]: Sesion valida: SI
+2026-04-06 09:56:38 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 09:56:46 [info]: Sesion valida: SI
+2026-04-06 09:56:46 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-06 09:56:46 [info]: Sesion valida: SI
+2026-04-06 09:56:46 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-06 09:56:49 [info]: Sesion valida: SI
+2026-04-06 09:56:49 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-06 09:56:49 [info]: Sesion eliminada correctamente
+2026-04-06 09:56:49 [info]: Logout: usuario 2
+2026-04-06 09:56:53 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 09:56:53 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 09:56:54 [info]: Categorias listadas: 7
+2026-04-06 09:56:54 [info]: Categorias listadas: 7
+2026-04-06 09:57:23 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 09:57:23 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 09:57:26 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 09:57:29 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 10:00:00 [info]: Limpieza de codigos expirados...
+2026-04-06 10:00:00 [info]: Ejecutando limpieza de codigos expirados...
+2026-04-06 10:00:00 [info]: Limpieza completada
+2026-04-06 10:00:00 [info]: Limpieza completada.
+2026-04-06 11:00:00 [info]: Limpieza de codigos expirados...
+2026-04-06 11:00:00 [info]: Ejecutando limpieza de codigos expirados...
+2026-04-06 11:00:00 [info]: Limpieza completada
+2026-04-06 11:00:00 [info]: Limpieza completada.
+2026-04-06 11:11:56 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 11:12:15 [info]: Brevo API configurada correctamente
+2026-04-06 11:12:16 [info]: Servidor corriendo en el puerto 4000
+2026-04-06 11:12:16 [info]: CORS habilitado para: https://front-auth-eight.vercel.app, http://localhost:4200, http://localhost:5173
+2026-04-06 11:12:16 [info]: Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS
+2026-04-06 11:12:17 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 11:12:17 [info]: Conectado a PostgreSQL (neondb)
+2026-04-06 11:12:17 [info]: Host: ep-sweet-lake-ad4v82aj-pooler.c-2.us-east-1.aws.neon.tech:5432
+2026-04-06 11:12:17 [info]: Server time: Mon Apr 06 2026 11:12:17 GMT-0600 (hora estándar central)
+2026-04-06 11:12:17 [info]: Conexion PostgreSQL verificada correctamente.
+2026-04-06 11:12:17 [info]: Cron de backups inicializado.
+2026-04-06 11:12:25 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 11:12:25 [info]: Categorias listadas: 7
+2026-04-06 11:12:25 [info]: Categorias listadas: 7
+2026-04-06 11:12:29 [info]: Categorias listadas: 7
+2026-04-06 11:12:29 [info]: Categorias listadas: 7
+2026-04-06 11:12:59 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 11:13:31 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 12:00:00 [info]: Limpieza de codigos expirados...
+2026-04-06 12:00:00 [info]: Ejecutando limpieza de codigos expirados...
+2026-04-06 12:00:00 [info]: Limpieza completada
+2026-04-06 12:00:00 [info]: Limpieza completada.
+2026-04-06 13:00:00 [info]: Limpieza de codigos expirados...
+2026-04-06 13:00:00 [info]: Ejecutando limpieza de codigos expirados...
+2026-04-06 13:00:00 [info]: Limpieza completada
+2026-04-06 13:00:00 [info]: Limpieza completada.
+2026-04-06 13:08:52 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 13:09:03 [info]: Categorias listadas: 7
+2026-04-06 13:09:03 [info]: Categorias listadas: 7
+2026-04-06 13:09:03 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 13:09:33 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 13:09:52 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 13:14:44 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 13:15:14 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 13:15:35 [info]: Brevo API configurada correctamente
+2026-04-06 13:15:36 [info]: Servidor corriendo en el puerto 4000
+2026-04-06 13:15:36 [info]: CORS habilitado para: https://front-auth-eight.vercel.app, http://localhost:4200, http://localhost:5173
+2026-04-06 13:15:36 [info]: Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS
+2026-04-06 13:15:36 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 13:15:36 [info]: Conectado a PostgreSQL (neondb)
+2026-04-06 13:15:36 [info]: Host: ep-sweet-lake-ad4v82aj-pooler.c-2.us-east-1.aws.neon.tech:5432
+2026-04-06 13:15:36 [info]: Server time: Mon Apr 06 2026 13:15:36 GMT-0600 (hora estándar central)
+2026-04-06 13:15:36 [info]: Conexion PostgreSQL verificada correctamente.
+2026-04-06 13:15:37 [info]: Cron de backups inicializado.
+2026-04-06 13:16:22 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 13:18:07 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 13:18:38 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 13:20:50 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 13:21:21 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 13:24:20 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 13:24:50 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 13:59:38 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 14:00:00 [info]: Limpieza de codigos expirados...
+2026-04-06 14:00:00 [info]: Ejecutando limpieza de codigos expirados...
+2026-04-06 14:00:00 [info]: Limpieza completada
+2026-04-06 14:00:00 [info]: Limpieza completada.
+2026-04-06 14:00:08 [info]: Conexion PostgreSQL removida del pool
