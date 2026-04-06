@@ -1208,3 +1208,9 @@
 2026-04-05 18:55:24 [warn]: Auth: sesion revocada usuario 14
 2026-04-05 18:55:53 [error]: Error al verificar sesion: Connection terminated due to connection timeout
 2026-04-05 18:55:53 [warn]: Auth: sesion revocada usuario 14
+2026-04-06 17:56:48 [error]: Error de conexion a PostgreSQL: Connection terminated due to connection timeout
+2026-04-06 17:56:59 [error]: Error al obtener artista: Connection terminated due to connection timeout | Error: Connection terminated due to connection timeout
+    at C:\xampp\htdocs\ProtectoAltar\back_auth_mysql\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async obtenerArtistaPorId (file:///C:/xampp/htdocs/ProtectoAltar/back_auth_mysql/src/controllers/artistasController.js:97:27)
+2026-04-06 17:57:21 [error]: Error de conexion a PostgreSQL: Connection terminated due to connection timeout

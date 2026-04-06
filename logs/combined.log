@@ -6667,3 +6667,23 @@
 2026-04-06 17:53:56 [info]: Conexion PostgreSQL verificada correctamente.
 2026-04-06 17:53:58 [info]: Cron de backups inicializado.
 2026-04-06 17:54:33 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 17:56:37 [info]: Brevo API configurada correctamente
+2026-04-06 17:56:38 [info]: Servidor corriendo en el puerto 4000
+2026-04-06 17:56:38 [info]: CORS habilitado para: http://localhost:5173, http://localhost:4200, http://localhost:5173
+2026-04-06 17:56:38 [info]: Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS
+2026-04-06 17:56:48 [error]: Error de conexion a PostgreSQL: Connection terminated due to connection timeout
+2026-04-06 17:56:48 [info]: Conexion PostgreSQL verificada correctamente.
+2026-04-06 17:56:58 [info]: Cron de backups inicializado.
+2026-04-06 17:56:59 [error]: Error al obtener artista: Connection terminated due to connection timeout | Error: Connection terminated due to connection timeout
+    at C:\xampp\htdocs\ProtectoAltar\back_auth_mysql\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async obtenerArtistaPorId (file:///C:/xampp/htdocs/ProtectoAltar/back_auth_mysql/src/controllers/artistasController.js:97:27)
+2026-04-06 17:57:10 [info]: Brevo API configurada correctamente
+2026-04-06 17:57:11 [info]: Servidor corriendo en el puerto 4000
+2026-04-06 17:57:11 [info]: CORS habilitado para: http://localhost:5173, http://localhost:4200, http://localhost:5173
+2026-04-06 17:57:11 [info]: Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS
+2026-04-06 17:57:21 [error]: Error de conexion a PostgreSQL: Connection terminated due to connection timeout
+2026-04-06 17:57:21 [info]: Conexion PostgreSQL verificada correctamente.
+2026-04-06 17:57:23 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 17:57:25 [info]: Cron de backups inicializado.
+2026-04-06 17:57:55 [info]: Conexion PostgreSQL removida del pool
