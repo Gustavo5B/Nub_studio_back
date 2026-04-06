@@ -6645,3 +6645,25 @@
 2026-04-06 14:00:00 [info]: Limpieza completada
 2026-04-06 14:00:00 [info]: Limpieza completada.
 2026-04-06 14:00:08 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 17:49:50 [info]: Brevo API configurada correctamente
+2026-04-06 17:49:51 [info]: Servidor corriendo en el puerto 4000
+2026-04-06 17:49:51 [info]: CORS habilitado para: http://localhost:5173, http://localhost:4200, http://localhost:5173
+2026-04-06 17:49:51 [info]: Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS
+2026-04-06 17:49:53 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 17:49:53 [info]: Conectado a PostgreSQL (neondb)
+2026-04-06 17:49:53 [info]: Host: ep-sweet-lake-ad4v82aj-pooler.c-2.us-east-1.aws.neon.tech:5432
+2026-04-06 17:49:53 [info]: Server time: Mon Apr 06 2026 17:49:51 GMT-0600 (GMT-06:00)
+2026-04-06 17:49:53 [info]: Conexion PostgreSQL verificada correctamente.
+2026-04-06 17:49:54 [info]: Cron de backups inicializado.
+2026-04-06 17:50:48 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 17:53:51 [info]: Brevo API configurada correctamente
+2026-04-06 17:53:52 [info]: Servidor corriendo en el puerto 4000
+2026-04-06 17:53:52 [info]: CORS habilitado para: http://localhost:5173, http://localhost:4200, http://localhost:5173
+2026-04-06 17:53:52 [info]: Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS
+2026-04-06 17:53:56 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 17:53:56 [info]: Conectado a PostgreSQL (neondb)
+2026-04-06 17:53:56 [info]: Host: ep-sweet-lake-ad4v82aj-pooler.c-2.us-east-1.aws.neon.tech:5432
+2026-04-06 17:53:56 [info]: Server time: Mon Apr 06 2026 17:53:53 GMT-0600 (GMT-06:00)
+2026-04-06 17:53:56 [info]: Conexion PostgreSQL verificada correctamente.
+2026-04-06 17:53:58 [info]: Cron de backups inicializado.
+2026-04-06 17:54:33 [info]: Conexion PostgreSQL removida del pool
