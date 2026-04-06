@@ -58,7 +58,6 @@ const isProd = process.env.NODE_ENV === "production";
 
 // =========================================================
 // FIX ZAP #1 — HELMET COMPLETO
-// Corrige: CSP no configurada, Anti-Clickjacking, HSTS, X-Content-Type
 // =========================================================
 app.set("trust proxy", false);
 
@@ -67,16 +66,22 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        styleSrc: ["'self'", "'unsafe-inline'"],
-        imgSrc: ["'self'", "data:", "https://res.cloudinary.com"],
+        scriptSrc:  ["'self'"],
+        styleSrc:   ["'self'", "'unsafe-inline'"],
+        imgSrc: [
+          "'self'",
+          "data:",
+          "blob:",                          // ← preview de imágenes locales
+          "https://res.cloudinary.com",     // ← imágenes subidas a Cloudinary
+          "https://images.unsplash.com",    // ← placeholders Unsplash
+        ],
         connectSrc: ["'self'"],
         fontSrc: [
           "'self'",
           "https://fonts.googleapis.com",
           "https://fonts.gstatic.com",
         ],
-        objectSrc: ["'none'"],
+        objectSrc:      ["'none'"],
         frameAncestors: ["'none'"],
       },
     },
@@ -85,11 +90,11 @@ app.use(
       includeSubDomains: true,
       preload: true,
     },
-    hidePoweredBy: true,
+    hidePoweredBy:            true,
     crossOriginEmbedderPolicy: false,
-    noSniff: true,
-    frameguard: { action: "deny" },
-    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
+    noSniff:                  true,
+    frameguard:               { action: "deny" },
+    referrerPolicy:           { policy: "strict-origin-when-cross-origin" },
   }),
 );
 
@@ -132,9 +137,9 @@ app.use(
 app.use((err, req, res, next) => {
   if (err.message === "Origen no autorizado por CORS") {
     return res.status(403).json({
-      error: "Acceso denegado",
+      error:   "Acceso denegado",
       message: "Origen no autorizado por política CORS",
-      origin: req.headers.origin || "desconocido",
+      origin:  req.headers.origin || "desconocido",
     });
   }
   next(err);
@@ -149,14 +154,10 @@ app.use(preventSQLInjection);
 
 // =========================================================
 // FIX ZAP #3 — CABECERAS DE CACHE
-// Corrige: Reexaminar las Directivas de Control de Caché
 // =========================================================
 app.use((req, res, next) => {
   if (req.path.startsWith("/api/auth") || req.path.startsWith("/api/admin")) {
-    res.setHeader(
-      "Cache-Control",
-      "no-store, no-cache, must-revalidate, private",
-    );
+    res.setHeader("Cache-Control", "no-store, no-cache, must-revalidate, private");
     res.setHeader("Pragma", "no-cache");
     res.setHeader("Expires", "0");
   }
@@ -166,26 +167,26 @@ app.use((req, res, next) => {
 // =========================================================
 // RUTAS
 // =========================================================
-app.use("/api/auth", authRoutes);
-app.use("/api/recovery", recoveryRoutes);
-app.use("/api/2fa", twoFactorRoutes);
-app.use("/api/gmail-2fa", gmail2faRoutes);
-app.use("/api/imagenes", imagenesRoutes);
-app.use("/api/obras", obrasRoutes);
-app.use("/api/categorias", categoriasRoutes);
-app.use("/api/artistas", artistasRoutes);
-app.use("/api/etiquetas", etiquetasRoutes);
-app.use("/api/artista-portal", artistaPortalRoutes);
-app.use("/api/tecnicas", tecnicasRoutes);
-app.use("/api/stats", statsRoutes);
+app.use("/api/auth",            authRoutes);
+app.use("/api/recovery",        recoveryRoutes);
+app.use("/api/2fa",             twoFactorRoutes);
+app.use("/api/gmail-2fa",       gmail2faRoutes);
+app.use("/api/imagenes",        imagenesRoutes);
+app.use("/api/obras",           obrasRoutes);
+app.use("/api/categorias",      categoriasRoutes);
+app.use("/api/artistas",        artistasRoutes);
+app.use("/api/etiquetas",       etiquetasRoutes);
+app.use("/api/artista-portal",  artistaPortalRoutes);
+app.use("/api/tecnicas",        tecnicasRoutes);
+app.use("/api/stats",           statsRoutes);
 app.use("/api/admin/monitoreo", monitoreoRoutes);
-app.use("/api/admin", adminRoutes);
-app.use("/api/reportes", reportesRoutes);
-app.use("/api/estados", estadosRoutes);
-app.use("/api/estadisticas", estadisticasRoutes);
-app.use("/api/sobre-nosotros", sobreNosotrosRoutes);
-app.use("/api/municipios", municipiosRoutes);
-app.use("/api/colecciones", coleccionesRoutes);
+app.use("/api/admin",           adminRoutes);
+app.use("/api/reportes",        reportesRoutes);
+app.use("/api/estados",         estadosRoutes);
+app.use("/api/estadisticas",    estadisticasRoutes);
+app.use("/api/sobre-nosotros",  sobreNosotrosRoutes);
+app.use("/api/municipios",      municipiosRoutes);
+app.use("/api/colecciones",     coleccionesRoutes);
 
 // =========================================================
 // RUTA DE PRUEBA
@@ -200,10 +201,10 @@ app.get("/", (req, res) => {
           database: "PostgreSQL",
           cors: allowedOrigins,
           security: {
-            xss: "enabled",
+            xss:          "enabled",
             sqlInjection: "enabled",
-            csrf: "not-needed (JWT-based)",
-            helmet: "enabled",
+            csrf:         "not-needed (JWT-based)",
+            helmet:       "enabled",
           },
         }),
     timestamp: new Date().toISOString(),
@@ -226,7 +227,6 @@ app.get("/api/test-email", async (req, res) => {
 
 // =========================================================
 // FIX ZAP #5 — MANEJO GLOBAL DE ERRORES
-// Corrige: Divulgacion de error de aplicacion
 // =========================================================
 app.use((err, req, res, next) => {
   logger.error(`Error no manejado: ${err.message}`);
@@ -267,9 +267,7 @@ const PORT = process.env.PORT || 4000;
 app.listen(PORT, async () => {
   logger.info(`Servidor corriendo en el puerto ${PORT}`);
   logger.info(`CORS habilitado para: ${allowedOrigins.join(", ")}`);
-  logger.info(
-    "Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS",
-  );
+  logger.info("Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS");
 
   try {
     await testConnection();

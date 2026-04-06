@@ -12,42 +12,52 @@ export const pool = new Pool({
   password: process.env.DB_PASSWORD,
   database: process.env.DB_NAME,
   port:     parseInt(process.env.DB_PORT, 10) || 5432,
-  max: 10, idleTimeoutMillis: 30000, connectionTimeoutMillis: 2000,
+  max: 10, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000,
   ssl: { rejectUnauthorized: false },
   application_name: 'nuub_studio_backend',
 });
 
-// Pools por rol — Direct connection, también requiere SSL
-const PROJECT_REF = process.env.SUPABASE_PROJECT_REF;
-
+// Pools por rol — todos usan DB_HOST (pooler) para compatibilidad con Render/Vercel
 export const pools = {
   admin: new Pool({
-    host: process.env.DB_HOST_DIRECT, database: process.env.DB_NAME,
-    port: parseInt(process.env.DB_PORT, 10) || 5432,
-    user: 'usr_admin', password: process.env.DB_PASS_ADMIN,
-    max: 10, idleTimeoutMillis: 30000, connectionTimeoutMillis: 2000,
-    ssl: { rejectUnauthorized: false }, application_name: 'nuub_studio_admin',
+    host:     process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    port:     parseInt(process.env.DB_PORT, 10) || 5432,
+    user:     'usr_admin',
+    password: process.env.DB_PASS_ADMIN,
+    max: 10, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000,
+    ssl: { rejectUnauthorized: false },
+    application_name: 'nuub_studio_admin',
   }),
   artista: new Pool({
-    host: process.env.DB_HOST_DIRECT, database: process.env.DB_NAME,
-    port: parseInt(process.env.DB_PORT, 10) || 5432,
-    user: 'usr_artista', password: process.env.DB_PASS_ARTISTA,
-    max: 10, idleTimeoutMillis: 30000, connectionTimeoutMillis: 2000,
-    ssl: { rejectUnauthorized: false }, application_name: 'nuub_studio_artista',
+    host:     process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    port:     parseInt(process.env.DB_PORT, 10) || 5432,
+    user:     'usr_artista',
+    password: process.env.DB_PASS_ARTISTA,
+    max: 10, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000,
+    ssl: { rejectUnauthorized: false },
+    application_name: 'nuub_studio_artista',
   }),
   cliente: new Pool({
-    host: process.env.DB_HOST_DIRECT, database: process.env.DB_NAME,
-    port: parseInt(process.env.DB_PORT, 10) || 5432,
-    user: 'usr_cliente', password: process.env.DB_PASS_CLIENTE,
-    max: 10, idleTimeoutMillis: 30000, connectionTimeoutMillis: 2000,
-    ssl: { rejectUnauthorized: false }, application_name: 'nuub_studio_cliente',
+    host:     process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    port:     parseInt(process.env.DB_PORT, 10) || 5432,
+    user:     'usr_cliente',
+    password: process.env.DB_PASS_CLIENTE,
+    max: 10, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000,
+    ssl: { rejectUnauthorized: false },
+    application_name: 'nuub_studio_cliente',
   }),
   visitante: new Pool({
-    host: process.env.DB_HOST_DIRECT, database: process.env.DB_NAME,
-    port: parseInt(process.env.DB_PORT, 10) || 5432,
-    user: 'usr_visitante', password: process.env.DB_PASS_VISITANTE,
-    max: 10, idleTimeoutMillis: 30000, connectionTimeoutMillis: 2000,
-    ssl: { rejectUnauthorized: false }, application_name: 'nuub_studio_visitante',
+    host:     process.env.DB_HOST,
+    database: process.env.DB_NAME,
+    port:     parseInt(process.env.DB_PORT, 10) || 5432,
+    user:     'usr_visitante',
+    password: process.env.DB_PASS_VISITANTE,
+    max: 10, idleTimeoutMillis: 30000, connectionTimeoutMillis: 10000,
+    ssl: { rejectUnauthorized: false },
+    application_name: 'nuub_studio_visitante',
   }),
 };
 
@@ -74,8 +84,8 @@ export const testConnection = async () => {
 };
 
 pool.on('connect', () => logger.info('Nueva conexion PostgreSQL establecida'));
-pool.on('error', (err) => logger.error(`Error en el pool de PostgreSQL: ${err.message}`));
-pool.on('remove', () => logger.info('Conexion PostgreSQL removida del pool'));
+pool.on('error',   (err) => logger.error(`Error en el pool de PostgreSQL: ${err.message}`));
+pool.on('remove',  () => logger.info('Conexion PostgreSQL removida del pool'));
 
 export const queryWithRetry = async (sql, params, maxRetries = 3) => {
   let lastError;
