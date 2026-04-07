@@ -6930,3 +6930,155 @@
 2026-04-06 17:57:25 [info]: Cron de backups inicializado.
 2026-04-06 17:57:55 [info]: Conexion PostgreSQL removida del pool
 >>>>>>> 18f2b363fc444322ce5678812db871b244dbf301
+2026-04-07 10:23:54 [info]: Brevo API configurada correctamente
+2026-04-07 10:23:55 [info]: Servidor corriendo en el puerto 4000
+2026-04-07 10:23:55 [info]: CORS habilitado para: https://front-auth-eight.vercel.app, http://localhost:4200, http://localhost:5173, http://localhost:5174
+2026-04-07 10:23:55 [info]: Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS
+2026-04-07 10:23:56 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:23:56 [info]: Conectado a PostgreSQL (neondb)
+2026-04-07 10:23:56 [info]: Host: ep-sweet-lake-ad4v82aj-pooler.c-2.us-east-1.aws.neon.tech:5432
+2026-04-07 10:23:56 [info]: Server time: Tue Apr 07 2026 10:23:56 GMT-0600 (hora estándar central)
+2026-04-07 10:23:56 [info]: Conexion PostgreSQL verificada correctamente.
+2026-04-07 10:23:57 [info]: Cron de backups inicializado.
+2026-04-07 10:24:27 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:24:36 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:24:36 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:24:40 [info]: Categorias listadas: 7
+2026-04-07 10:24:40 [info]: Categorias listadas: 7
+2026-04-07 10:25:21 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:25:21 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:25:24 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:25:24 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:25:24 [info]: Categorias listadas: 7
+2026-04-07 10:25:24 [info]: Categorias listadas: 7
+2026-04-07 10:25:58 [info]: Categorias listadas: 7
+2026-04-07 10:25:59 [info]: Categorias listadas: 7
+2026-04-07 10:26:38 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:26:39 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:26:46 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:26:46 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:26:46 [info]: Categorias listadas: 7
+2026-04-07 10:26:46 [info]: Categorias listadas: 7
+2026-04-07 10:26:47 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:27:17 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:27:17 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:27:22 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:36:42 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:36:42 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:36:42 [info]: Categorias listadas: 7
+2026-04-07 10:36:42 [info]: Categorias listadas: 7
+2026-04-07 10:37:12 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:37:13 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:37:15 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:37:45 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:51:46 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:51:46 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:51:47 [info]: Categorias listadas: 7
+2026-04-07 10:51:47 [info]: Categorias listadas: 7
+2026-04-07 10:52:17 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:52:17 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:53:54 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:55:11 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:57:37 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:58:06 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:58:09 [info]: Categorias listadas: 7
+2026-04-07 10:58:10 [info]: Categorias listadas: 7
+2026-04-07 10:58:40 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:58:40 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:58:53 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:58:53 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 10:58:54 [info]: Categorias listadas: 7
+2026-04-07 10:59:02 [info]: Categorias listadas: 7
+2026-04-07 10:59:32 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 10:59:57 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:00:00 [info]: Limpieza de codigos expirados...
+2026-04-07 11:00:00 [info]: Ejecutando limpieza de codigos expirados...
+2026-04-07 11:00:00 [info]: Limpieza completada
+2026-04-07 11:00:00 [info]: Limpieza completada.
+2026-04-07 11:00:26 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:00:26 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:00:26 [info]: Categorias listadas: 7
+2026-04-07 11:00:26 [info]: Categorias listadas: 7
+2026-04-07 11:00:30 [info]: Categorias listadas: 7
+2026-04-07 11:00:30 [info]: Categorias listadas: 7
+2026-04-07 11:00:38 [info]: Categorias listadas: 7
+2026-04-07 11:00:38 [info]: Categorias listadas: 7
+2026-04-07 11:00:42 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:00:58 [info]: Categorias listadas: 7
+2026-04-07 11:00:58 [info]: Categorias listadas: 7
+2026-04-07 11:01:12 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:01:28 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:01:29 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:06:51 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:07:21 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:07:31 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:08:02 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:11:03 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:11:04 [info]: Categorias listadas: 7
+2026-04-07 11:11:04 [info]: Categorias listadas: 7
+2026-04-07 11:11:05 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:11:34 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:11:35 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:12:44 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:12:44 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:12:45 [info]: Categorias listadas: 7
+2026-04-07 11:12:45 [info]: Categorias listadas: 7
+2026-04-07 11:12:56 [info]: Categorias listadas: 7
+2026-04-07 11:12:56 [info]: Categorias listadas: 7
+2026-04-07 11:13:03 [info]: Categorias listadas: 7
+2026-04-07 11:13:03 [info]: Categorias listadas: 7
+2026-04-07 11:13:33 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:13:48 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:17:23 [info]: Intento de login: ad***min@n***.mx
+2026-04-07 11:17:24 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:17:25 [info]: Sesion guardada: usuario 2
+2026-04-07 11:17:25 [info]: Login exitoso: usuario 2 rol admin
+2026-04-07 11:17:26 [info]: Sesion valida: SI
+2026-04-07 11:17:26 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-07 11:17:27 [info]: Sesion valida: SI
+2026-04-07 11:17:27 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-07 11:17:34 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:17:34 [info]: Categorias listadas: 7
+2026-04-07 11:17:35 [info]: Categorias listadas: 7
+2026-04-07 11:17:38 [info]: Sesion valida: SI
+2026-04-07 11:17:38 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-07 11:17:38 [info]: Sesion valida: SI
+2026-04-07 11:17:38 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-07 11:17:41 [info]: Sesion valida: SI
+2026-04-07 11:17:41 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-07 11:17:42 [info]: Colección 2 actualizada por admin
+2026-04-07 11:17:44 [info]: Sesion valida: SI
+2026-04-07 11:17:44 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-07 11:17:44 [info]: Sesion valida: SI
+2026-04-07 11:17:44 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-07 11:17:48 [info]: Sesion valida: SI
+2026-04-07 11:17:48 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-07 11:17:49 [info]: Colección 1 actualizada por admin
+2026-04-07 11:17:53 [info]: Sesion valida: SI
+2026-04-07 11:17:53 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-07 11:17:53 [info]: Sesion eliminada correctamente
+2026-04-07 11:17:53 [info]: Logout: usuario 2
+2026-04-07 11:18:01 [info]: Categorias listadas: 7
+2026-04-07 11:18:01 [info]: Categorias listadas: 7
+2026-04-07 11:18:31 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:18:32 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:22:29 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:22:37 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:22:37 [info]: Categorias listadas: 7
+2026-04-07 11:22:47 [info]: Categorias listadas: 7
+2026-04-07 11:22:47 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:23:17 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:23:17 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:23:18 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:24:09 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:24:29 [info]: Categorias listadas: 7
+2026-04-07 11:24:29 [info]: Categorias listadas: 7
+2026-04-07 11:24:29 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:24:29 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:24:59 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:25:00 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:25:00 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:26:29 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:27:34 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 11:27:40 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 11:28:11 [info]: Conexion PostgreSQL removida del pool
