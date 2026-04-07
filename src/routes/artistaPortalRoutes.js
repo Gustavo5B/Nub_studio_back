@@ -5,6 +5,7 @@ import {
   agregarFotoPersonal, eliminarFotoPersonal,
   getMisObras, nuevaObra,
   getObraById, actualizarObraArtista,
+  getMisColecciones,  // 👈 NUEVA IMPORTACIÓN
 } from '../controllers/artistaPortalController.js';
 import {
   getRedesSociales, agregarRedSocial,
@@ -64,6 +65,9 @@ router.put('/mi-perfil', authenticateToken, requireRole('artista'),
 // ── Fotos personales ─────────────────────────────────────────
 router.post('/fotos-personales',       authenticateToken, requireRole('artista'), upload.single('foto'), agregarFotoPersonal);
 router.delete('/fotos-personales/:id', authenticateToken, requireRole('artista'), eliminarFotoPersonal);
+
+// ── Colecciones del artista ────────────────────────────────────
+router.get('/mis-colecciones', authenticateToken, requireRole('artista'), getMisColecciones);  // 👈 NUEVA RUTA
 
 // ── Obras ────────────────────────────────────────────────────
 router.get('/mis-obras',   authenticateToken, requireRole('artista'), getMisObras);

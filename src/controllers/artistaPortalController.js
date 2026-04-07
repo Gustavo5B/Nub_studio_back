@@ -595,3 +595,45 @@ export const actualizarObraArtista = async (req, res) => {
     res.status(500).json({ message: 'Error interno del servidor', error: error.message });
   }
 };
+
+// =========================================================
+// GET /api/artista-portal/mis-colecciones
+// Lista las colecciones del artista autenticado
+// =========================================================
+export const getMisColecciones = async (req, res) => {
+  try {
+    const db = pools[req.user.rol] || pool;
+    const usuarioId = req.user.id_usuario;
+
+    const artistaRes = await db.query(
+      'SELECT id_artista FROM artistas WHERE id_usuario = $1 AND estado = $2 LIMIT 1',
+      [usuarioId, 'activo']
+    );
+    if (artistaRes.rows.length === 0)
+      return res.status(403).json({ message: 'Artista no encontrado o inactivo' });
+
+    const { id_artista } = artistaRes.rows[0];
+
+    const result = await db.query(`
+      SELECT 
+        c.id_coleccion, 
+        c.nombre, 
+        c.slug, 
+        c.estado,
+        c.destacada,
+        c.imagen_portada,
+        c.fecha_creacion,
+        (SELECT COUNT(*) FROM obras WHERE id_coleccion = c.id_coleccion AND activa = TRUE AND eliminada = FALSE) as total_obras
+      FROM colecciones c
+      WHERE c.id_artista = $1 
+        AND c.activa = TRUE 
+        AND c.eliminada = FALSE
+      ORDER BY c.destacada DESC, c.fecha_creacion DESC
+    `, [id_artista]);
+
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    logger.error(`Error en getMisColecciones: ${error.message}`);
+    res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
