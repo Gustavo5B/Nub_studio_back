@@ -1208,6 +1208,7 @@
 2026-04-05 18:55:24 [warn]: Auth: sesion revocada usuario 14
 2026-04-05 18:55:53 [error]: Error al verificar sesion: Connection terminated due to connection timeout
 2026-04-05 18:55:53 [warn]: Auth: sesion revocada usuario 14
+<<<<<<< HEAD
 2026-04-06 10:42:06 [warn]: [monitoreo] query falló: relation "pg_stat_statements" does not exist
 2026-04-06 10:42:06 [warn]: [monitoreo] query falló: relation "pg_stat_statements" does not exist
 2026-04-06 10:42:07 [warn]: [monitoreo] query falló: relation "pg_stat_statements" does not exist
@@ -1283,3 +1284,11 @@
     at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
     at async obtenerArtistaPorId (file:///C:/Users/gudel/Documents/ing/8vo/juvencio/mes%202/juvencio/Nub_studio_back/src/controllers/artistasController.js:95:27)
 2026-04-07 00:00:02 [error]: Error al limpiar sesiones: column "ultima_actividad" does not exist
+=======
+2026-04-06 17:56:48 [error]: Error de conexion a PostgreSQL: Connection terminated due to connection timeout
+2026-04-06 17:56:59 [error]: Error al obtener artista: Connection terminated due to connection timeout | Error: Connection terminated due to connection timeout
+    at C:\xampp\htdocs\ProtectoAltar\back_auth_mysql\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async obtenerArtistaPorId (file:///C:/xampp/htdocs/ProtectoAltar/back_auth_mysql/src/controllers/artistasController.js:97:27)
+2026-04-06 17:57:21 [error]: Error de conexion a PostgreSQL: Connection terminated due to connection timeout
+>>>>>>> 18f2b363fc444322ce5678812db871b244dbf301
