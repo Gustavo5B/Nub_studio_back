@@ -1246,3 +1246,40 @@
     at C:\xampp\htdocs\ProtectoAltar\back_auth_mysql\node_modules\pg-pool\index.js:45:11
     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
     at async listarArtistas (file:///C:/xampp/htdocs/ProtectoAltar/back_auth_mysql/src/controllers/artistasController.js:45:20)
+2026-04-06 17:42:05 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:05 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:05 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:05 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:10 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:10 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:43 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:43 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:44 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:44 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:45 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:45 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:46 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:46 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:47 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:47 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:48 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:48 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:48 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:48 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:49 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:49 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:50 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:50 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:51 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:51 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:51 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:51 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:53 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:53 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:47:54 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:47:54 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 18:40:27 [error]: Error al obtener artista: invalid input syntax for type integer: "undefined" | error: invalid input syntax for type integer: "undefined"
+    at C:\Users\gudel\Documents\ing\8vo\juvencio\mes 2\juvencio\Nub_studio_back\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async obtenerArtistaPorId (file:///C:/Users/gudel/Documents/ing/8vo/juvencio/mes%202/juvencio/Nub_studio_back/src/controllers/artistasController.js:95:27)
+2026-04-07 00:00:02 [error]: Error al limpiar sesiones: column "ultima_actividad" does not exist

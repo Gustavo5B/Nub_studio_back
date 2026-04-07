@@ -1,0 +1,240 @@
+2026-04-06 17:41:30 [info]: Brevo API configurada correctamente
+2026-04-06 17:41:31 [info]: Servidor corriendo en el puerto 4000
+2026-04-06 17:41:31 [info]: CORS habilitado para: https://front-auth-eight.vercel.app, http://localhost:4200, http://localhost:5173
+2026-04-06 17:41:31 [info]: Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS
+2026-04-06 17:41:32 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 17:41:32 [info]: Conectado a PostgreSQL (neondb)
+2026-04-06 17:41:32 [info]: Host: ep-sweet-lake-ad4v82aj-pooler.c-2.us-east-1.aws.neon.tech:5432
+2026-04-06 17:41:32 [info]: Server time: Mon Apr 06 2026 17:41:31 GMT-0600 (hora estándar central)
+2026-04-06 17:41:32 [info]: Conexion PostgreSQL verificada correctamente.
+2026-04-06 17:41:32 [info]: Cron de backups inicializado.
+2026-04-06 17:42:02 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 17:42:05 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:05 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:05 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:05 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:10 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:10 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:43 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:43 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:44 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:44 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:45 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:45 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:46 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:46 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:47 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:47 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:48 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:48 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:48 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:48 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:49 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:49 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:50 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:50 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:51 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:51 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:51 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:51 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:53 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:42:53 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:47:54 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 17:47:54 [warn]: Bloqueado por CORS: http://localhost:5174
+2026-04-06 18:00:00 [info]: Limpieza de codigos expirados...
+2026-04-06 18:00:00 [info]: Ejecutando limpieza de codigos expirados...
+2026-04-06 18:00:00 [info]: Limpieza completada
+2026-04-06 18:00:00 [info]: Limpieza completada.
+2026-04-06 18:01:50 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 18:02:21 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 18:15:31 [info]: Brevo API configurada correctamente
+2026-04-06 18:15:31 [info]: Servidor corriendo en el puerto 4000
+2026-04-06 18:15:31 [info]: CORS habilitado para: https://front-auth-eight.vercel.app, http://localhost:4200, http://localhost:5173, http://localhost:5174
+2026-04-06 18:15:31 [info]: Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS
+2026-04-06 18:15:33 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 18:15:34 [info]: Conectado a PostgreSQL (neondb)
+2026-04-06 18:15:34 [info]: Host: ep-sweet-lake-ad4v82aj-pooler.c-2.us-east-1.aws.neon.tech:5432
+2026-04-06 18:15:34 [info]: Server time: Mon Apr 06 2026 18:15:33 GMT-0600 (hora estándar central)
+2026-04-06 18:15:34 [info]: Conexion PostgreSQL verificada correctamente.
+2026-04-06 18:15:34 [info]: Cron de backups inicializado.
+2026-04-06 18:16:19 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 18:22:28 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 18:23:28 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 18:26:35 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 18:27:07 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 18:37:20 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 18:37:52 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 18:40:27 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 18:40:27 [error]: Error al obtener artista: invalid input syntax for type integer: "undefined" | error: invalid input syntax for type integer: "undefined"
+    at C:\Users\gudel\Documents\ing\8vo\juvencio\mes 2\juvencio\Nub_studio_back\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:103:5)
+    at async obtenerArtistaPorId (file:///C:/Users/gudel/Documents/ing/8vo/juvencio/mes%202/juvencio/Nub_studio_back/src/controllers/artistasController.js:95:27)
+2026-04-06 18:40:27 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 18:44:08 [info]: Brevo API configurada correctamente
+2026-04-06 18:44:08 [info]: Servidor corriendo en el puerto 4000
+2026-04-06 18:44:08 [info]: CORS habilitado para: https://front-auth-eight.vercel.app, http://localhost:4200, http://localhost:5173, http://localhost:5174
+2026-04-06 18:44:08 [info]: Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS
+2026-04-06 18:44:09 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 18:44:09 [info]: Conectado a PostgreSQL (neondb)
+2026-04-06 18:44:09 [info]: Host: ep-sweet-lake-ad4v82aj-pooler.c-2.us-east-1.aws.neon.tech:5432
+2026-04-06 18:44:09 [info]: Server time: Mon Apr 06 2026 18:44:09 GMT-0600 (hora estándar central)
+2026-04-06 18:44:09 [info]: Conexion PostgreSQL verificada correctamente.
+2026-04-06 18:44:09 [info]: Cron de backups inicializado.
+2026-04-06 18:44:39 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 18:46:29 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 18:47:00 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 18:47:14 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 18:48:13 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 18:57:14 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 18:57:14 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 18:57:15 [info]: Categorias listadas: 7
+2026-04-06 18:57:15 [info]: Categorias listadas: 7
+2026-04-06 18:57:15 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 18:57:45 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 18:57:52 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 18:58:08 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 19:00:00 [info]: Limpieza de codigos expirados...
+2026-04-06 19:00:00 [info]: Ejecutando limpieza de codigos expirados...
+2026-04-06 19:00:00 [info]: Limpieza completada
+2026-04-06 19:00:00 [info]: Limpieza completada.
+2026-04-06 19:27:47 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 19:27:48 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 19:28:18 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 19:28:18 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 19:31:58 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 19:31:58 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 19:32:43 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 19:32:43 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 19:45:52 [info]: Intento de login: ad***min@n***.mx
+2026-04-06 19:45:53 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 19:46:06 [info]: Intento de login: ad***min@n***.mx
+2026-04-06 19:46:14 [info]: Intento de login: ad***min@n***.mx
+2026-04-06 19:46:14 [info]: Sesion guardada: usuario 2
+2026-04-06 19:46:14 [info]: Login exitoso: usuario 2 rol admin
+2026-04-06 19:46:15 [info]: Sesion valida: SI
+2026-04-06 19:46:15 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-06 19:46:16 [info]: Sesion valida: SI
+2026-04-06 19:46:16 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-06 19:46:24 [info]: Categorias listadas: 7
+2026-04-06 19:46:24 [info]: Categorias listadas: 7
+2026-04-06 19:46:24 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 19:46:32 [info]: Sesion valida: SI
+2026-04-06 19:46:32 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-06 19:46:32 [info]: Estado obra 37 → "publicada" | activa=true | admin_id=2
+2026-04-06 19:46:33 [info]: Email obra aprobada enviado a str*** (Message ID: <202604070146.65965637187@smtp-relay.mailin.fr>)
+2026-04-06 19:46:40 [info]: Sesion valida: SI
+2026-04-06 19:46:40 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-06 19:46:40 [info]: Estado obra 36 → "publicada" | activa=true | admin_id=2
+2026-04-06 19:46:40 [info]: Email obra aprobada enviado a str*** (Message ID: <202604070146.11675930667@smtp-relay.mailin.fr>)
+2026-04-06 19:46:46 [info]: Sesion valida: SI
+2026-04-06 19:46:46 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-06 19:46:46 [info]: Sesion valida: SI
+2026-04-06 19:46:46 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-06 19:46:57 [info]: Categorias listadas: 7
+2026-04-06 19:46:57 [info]: Categorias listadas: 7
+2026-04-06 19:47:34 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 19:47:35 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 19:47:53 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 19:47:53 [info]: Sesion valida: SI
+2026-04-06 19:47:53 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-06 19:47:54 [info]: Sesion valida: SI
+2026-04-06 19:47:54 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-06 19:47:54 [info]: Sesion valida: SI
+2026-04-06 19:47:54 [info]: Auth exitosa: usuario 2 rol admin
+2026-04-06 19:47:54 [info]: Sesion eliminada correctamente
+2026-04-06 19:47:54 [info]: Logout: usuario 2
+2026-04-06 19:47:59 [info]: Categorias listadas: 7
+2026-04-06 19:47:59 [info]: Categorias listadas: 7
+2026-04-06 19:48:04 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 19:48:33 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 19:48:34 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 20:00:00 [info]: Limpieza de codigos expirados...
+2026-04-06 20:00:00 [info]: Ejecutando limpieza de codigos expirados...
+2026-04-06 20:00:00 [info]: Limpieza completada
+2026-04-06 20:00:00 [info]: Limpieza completada.
+2026-04-06 21:00:00 [info]: Limpieza de codigos expirados...
+2026-04-06 21:00:00 [info]: Ejecutando limpieza de codigos expirados...
+2026-04-06 21:00:00 [info]: Limpieza completada
+2026-04-06 21:00:00 [info]: Limpieza completada.
+2026-04-06 22:00:00 [info]: Limpieza de codigos expirados...
+2026-04-06 22:00:00 [info]: Ejecutando limpieza de codigos expirados...
+2026-04-06 22:00:00 [info]: Limpieza completada
+2026-04-06 22:00:00 [info]: Limpieza completada.
+2026-04-06 23:00:00 [info]: Limpieza de codigos expirados...
+2026-04-06 23:00:00 [info]: Ejecutando limpieza de codigos expirados...
+2026-04-06 23:00:00 [info]: Limpieza completada
+2026-04-06 23:00:00 [info]: Limpieza completada.
+2026-04-06 23:08:22 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:08:23 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:08:58 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:09:03 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:11:48 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:11:48 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:12:29 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:12:30 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:22:06 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:22:06 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:22:57 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:22:58 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:28:13 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:28:13 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:29:04 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:29:04 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:29:59 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:29:59 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:30:30 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:30:30 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:32:33 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:32:33 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:33:03 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:33:06 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:33:36 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:33:36 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:34:07 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:34:11 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:34:41 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:34:42 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:39:42 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:39:42 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:40:12 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:40:13 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:46:24 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:46:25 [info]: Nueva conexion PostgreSQL establecida
+2026-04-06 23:47:15 [info]: Conexion PostgreSQL removida del pool
+2026-04-06 23:47:15 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 00:00:00 [info]: Limpieza de sesiones antiguas...
+2026-04-07 00:00:00 [info]: Limpieza de codigos expirados...
+2026-04-07 00:00:00 [info]: Ejecutando limpieza de codigos expirados...
+2026-04-07 00:00:00 [info]: Limpieza completada
+2026-04-07 00:00:00 [info]: Limpieza completada.
+2026-04-07 00:00:02 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 00:00:02 [error]: Error al limpiar sesiones: column "ultima_actividad" does not exist
+2026-04-07 00:00:02 [info]: Sesiones limpiadas.
+2026-04-07 00:00:02 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 00:01:06 [info]: Brevo API configurada correctamente
+2026-04-07 00:01:07 [info]: Servidor corriendo en el puerto 4000
+2026-04-07 00:01:07 [info]: CORS habilitado para: https://front-auth-eight.vercel.app, http://localhost:4200, http://localhost:5173, http://localhost:5174
+2026-04-07 00:01:07 [info]: Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS
+2026-04-07 00:01:08 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 00:01:08 [info]: Conectado a PostgreSQL (neondb)
+2026-04-07 00:01:08 [info]: Host: ep-sweet-lake-ad4v82aj-pooler.c-2.us-east-1.aws.neon.tech:5432
+2026-04-07 00:01:08 [info]: Server time: Tue Apr 07 2026 00:01:07 GMT-0600 (hora estándar central)
+2026-04-07 00:01:08 [info]: Conexion PostgreSQL verificada correctamente.
+2026-04-07 00:01:08 [info]: Cron de backups inicializado.
+2026-04-07 00:01:11 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 00:01:11 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 00:01:41 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 00:01:41 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 00:01:42 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 00:06:36 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 00:06:36 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 00:07:07 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 00:07:07 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 00:09:46 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 00:09:46 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 00:10:27 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 00:10:27 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 00:12:51 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 00:12:51 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 00:13:22 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 00:13:22 [info]: Conexion PostgreSQL removida del pool

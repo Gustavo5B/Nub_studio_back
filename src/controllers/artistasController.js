@@ -406,3 +406,67 @@ export const cambiarEstadoArtista = async (req, res) => {
   }
 };
 
+// =========================================================
+// OBTENER ARTISTA POR MATRÍCULA — público
+// GET /api/artistas/matricula/:matricula
+// =========================================================
+export const obtenerArtistaPorMatricula = async (req, res) => {
+  try {
+    const { matricula } = req.params;
+    const isAdmin = req.user?.rol === 'admin';
+    const db = isAdmin ? pool : (pools[req.user?.rol] || pool);
+
+    const whereClause = isAdmin
+      ? 'WHERE a.matricula = $1 AND a.eliminado = FALSE'
+      : "WHERE a.matricula = $1 AND a.activo = TRUE AND a.estado = 'activo' AND a.eliminado = FALSE";
+
+    const resultArtista = await db.query(`
+      SELECT a.*, c.nombre AS categoria_nombre,
+        COUNT(o.id_obra)                                                          AS total_obras,
+        COUNT(o.id_obra) FILTER (WHERE o.estado = 'aprobada' AND o.activa = TRUE) AS obras_publicadas,
+        COUNT(o.id_obra) FILTER (WHERE o.estado = 'pendiente')                    AS obras_pendientes,
+        COUNT(o.id_obra) FILTER (WHERE o.estado = 'rechazada')                    AS obras_rechazadas
+      FROM artistas a
+      LEFT JOIN categorias c ON a.id_categoria_principal = c.id_categoria
+      LEFT JOIN obras o ON a.id_artista = o.id_artista
+      ${whereClause}
+      GROUP BY a.id_artista, c.nombre
+      LIMIT 1
+    `, [matricula]);
+
+    if (resultArtista.rows.length === 0)
+      return res.status(404).json({ success: false, message: "Artista no encontrado" });
+
+    const artista = resultArtista.rows[0];
+
+    const resultObras = await db.query(`
+      SELECT o.id_obra, o.titulo, o.slug, o.imagen_principal,
+        o.anio_creacion, o.estado, o.activa, o.precio_base,
+        c.nombre AS categoria_nombre
+      FROM obras o
+      INNER JOIN categorias c ON o.id_categoria = c.id_categoria
+      WHERE o.id_artista = $1
+      ORDER BY o.fecha_creacion DESC
+    `, [artista.id_artista]);
+
+    const fotosPersonales = await db.query(`
+      SELECT id_foto, url_foto, es_principal, orden
+      FROM artistas_fotos_personales
+      WHERE id_artista = $1 AND activa = TRUE
+      ORDER BY es_principal DESC, orden ASC
+    `, [artista.id_artista]);
+
+    res.json({
+      success: true,
+      data: {
+        ...artista,
+        obras: resultObras.rows,
+        fotos_personales: fotosPersonales.rows,
+      },
+    });
+  } catch (error) {
+    logger.error(`Error al obtener artista por matrícula: ${error.message} | ${error.stack}`);
+    res.status(500).json({ success: false, message: "Error al obtener el artista" });
+  }
+};
+

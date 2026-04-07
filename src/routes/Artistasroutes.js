@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  listarArtistas, obtenerArtistaPorId,
+  listarArtistas, obtenerArtistaPorId, obtenerArtistaPorMatricula,
   crearArtista, actualizarArtista, eliminarArtista, cambiarEstadoArtista
 } from "../controllers/artistasController.js";
 import { authenticateToken, requireRole, optionalAuth } from '../middlewares/authMiddleware.js';
@@ -9,8 +9,9 @@ import { upload } from '../config/cloudinaryConfig.js';
 const router = Router();
 
 // ── PÚBLICAS ──────────────────────────────────────────────
-router.get('/',    optionalAuth, listarArtistas);
-router.get('/:id', optionalAuth, obtenerArtistaPorId);
+router.get('/',                    optionalAuth, listarArtistas);
+router.get('/matricula/:matricula', optionalAuth, obtenerArtistaPorMatricula);
+router.get('/:id',                 optionalAuth, obtenerArtistaPorId);
 
 // ── PROTEGIDAS (solo admin) ───────────────────────────────
 router.post('/',           authenticateToken, requireRole('admin'), upload.single('foto'), crearArtista);
