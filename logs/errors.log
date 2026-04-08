@@ -1317,3 +1317,4 @@
     at C:\xampp\htdocs\ProtectoAltar\back_auth_mysql\node_modules\pg-pool\index.js:45:11
     at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
     at async obtenerArtistaPorMatricula (file:///C:/xampp/htdocs/ProtectoAltar/back_auth_mysql/src/controllers/artistasController.js:463:21)
+2026-04-08 16:59:18 [warn]: Login fallido - no encontrado: kh***014@c***.edu.mx
