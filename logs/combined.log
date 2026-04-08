@@ -8286,3 +8286,125 @@
 2026-04-07 22:08:05 [info]: Conexion PostgreSQL removida del pool
 2026-04-07 22:08:26 [info]: Conexion PostgreSQL removida del pool
 2026-04-07 22:08:27 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:10:26 [info]: Brevo API configurada correctamente
+2026-04-07 22:10:27 [info]: Servidor corriendo en el puerto 4000
+2026-04-07 22:10:27 [info]: CORS habilitado para: http://localhost:5173, http://localhost:4200, http://localhost:5173, http://localhost:5174
+2026-04-07 22:10:27 [info]: Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS
+2026-04-07 22:10:28 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:10:28 [info]: Conectado a PostgreSQL (neondb)
+2026-04-07 22:10:28 [info]: Host: ep-sweet-lake-ad4v82aj-pooler.c-2.us-east-1.aws.neon.tech:5432
+2026-04-07 22:10:28 [info]: Server time: Tue Apr 07 2026 22:10:27 GMT-0600 (GMT-06:00)
+2026-04-07 22:10:28 [info]: Conexion PostgreSQL verificada correctamente.
+2026-04-07 22:10:28 [info]: Cron de backups inicializado.
+2026-04-07 22:10:36 [info]: Intento de login: 20***054@u***.edu.mx
+2026-04-07 22:10:37 [info]: Sesion guardada: usuario 14
+2026-04-07 22:10:37 [info]: Login exitoso: usuario 14 rol artista
+2026-04-07 22:10:38 [info]: Sesion valida: SI
+2026-04-07 22:10:38 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:10:39 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:10:39 [info]: Sesion valida: SI
+2026-04-07 22:10:39 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:10:39 [info]: Sesion valida: SI
+2026-04-07 22:10:39 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:10:40 [info]: Sesion valida: SI
+2026-04-07 22:10:40 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:10:41 [info]: Sesion valida: SI
+2026-04-07 22:10:41 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:10:41 [info]: Sesion valida: SI
+2026-04-07 22:10:41 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:10:42 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:10:42 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:10:42 [info]: Sesion valida: SI
+2026-04-07 22:10:42 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:10:42 [info]: Categorias listadas: 7
+2026-04-07 22:10:42 [info]: Categorias listadas: 7
+2026-04-07 22:10:42 [info]: Sesion valida: SI
+2026-04-07 22:10:42 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:11:11 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:11:11 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:11:12 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:11:12 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:12:06 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:12:06 [info]: Sesion valida: SI
+2026-04-07 22:12:06 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:12:07 [info]: Sesion valida: SI
+2026-04-07 22:12:07 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:12:07 [info]: Sesion valida: SI
+2026-04-07 22:12:07 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:12:07 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:12:08 [info]: Sesion valida: SI
+2026-04-07 22:12:08 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:12:08 [info]: Sesion valida: SI
+2026-04-07 22:12:08 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:12:08 [info]: Sesion valida: SI
+2026-04-07 22:12:08 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:12:08 [info]: Sesion valida: SI
+2026-04-07 22:12:08 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:12:09 [info]: Sesion valida: SI
+2026-04-07 22:12:09 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:12:09 [info]: Sesion valida: SI
+2026-04-07 22:12:09 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:12:09 [info]: Sesion eliminada correctamente
+2026-04-07 22:12:09 [info]: Logout: usuario 14
+2026-04-07 22:13:06 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:13:06 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:16:05 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:16:05 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:16:05 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:16:06 [info]: Categorias listadas: 7
+2026-04-07 22:16:06 [info]: Categorias listadas: 7
+2026-04-07 22:16:16 [info]: Intento de login: 20***054@u***.edu.mx
+2026-04-07 22:16:16 [info]: Sesion guardada: usuario 14
+2026-04-07 22:16:17 [info]: Login exitoso: usuario 14 rol artista
+2026-04-07 22:16:18 [info]: Sesion valida: SI
+2026-04-07 22:16:18 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:16:18 [info]: Sesion valida: SI
+2026-04-07 22:16:18 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:16:19 [info]: Sesion valida: SI
+2026-04-07 22:16:19 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:16:19 [info]: Sesion valida: SI
+2026-04-07 22:16:19 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:16:19 [info]: Sesion valida: SI
+2026-04-07 22:16:19 [info]: Auth exitosa: usuario 14 rol artista
+2026-04-07 22:16:20 [info]: Sesion eliminada correctamente
+2026-04-07 22:16:20 [info]: Logout: usuario 14
+2026-04-07 22:16:36 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:17:29 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:17:32 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:27:02 [info]: Brevo API configurada correctamente
+2026-04-07 22:27:03 [info]: Servidor corriendo en el puerto 4000
+2026-04-07 22:27:03 [info]: CORS habilitado para: http://localhost:5173, http://localhost:4200, http://localhost:5173, http://localhost:5174
+2026-04-07 22:27:03 [info]: Protecciones activas: XSS, SQL Injection, JWT-Auth, Helmet, CSP, HSTS
+2026-04-07 22:27:04 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:27:04 [info]: Conectado a PostgreSQL (neondb)
+2026-04-07 22:27:04 [info]: Host: ep-sweet-lake-ad4v82aj-pooler.c-2.us-east-1.aws.neon.tech:5432
+2026-04-07 22:27:04 [info]: Server time: Tue Apr 07 2026 22:27:03 GMT-0600 (GMT-06:00)
+2026-04-07 22:27:04 [info]: Conexion PostgreSQL verificada correctamente.
+2026-04-07 22:27:05 [info]: Cron de backups inicializado.
+2026-04-07 22:27:05 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:27:44 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:27:44 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:31:24 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:31:55 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:32:26 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:32:26 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:32:56 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:32:57 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:34:16 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:34:17 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:35:58 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:35:58 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:37:55 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:37:56 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:38:26 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:38:27 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:39:07 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:39:08 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:40:05 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:40:35 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:40:42 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:40:42 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:40:48 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:41:19 [info]: Conexion PostgreSQL removida del pool
+2026-04-07 22:43:37 [info]: Nueva conexion PostgreSQL establecida
+2026-04-07 22:43:37 [info]: Nueva conexion PostgreSQL establecida
