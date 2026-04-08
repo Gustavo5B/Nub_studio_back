@@ -1299,3 +1299,21 @@
 2026-04-07 19:34:23 [error]: Error al listar obras: Connection terminated due to connection timeout
 2026-04-07 19:34:33 [error]: Error al listar obras: Connection terminated due to connection timeout
 2026-04-07 19:46:55 [error]: Error en listarColecciones: Connection terminated due to connection timeout
+2026-04-07 20:46:31 [error]: Error en getMisObras: Connection terminated due to connection timeout
+2026-04-07 20:46:31 [error]: Error en getMiPerfil: Connection terminated due to connection timeout
+2026-04-07 22:05:49 [error]: Error al obtener artista por matrícula: syntax error at or near "AHORA" | error: syntax error at or near "AHORA"
+    at C:\xampp\htdocs\ProtectoAltar\back_auth_mysql\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async obtenerArtistaPorMatricula (file:///C:/xampp/htdocs/ProtectoAltar/back_auth_mysql/src/controllers/artistasController.js:463:21)
+2026-04-07 22:05:50 [error]: Error al obtener artista por matrícula: syntax error at or near "AHORA" | error: syntax error at or near "AHORA"
+    at C:\xampp\htdocs\ProtectoAltar\back_auth_mysql\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async obtenerArtistaPorMatricula (file:///C:/xampp/htdocs/ProtectoAltar/back_auth_mysql/src/controllers/artistasController.js:463:21)
+2026-04-07 22:05:56 [error]: Error al obtener artista por matrícula: syntax error at or near "AHORA" | error: syntax error at or near "AHORA"
+    at C:\xampp\htdocs\ProtectoAltar\back_auth_mysql\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async obtenerArtistaPorMatricula (file:///C:/xampp/htdocs/ProtectoAltar/back_auth_mysql/src/controllers/artistasController.js:463:21)
+2026-04-07 22:06:00 [error]: Error al obtener artista por matrícula: syntax error at or near "AHORA" | error: syntax error at or near "AHORA"
+    at C:\xampp\htdocs\ProtectoAltar\back_auth_mysql\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async obtenerArtistaPorMatricula (file:///C:/xampp/htdocs/ProtectoAltar/back_auth_mysql/src/controllers/artistasController.js:463:21)

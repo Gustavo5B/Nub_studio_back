@@ -1,3 +1,5 @@
+// src/controllers/artistaController.js (COMPLETO Y CORREGIDO)
+
 import crypto from 'crypto';
 import { pool, pools } from "../config/db.js";
 import logger from "../config/logger.js";
@@ -33,6 +35,18 @@ const generarTokenActivacion = () => ({
   expiracion: new Date(Date.now() + 48 * 60 * 60 * 1000),
 });
 
+// Helper para generar slug a partir del título
+const generarSlug = (titulo, id) => {
+  if (!titulo) return `obra-${id}`;
+  
+  return titulo
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // eliminar acentos
+    .replace(/[^a-z0-9]+/g, "-") // reemplazar espacios y caracteres especiales
+    .replace(/^-+|-+$/g, "") // eliminar guiones al inicio/final
+    .substring(0, 80); // limitar longitud
+};
+
 // =========================================================
 // LISTAR TODOS LOS ARTISTAS
 // GET /api/artistas
@@ -49,7 +63,7 @@ export const listarArtistas = async (req, res) => {
         a.correo, a.telefono, a.matricula, a.porcentaje_comision, a.estado,
         c.nombre AS categoria_nombre,
         COUNT(o.id_obra)                                                          AS total_obras,
-        COUNT(o.id_obra) FILTER (WHERE o.estado = 'aprobada' AND o.activa = TRUE) AS obras_publicadas,
+        COUNT(o.id_obra) FILTER (WHERE o.estado = 'publicada' AND o.activa = TRUE) AS obras_publicadas,
         COUNT(o.id_obra) FILTER (WHERE o.estado = 'pendiente')                    AS obras_pendientes,
         COUNT(o.id_obra) FILTER (WHERE o.estado = 'rechazada')                    AS obras_rechazadas
       FROM artistas a
@@ -95,7 +109,7 @@ export const obtenerArtistaPorId = async (req, res) => {
     const resultArtista = await db.query(`
       SELECT a.*, c.nombre AS categoria_nombre,
         COUNT(o.id_obra)                                                          AS total_obras,
-        COUNT(o.id_obra) FILTER (WHERE o.estado = 'aprobada' AND o.activa = TRUE) AS obras_publicadas,
+        COUNT(o.id_obra) FILTER (WHERE o.estado = 'publicada' AND o.activa = TRUE) AS obras_publicadas,
         COUNT(o.id_obra) FILTER (WHERE o.estado = 'pendiente')                    AS obras_pendientes,
         COUNT(o.id_obra) FILTER (WHERE o.estado = 'rechazada')                    AS obras_rechazadas
       FROM artistas a
@@ -113,16 +127,22 @@ export const obtenerArtistaPorId = async (req, res) => {
 
     const dbObras = isAdmin ? pool : db;
     const resultObras = await dbObras.query(`
-      SELECT o.id_obra, o.titulo, o.slug, o.imagen_principal,
-        o.anio_creacion, o.estado, o.activa, o.precio_base,
+      SELECT 
+        o.id_obra, 
+        o.titulo, 
+        COALESCE(o.slug, $1 || '-' || o.id_obra) AS slug,
+        o.imagen_principal,
+        o.anio_creacion, 
+        o.estado, 
+        o.activa, 
+        o.precio_base,
         c.nombre AS categoria_nombre
       FROM obras o
       INNER JOIN categorias c ON o.id_categoria = c.id_categoria
-      WHERE o.id_artista = $1
+      WHERE o.id_artista = $2
       ORDER BY o.fecha_creacion DESC
-    `, [id]);
+    `, [generarSlug(artista.nombre_artistico || artista.nombre_completo, artista.id_artista), id]);
 
-    // 👇 AGREGAR ESTO - usa la misma variable 'db' que ya existe
     const fotosPersonales = await db.query(`
       SELECT id_foto, url_foto, es_principal, orden
       FROM artistas_fotos_personales
@@ -135,7 +155,7 @@ export const obtenerArtistaPorId = async (req, res) => {
       data: { 
         ...artista, 
         obras: resultObras.rows,
-        fotos_personales: fotosPersonales.rows  // 👈 ESTO DEVUELVE LAS FOTOS
+        fotos_personales: fotosPersonales.rows
       } 
     });
   } catch (error) {
@@ -439,15 +459,25 @@ export const obtenerArtistaPorMatricula = async (req, res) => {
 
     const artista = resultArtista.rows[0];
 
-    const resultObras = await db.query(`
-      SELECT o.id_obra, o.titulo, o.slug, o.imagen_principal,
-        o.anio_creacion, o.estado, o.activa, o.precio_base,
-        c.nombre AS categoria_nombre
-      FROM obras o
-      INNER JOIN categorias c ON o.id_categoria = c.id_categoria
-      WHERE o.id_artista = $1
-      ORDER BY o.fecha_creacion DESC
-    `, [artista.id_artista]);
+   // ✅ CORREGIDO
+const resultObras = await db.query(`
+  SELECT 
+    o.id_obra, 
+    o.titulo, 
+    COALESCE(o.slug, 'obra-' || o.id_obra) AS slug,
+    o.imagen_principal,
+    o.anio_creacion, 
+    o.estado, 
+    o.activa, 
+    o.precio_base,
+    c.nombre AS categoria_nombre
+  FROM obras o
+  INNER JOIN categorias c ON o.id_categoria = c.id_categoria
+  WHERE o.id_artista = $1
+    AND o.estado = 'publicada'  
+    AND o.activa = TRUE
+  ORDER BY o.fecha_creacion DESC
+`, [artista.id_artista]);
 
     const fotosPersonales = await db.query(`
       SELECT id_foto, url_foto, es_principal, orden
@@ -469,4 +499,3 @@ export const obtenerArtistaPorMatricula = async (req, res) => {
     res.status(500).json({ success: false, message: "Error al obtener el artista" });
   }
 };
-
