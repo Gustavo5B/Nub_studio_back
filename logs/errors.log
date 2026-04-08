@@ -1292,3 +1292,10 @@
     at async obtenerArtistaPorId (file:///C:/xampp/htdocs/ProtectoAltar/back_auth_mysql/src/controllers/artistasController.js:97:27)
 2026-04-06 17:57:21 [error]: Error de conexion a PostgreSQL: Connection terminated due to connection timeout
 >>>>>>> 18f2b363fc444322ce5678812db871b244dbf301
+2026-04-07 19:34:23 [error]: Error al listar artistas: Connection terminated due to connection timeout | Error: Connection terminated due to connection timeout
+    at C:\xampp\htdocs\ProtectoAltar\back_auth_mysql\node_modules\pg-pool\index.js:45:11
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+    at async listarArtistas (file:///C:/xampp/htdocs/ProtectoAltar/back_auth_mysql/src/controllers/artistasController.js:45:20)
+2026-04-07 19:34:23 [error]: Error al listar obras: Connection terminated due to connection timeout
+2026-04-07 19:34:33 [error]: Error al listar obras: Connection terminated due to connection timeout
+2026-04-07 19:46:55 [error]: Error en listarColecciones: Connection terminated due to connection timeout
