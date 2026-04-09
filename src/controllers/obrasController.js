@@ -123,10 +123,14 @@ export const obtenerObraPorId = async (req, res) => {
     const resultObra = await db.query(`
       SELECT o.*, a.nombre_completo AS artista_nombre, a.nombre_artistico AS artista_alias,
         a.biografia AS artista_biografia, a.foto_perfil AS artista_foto,
-        c.nombre AS categoria_nombre, c.slug AS categoria_slug
+        c.nombre AS categoria_nombre, c.slug AS categoria_slug,
+        COALESCE(i.stock_actual, 0) AS stock_actual,
+        COALESCE(i.stock_reservado, 0) AS stock_reservado,
+        GREATEST(COALESCE(i.stock_actual, 0) - COALESCE(i.stock_reservado, 0), 0) AS stock_disponible
       FROM obras o
       INNER JOIN artistas a ON o.id_artista = a.id_artista
       INNER JOIN categorias c ON o.id_categoria = c.id_categoria
+      LEFT JOIN inventario i ON i.id_obra = o.id_obra
       WHERE o.id_obra = $1 AND o.eliminada IS NOT TRUE LIMIT 1
     `, [id]);
 
@@ -325,7 +329,7 @@ export const crearObra = async (req, res) => {
     const {
       titulo, descripcion,
       id_categoria, id_artista, id_tecnica,
-      anio_creacion, precio_base,
+      anio_creacion, precio_base, stock,
       dimensiones_alto, dimensiones_ancho, dimensiones_profundidad,
       permite_marco, con_certificado, destacada
     } = req.body;
@@ -367,7 +371,17 @@ export const crearObra = async (req, res) => {
     const { id_obra } = result.rows[0];
     logger.info(`Obra creada: id ${id_obra} slug ${slug}`);
 
-    res.status(201).json({ success: true, message: 'Obra creada exitosamente', data: { id_obra, slug, imagen_principal } });
+    // Crear registro en inventario automáticamente
+    const stockInicial = parseInt(stock) > 0 ? parseInt(stock) : 1;
+    await db.query(
+      `INSERT INTO inventario (id_obra, stock_actual, stock_reservado, stock_vendido, activo)
+       VALUES ($1, $2, 0, 0, true)
+       ON CONFLICT (id_obra) DO UPDATE SET stock_actual = $2, ultima_actualizacion = NOW()`,
+      [id_obra, stockInicial]
+    );
+    logger.info(`Inventario creado: obra ${id_obra} stock ${stockInicial}`);
+
+    res.status(201).json({ success: true, message: 'Obra creada exitosamente', data: { id_obra, slug, imagen_principal, stock: stockInicial } });
 
   } catch (error) {
     logger.error(`Error al crear obra: ${error.message}`);

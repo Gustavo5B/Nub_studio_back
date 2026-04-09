@@ -369,11 +369,18 @@ export const nuevaObra = async (req, res) => {
     const {
       titulo, descripcion, historia, id_categoria, id_coleccion, tecnica, anio_creacion,
       dimensiones_alto, dimensiones_ancho, dimensiones_profundidad,
-      precio_base, permite_marco, con_certificado, etiquetas: etiquetasRaw,
+      precio_base, stock, permite_marco, con_certificado, etiquetas: etiquetasRaw,
     } = req.body;
 
     if (!titulo || !descripcion || !id_categoria || !precio_base)
       return res.status(400).json({ message: 'Faltan campos requeridos: titulo, descripcion, id_categoria, precio_base' });
+
+    if (stock !== undefined && stock !== null && stock !== '') {
+      const stockVal = parseInt(stock);
+      if (isNaN(stockVal) || stockVal < 1) {
+        return res.status(400).json({ message: 'El stock debe ser al menos 1' });
+      }
+    }
 
     if (!req.file)
       return res.status(400).json({ message: 'La imagen es requerida' });
@@ -433,8 +440,17 @@ export const nuevaObra = async (req, res) => {
       }
     }
 
-    logger.info(`Nueva obra creada: ${obraCreada.titulo} (id: ${obraCreada.id_obra})`);
-    res.status(201).json({ message: 'Obra enviada. Quedará en revisión hasta que el admin la apruebe.', obra: obraCreada });
+    // Crear registro de inventario automáticamente al crear la obra
+    const stockInicial = stock && parseInt(stock) > 0 ? parseInt(stock) : 1;
+    await db.query(
+      `INSERT INTO inventario (id_obra, stock_actual, stock_reservado, stock_vendido, activo)
+       VALUES ($1, $2, 0, 0, true)
+       ON CONFLICT (id_obra) DO UPDATE SET stock_actual = $2, ultima_actualizacion = NOW()`,
+      [obraCreada.id_obra, stockInicial]
+    );
+
+    logger.info(`Nueva obra creada: ${obraCreada.titulo} (id: ${obraCreada.id_obra}) stock: ${stockInicial}`);
+    res.status(201).json({ message: 'Obra enviada. Quedará en revisión hasta que el admin la apruebe.', obra: { ...obraCreada, stock: stockInicial } });
 
   } catch (error) {
     logger.error(`Error en nuevaObra: ${error.message}`);
@@ -463,13 +479,16 @@ export const getObraById = async (req, res) => {
     const result = await db.query(`
       SELECT o.*,
         c.nombre AS categoria_nombre,
-        COALESCE(json_agg(oe.id_etiqueta) FILTER (WHERE oe.id_etiqueta IS NOT NULL), '[]') AS etiquetas
+        COALESCE(json_agg(oe.id_etiqueta) FILTER (WHERE oe.id_etiqueta IS NOT NULL), '[]') AS etiquetas,
+        COALESCE(i.stock_actual, 1) AS stock_actual,
+        COALESCE(i.stock_reservado, 0) AS stock_reservado
       FROM obras o
       LEFT JOIN categorias c ON c.id_categoria = o.id_categoria
       LEFT JOIN obras_etiquetas oe ON oe.id_obra = o.id_obra
+      LEFT JOIN inventario i ON i.id_obra = o.id_obra
       WHERE o.id_obra = $1 AND o.id_artista = $2
         AND (o.eliminada IS NULL OR o.eliminada = FALSE)
-      GROUP BY o.id_obra, c.nombre
+      GROUP BY o.id_obra, c.nombre, i.stock_actual, i.stock_reservado
       LIMIT 1
     `, [id, id_artista]);
 
@@ -523,8 +542,16 @@ export const actualizarObraArtista = async (req, res) => {
       titulo, descripcion, historia, id_categoria, id_coleccion, tecnica, anio_creacion,
       dimensiones_alto, dimensiones_ancho, dimensiones_profundidad,
       precio_base, permite_marco, con_certificado,
-      imagen_principal: imgUrl, etiquetas: etiquetasRaw,
+      imagen_principal: imgUrl, etiquetas: etiquetasRaw, stock,
     } = req.body;
+
+    // Validar stock si viene en el body
+    if (stock !== undefined && stock !== null && stock !== '') {
+      const stockVal = parseInt(stock);
+      if (isNaN(stockVal) || stockVal < 1) {
+        return res.status(400).json({ message: 'El stock debe ser al menos 1' });
+      }
+    }
 
     let imagen_principal = imgUrl || null;
 
@@ -585,6 +612,17 @@ export const actualizarObraArtista = async (req, res) => {
           await db.query('INSERT INTO obras_etiquetas (id_obra, id_etiqueta) VALUES ($1, $2) ON CONFLICT DO NOTHING', [id, idEtiqueta]);
         }
       }
+    }
+
+    // Actualizar stock en inventario si se proporcionó
+    if (stock !== undefined && stock !== null && stock !== '') {
+      const stockVal = parseInt(stock);
+      await db.query(
+        `INSERT INTO inventario (id_obra, stock_actual, stock_reservado, stock_vendido, activo)
+         VALUES ($1, $2, 0, 0, true)
+         ON CONFLICT (id_obra) DO UPDATE SET stock_actual = $2, ultima_actualizacion = NOW()`,
+        [id, stockVal]
+      );
     }
 
     logger.info(`Obra actualizada: id ${id} por artista ${id_artista}`);
