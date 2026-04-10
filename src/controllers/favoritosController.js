@@ -14,7 +14,6 @@ export const getFavoritos = async (req, res) => {
       SELECT
         f.id_favorito,
         f.id_obra,
-        f.created_at,
         o.titulo,
         o.slug,
         o.imagen_principal,
@@ -26,7 +25,7 @@ export const getFavoritos = async (req, res) => {
       INNER JOIN artistas a ON a.id_artista = o.id_artista
       WHERE f.id_usuario = $1
         AND o.eliminada IS NOT TRUE
-      ORDER BY f.created_at DESC
+      ORDER BY f.id_favorito DESC
     `, [id_usuario]);
 
     return res.json({ success: true, data: result.rows });
