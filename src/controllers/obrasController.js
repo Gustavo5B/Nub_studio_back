@@ -131,7 +131,8 @@ export const obtenerObraPorId = async (req, res) => {
       INNER JOIN artistas a ON o.id_artista = a.id_artista
       INNER JOIN categorias c ON o.id_categoria = c.id_categoria
       LEFT JOIN inventario i ON i.id_obra = o.id_obra
-      WHERE o.id_obra = $1 AND o.eliminada IS NOT TRUE LIMIT 1
+      WHERE o.id_obra = $1 AND o.eliminada IS NOT TRUE
+        AND o.estado = 'publicada' AND o.activa = TRUE LIMIT 1
     `, [id]);
 
     if (resultObra.rows.length === 0)
@@ -205,7 +206,7 @@ export const obtenerObraPorSlug = async (req, res) => {
   try {
     const db = pools[req.user?.rol] || pool;
     const { slug } = req.params;
-    const result = await db.query('SELECT id_obra FROM obras WHERE slug = $1 AND activa = TRUE LIMIT 1', [slug]);
+    const result = await db.query(`SELECT id_obra FROM obras WHERE slug = $1 AND activa = TRUE AND estado = 'publicada' AND eliminada IS NOT TRUE LIMIT 1`, [slug]);
     if (result.rows.length === 0)
       return res.status(404).json({ success: false, message: "Obra no encontrada" });
     req.params.id = result.rows[0].id_obra;

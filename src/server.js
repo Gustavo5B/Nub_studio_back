@@ -26,7 +26,8 @@ import estadisticasRoutes from "./routes/estadisticasRoutes.js";
 import sobreNosotrosRoutes from "./routes/sobreNosotrosRoutes.js";
 import municipiosRoutes from "./routes/municipiosRoutes.js";
 import coleccionesRoutes from "./routes/coleccionesRoutes.js";
-import carritoRoutes from "./routes/carritoRoutes.js";
+import carritoRoutes   from "./routes/carritoRoutes.js";
+import favoritosRoutes from "./routes/favoritosRoutes.js";
 
 import { testConnection } from "./config/db.js";
 import {
@@ -190,6 +191,7 @@ app.use("/api/sobre-nosotros",  sobreNosotrosRoutes);
 app.use("/api/municipios",      municipiosRoutes);
 app.use("/api/colecciones",     coleccionesRoutes);
 app.use("/api/carrito",        carritoRoutes);
+app.use("/api/favoritos",      favoritosRoutes);
 
 // =========================================================
 // RUTA DE PRUEBA

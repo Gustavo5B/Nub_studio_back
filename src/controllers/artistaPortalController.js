@@ -297,10 +297,13 @@ export const getMisObras = async (req, res) => {
         o.permite_marco, o.con_certificado,
         o.id_coleccion,
         c.nombre AS categoria,
-        col.nombre AS nombre_coleccion
+        col.nombre AS nombre_coleccion,
+        COALESCE(i.stock_actual, 0) AS stock_actual,
+        COALESCE(i.stock_reservado, 0) AS stock_reservado
       FROM obras o
       LEFT JOIN categorias c ON c.id_categoria = o.id_categoria
       LEFT JOIN colecciones col ON col.id_coleccion = o.id_coleccion AND col.eliminada = FALSE
+      LEFT JOIN inventario i ON i.id_obra = o.id_obra
       WHERE o.id_artista = $1
         AND (o.eliminada IS NULL OR o.eliminada = false)
       ORDER BY o.fecha_creacion DESC`,
