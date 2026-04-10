@@ -17,6 +17,7 @@ import {
   editarPost,
   eliminarPost,
   listarMisPosts,
+  obtenerPostParaEditar,
   // Cliente / Artista
   crearComentario,
   eliminarComentario,
@@ -91,6 +92,11 @@ router.get(
   '/mis-posts',
   authenticateToken, requireRole('artista'),
   listarMisPosts
+);
+router.get(
+  '/posts/:id/editar',
+  authenticateToken, requireRole('admin', 'artista'),
+  obtenerPostParaEditar
 );
 router.post(
   '/posts',
