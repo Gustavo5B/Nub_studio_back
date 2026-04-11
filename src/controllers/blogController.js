@@ -171,8 +171,7 @@ export const eliminarComentarioAdmin = async (req, res) => {
       UPDATE blog_comentarios SET
         eliminado = true,
         eliminado_por = $1,
-        fecha_eliminacion = NOW(),
-        fecha_actualizacion = NOW()
+        fecha_eliminacion = NOW()
       WHERE id_comentario = $2
     `, [req.user.id_usuario, id]);
 
@@ -253,8 +252,7 @@ export const moderarComentario = async (req, res) => {
     const nuevoEstado = accion === 'aprobar' ? 'aprobado' : 'rechazado';
 
     const result = await db.query(`
-      UPDATE blog_comentarios SET
-        estado = $1, fecha_actualizacion = NOW()
+      UPDATE blog_comentarios SET estado = $1
       WHERE id_comentario = $2 AND eliminado = false
       RETURNING id_comentario, estado
     `, [nuevoEstado, id]);
@@ -669,14 +667,14 @@ export const crearComentario = async (req, res) => {
     const result = await db.query(`
       INSERT INTO blog_comentarios
         (id_post, id_usuario, padre_id, nivel, contenido, imagen_url, estado)
-      VALUES ($1, $2, $3, $4, $5, $6, 'pendiente')
+      VALUES ($1, $2, $3, $4, $5, $6, 'aprobado')
       RETURNING id_comentario, estado
     `, [id, id_usuario, padre_id_val, nivel, contenido.trim(), imagen_url]);
 
     logger.info(`Comentario creado: id=${result.rows[0].id_comentario} post=${id} usuario=${id_usuario}`);
     res.status(201).json({
       success: true,
-      message: 'Comentario enviado. Será visible una vez que sea aprobado por el administrador.',
+      message: 'Comentario publicado.',
       data: result.rows[0]
     });
   } catch (error) {
@@ -796,6 +794,48 @@ export const listarPosts = async (req, res) => {
   } catch (error) {
     logger.error(`Error listarPosts: ${error.message}`);
     res.status(500).json({ success: false, message: 'Error al obtener los posts' });
+  }
+};
+
+// =========================================================
+// OBTENER POST COMPLETO PARA EDITAR (admin o artista dueño)
+// GET /api/blog/posts/:id/editar
+// Devuelve todos los campos incluyendo contenido, sin filtro de estado
+// =========================================================
+export const obtenerPostParaEditar = async (req, res) => {
+  try {
+    const db = pools[req.user?.rol] || pool;
+    const idNum = parseInt(req.params.id, 10);
+    if (isNaN(idNum))
+      return res.status(400).json({ success: false, message: 'ID inválido' });
+
+    const conditions = ['bp.id_post = $1', 'bp.eliminado = false'];
+    const params = [idNum];
+
+    // Artista solo puede ver sus propios posts
+    if (req.user?.rol === 'artista') {
+      params.push(req.user.id_usuario);
+      conditions.push(`bp.autor_id = $${params.length}`);
+    }
+
+    const result = await db.query(`
+      SELECT
+        bp.id_post, bp.titulo, bp.slug, bp.extracto, bp.contenido,
+        bp.imagen_destacada, bp.meta_description, bp.autor_id, bp.autor_rol,
+        bp.id_categoria, bp.estado, bp.activo, bp.vistas,
+        bp.fecha_publicacion, bp.fecha_creacion, bp.fecha_actualizacion
+      FROM blog_posts bp
+      WHERE ${conditions.join(' AND ')}
+      LIMIT 1
+    `, params);
+
+    if (result.rows.length === 0)
+      return res.status(404).json({ success: false, message: 'Post no encontrado' });
+
+    res.json({ success: true, data: result.rows[0] });
+  } catch (error) {
+    logger.error(`Error obtenerPostParaEditar ${req.params.id}: ${error.message}`);
+    res.status(500).json({ success: false, message: 'Error al obtener el post' });
   }
 };
 
