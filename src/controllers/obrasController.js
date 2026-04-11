@@ -25,8 +25,8 @@ export const listarObras = async (req, res) => {
       whereConditions.push("o.activa = TRUE");
     }
 
-    if (categoria)             { whereConditions.push(`o.id_categoria = $${paramCount}`); queryParams.push(categoria); paramCount++; }
-    if (artista)               { whereConditions.push(`o.id_artista = $${paramCount}`);   queryParams.push(artista);   paramCount++; }
+    if (categoria) { whereConditions.push(`o.id_categoria = $${paramCount}`); queryParams.push(categoria); paramCount++; }
+    if (artista) { whereConditions.push(`o.id_artista = $${paramCount}`); queryParams.push(artista); paramCount++; }
     if (destacadas === 'true') { whereConditions.push('o.destacada = TRUE'); }
 
     if (precio_min || precio_max) {
@@ -42,10 +42,10 @@ export const listarObras = async (req, res) => {
 
     let orderBy = 'o.fecha_creacion DESC';
     switch (ordenar) {
-      case 'antiguos':    orderBy = 'o.fecha_creacion ASC';           break;
-      case 'precio_asc':  orderBy = 'precio_minimo ASC NULLS LAST';   break;
-      case 'precio_desc': orderBy = 'precio_minimo DESC NULLS LAST';  break;
-      case 'nombre':      orderBy = 'o.titulo ASC';                   break;
+      case 'antiguos': orderBy = 'o.fecha_creacion ASC'; break;
+      case 'precio_asc': orderBy = 'precio_minimo ASC NULLS LAST'; break;
+      case 'precio_desc': orderBy = 'precio_minimo DESC NULLS LAST'; break;
+      case 'nombre': orderBy = 'o.titulo ASC'; break;
       case 'admin':
         orderBy = `o.activa DESC,
           CASE o.estado
@@ -200,6 +200,80 @@ export const obtenerObraPorId = async (req, res) => {
 };
 
 // =========================================================
+// OBTENER OBRA PARA ADMIN (sin filtros de estado)
+// =========================================================
+export const obtenerObraAdmin = async (req, res) => {
+  try {
+    const db = pools[req.user?.rol] || pool;
+    const { id } = req.params;
+
+    const resultObra = await db.query(
+      `
+      SELECT o.*, a.nombre_completo AS artista_nombre, a.nombre_artistico AS artista_alias,
+        a.biografia AS artista_biografia, a.foto_perfil AS artista_foto,
+        c.nombre AS categoria_nombre, c.slug AS categoria_slug,
+        COALESCE(i.stock_actual, 0) AS stock_actual,
+        COALESCE(i.stock_reservado, 0) AS stock_reservado
+      FROM obras o
+      INNER JOIN artistas a ON o.id_artista = a.id_artista
+      INNER JOIN categorias c ON o.id_categoria = c.id_categoria
+      LEFT JOIN inventario i ON i.id_obra = o.id_obra
+      WHERE o.id_obra = $1 AND (o.eliminada IS NULL OR o.eliminada = FALSE)
+      LIMIT 1
+    `,
+      [id],
+    );
+
+    if (resultObra.rows.length === 0) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Obra no encontrada" });
+    }
+
+    const obra = resultObra.rows[0];
+
+    // Obtener tamaños, imágenes, etiquetas (igual que en obtenerObraPorId)
+    const resultTamaños = await db.query(
+      `
+      SELECT ot.id AS id_obra_tamaño, ot.precio_base, ot.cantidad_disponible,
+        t.id_tamaño, t.nombre AS tamaño_nombre, t.ancho_cm, t.alto_cm
+      FROM obras_tamaños ot
+      INNER JOIN tamaños_disponibles t ON ot.id_tamaño = t.id_tamaño
+      WHERE ot.id_obra = $1 AND ot.activo = TRUE AND t.activo = TRUE
+      ORDER BY ot.precio_base ASC
+    `,
+      [id],
+    );
+
+    const tamaños = resultTamaños.rows;
+
+    const resultImagenes = await db.query(
+      `SELECT id_imagen, url_imagen, orden, es_principal FROM imagenes_obras WHERE id_obra = $1 AND activa = TRUE ORDER BY es_principal DESC, orden ASC`,
+      [id],
+    );
+    const resultEtiquetas = await db.query(
+      `SELECT e.id_etiqueta, e.nombre, e.slug FROM obras_etiquetas oe INNER JOIN etiquetas e ON oe.id_etiqueta = e.id_etiqueta WHERE oe.id_obra = $1 AND e.activa = TRUE`,
+      [id],
+    );
+
+    res.json({
+      success: true,
+      data: {
+        ...obra,
+        tamaños,
+        imagenes: resultImagenes.rows,
+        etiquetas: resultEtiquetas.rows,
+      },
+    });
+  } catch (error) {
+    logger.error(`Error al obtener obra para admin: ${error.message}`);
+    res
+      .status(500)
+      .json({ success: false, message: "Error al obtener la obra" });
+  }
+};
+
+// =========================================================
 // OBTENER OBRA POR SLUG
 // =========================================================
 export const obtenerObraPorSlug = async (req, res) => {
@@ -268,9 +342,9 @@ export const buscarObras = async (req, res) => {
 // =========================================================
 // FILTROS RAPIDOS — delegan a listarObras (req se pasa completo)
 // =========================================================
-export const obtenerObrasPorCategoria = async (req, res) => { req.query.categoria  = req.params.id;    return listarObras(req, res); };
-export const obtenerObrasPorArtista   = async (req, res) => { req.query.artista    = req.params.id;    return listarObras(req, res); };
-export const obtenerObrasDestacadas   = async (req, res) => { req.query.destacadas = 'true'; req.query.limit = req.query.limit || 8; return listarObras(req, res); };
+export const obtenerObrasPorCategoria = async (req, res) => { req.query.categoria = req.params.id; return listarObras(req, res); };
+export const obtenerObrasPorArtista = async (req, res) => { req.query.artista = req.params.id; return listarObras(req, res); };
+export const obtenerObrasDestacadas = async (req, res) => { req.query.destacadas = 'true'; req.query.limit = req.query.limit || 8; return listarObras(req, res); };
 
 export const obtenerObrasPorEtiqueta = async (req, res) => {
   try {
@@ -322,107 +396,179 @@ export const obtenerObrasPorEtiqueta = async (req, res) => {
 };
 
 // =========================================================
-// CREAR OBRA
+// CREAR OBRA (CORREGIDO)
 // =========================================================
 export const crearObra = async (req, res) => {
   try {
     const db = pools[req.user?.rol] || pool;
     const {
-      titulo, descripcion,
-      id_categoria, id_artista, id_tecnica,
-      anio_creacion, precio_base, stock,
-      dimensiones_alto, dimensiones_ancho, dimensiones_profundidad,
-      permite_marco, con_certificado, destacada
+      titulo,
+      descripcion,
+      historia, // ← AGREGAR historia
+      id_categoria,
+      id_artista,
+      id_tecnica,
+      anio_creacion,
+      precio_base,
+      stock,
+      dimensiones_alto,
+      dimensiones_ancho,
+      dimensiones_profundidad,
+      permite_marco,
+      con_certificado,
+      destacada,
     } = req.body;
 
     const id_usuario = req.user?.id_usuario || 1;
 
     if (!titulo || !descripcion || !id_categoria || !id_artista)
-      return res.status(400).json({ success: false, message: 'Titulo, descripcion, categoria y artista son obligatorios' });
+      return res.status(400).json({
+        success: false,
+        message: "Titulo, descripcion, categoria y artista son obligatorios",
+      });
 
-    const imagen_principal = req.file?.path || req.body.imagen_principal || null;
+    const imagen_principal =
+      req.file?.path || req.body.imagen_principal || null;
 
     let slug = titulo
-      .toLowerCase().trim()
-      .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-      .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      .toLowerCase()
+      .trim()
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-z0-9]+/g, "-")
+      .replace(/^-|-$/g, "");
 
-    const slugExiste = await db.query('SELECT id_obra FROM obras WHERE slug = $1 LIMIT 1', [slug]);
+    const slugExiste = await db.query(
+      "SELECT id_obra FROM obras WHERE slug = $1 LIMIT 1",
+      [slug],
+    );
     if (slugExiste.rows.length > 0) slug = `${slug}-${Date.now()}`;
 
-    const result = await db.query(`
+    const result = await db.query(
+      `
       INSERT INTO obras (
-        titulo, slug, descripcion,
+        titulo, slug, descripcion, historia,  // ← AGREGAR historia
         id_categoria, id_artista, id_tecnica,
         anio_creacion, imagen_principal, precio_base,
         dimensiones_alto, dimensiones_ancho, dimensiones_profundidad,
         permite_marco, con_certificado, destacada,
         id_usuario_creacion, activa, estado
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,TRUE,'pendiente')
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,TRUE,'pendiente')
       RETURNING id_obra, slug
-    `, [
-      titulo, slug, descripcion,
-      id_categoria, id_artista, id_tecnica || null,
-      anio_creacion || null, imagen_principal, precio_base || null,
-      dimensiones_alto || null, dimensiones_ancho || null, dimensiones_profundidad || null,
-      permite_marco ?? true, con_certificado ?? false,
-      destacada || false, id_usuario
-    ]);
+    `,
+      [
+        titulo,
+        slug,
+        descripcion,
+        historia || null, // ← AGREGAR historia
+        id_categoria,
+        id_artista,
+        id_tecnica || null,
+        anio_creacion || null,
+        imagen_principal,
+        precio_base || null,
+        dimensiones_alto || null,
+        dimensiones_ancho || null,
+        dimensiones_profundidad || null,
+        permite_marco ?? true,
+        con_certificado ?? false,
+        destacada || false,
+        id_usuario,
+      ],
+    );
 
     const { id_obra } = result.rows[0];
     logger.info(`Obra creada: id ${id_obra} slug ${slug}`);
 
-    // Crear registro en inventario automáticamente
     const stockInicial = parseInt(stock) > 0 ? parseInt(stock) : 1;
     await db.query(
       `INSERT INTO inventario (id_obra, stock_actual, stock_reservado, stock_vendido, activo)
        VALUES ($1, $2, 0, 0, true)
        ON CONFLICT (id_obra) DO UPDATE SET stock_actual = $2, ultima_actualizacion = NOW()`,
-      [id_obra, stockInicial]
+      [id_obra, stockInicial],
     );
     logger.info(`Inventario creado: obra ${id_obra} stock ${stockInicial}`);
 
-    res.status(201).json({ success: true, message: 'Obra creada exitosamente', data: { id_obra, slug, imagen_principal, stock: stockInicial } });
-
+    res.status(201).json({
+      success: true,
+      message: "Obra creada exitosamente",
+      data: { id_obra, slug, imagen_principal, stock: stockInicial },
+    });
   } catch (error) {
     logger.error(`Error al crear obra: ${error.message}`);
-    res.status(500).json({ success: false, message: 'Error al crear la obra' });
+    res.status(500).json({ success: false, message: "Error al crear la obra" });
   }
 };
 
 // =========================================================
-// ACTUALIZAR OBRA
+// ACTUALIZAR OBRA (CORREGIDO - NO CAMBIA ESTADO A MENOS QUE SE ESPECIFIQUE)
 // =========================================================
 export const actualizarObra = async (req, res) => {
   try {
     const db = pools[req.user?.rol] || pool;
     const { id } = req.params;
     const {
-      titulo, descripcion, id_categoria, id_artista, id_tecnica,
-      anio_creacion, precio_base,
-      dimensiones_alto, dimensiones_ancho, dimensiones_profundidad,
-      permite_marco, con_certificado, destacada, estado
+      titulo,
+      descripcion,
+      historia,
+      id_categoria,
+      id_artista,
+      id_tecnica,
+      anio_creacion,
+      precio_base,
+      dimensiones_alto,
+      dimensiones_ancho,
+      dimensiones_profundidad,
+      permite_marco,
+      con_certificado,
+      destacada,
+      estado,  // ← Puede venir o no
     } = req.body;
 
     const imagen_principal = req.file?.path || req.body.imagen_principal;
-    const activa = estado === 'publicada';
+
+    // Obtener el estado actual de la obra
+    const obraActual = await db.query(
+      `SELECT estado, activa FROM obras WHERE id_obra = $1`,
+      [id]
+    );
+
+    if (obraActual.rows.length === 0) {
+      return res.status(404).json({ success: false, message: "Obra no encontrada" });
+    }
+
+    // Si NO se envía "estado", mantener el estado actual
+    const nuevoEstado = estado || obraActual.rows[0].estado;
+    const activa = nuevoEstado === "publicada";
 
     let query = `
       UPDATE obras SET
-        titulo=$1, descripcion=$2, id_categoria=$3, id_artista=$4, id_tecnica=$5,
-        anio_creacion=$6, precio_base=$7,
-        dimensiones_alto=$8, dimensiones_ancho=$9, dimensiones_profundidad=$10,
-        permite_marco=$11, con_certificado=$12, destacada=$13,
-        estado=$14, activa=$15,
+        titulo=$1, descripcion=$2, historia=$3,
+        id_categoria=$4, id_artista=$5, id_tecnica=$6,
+        anio_creacion=$7, precio_base=$8,
+        dimensiones_alto=$9, dimensiones_ancho=$10, dimensiones_profundidad=$11,
+        permite_marco=$12, con_certificado=$13, destacada=$14,
+        estado=$15, activa=$16,
         fecha_actualizacion=NOW()
     `;
 
     const params = [
-      titulo, descripcion, id_categoria, id_artista, id_tecnica || null,
-      anio_creacion || null, precio_base || null,
-      dimensiones_alto || null, dimensiones_ancho || null, dimensiones_profundidad || null,
-      permite_marco ?? true, con_certificado ?? false, destacada || false,
-      estado || 'pendiente', activa,
+      titulo,
+      descripcion,
+      historia || null,
+      id_categoria,
+      id_artista,
+      id_tecnica || null,
+      anio_creacion || null,
+      precio_base || null,
+      dimensiones_alto || null,
+      dimensiones_ancho || null,
+      dimensiones_profundidad || null,
+      permite_marco ?? true,
+      con_certificado ?? false,
+      destacada || false,
+      nuevoEstado,   // ← Usa el nuevo estado (actual o el que viene)
+      activa,
     ];
 
     if (imagen_principal) {
@@ -436,14 +582,23 @@ export const actualizarObra = async (req, res) => {
     const result = await db.query(query, params);
 
     if (result.rows.length === 0)
-      return res.status(404).json({ success: false, message: 'Obra no encontrada' });
+      return res
+        .status(404)
+        .json({ success: false, message: "Obra no encontrada" });
 
-    logger.info(`Obra actualizada: id ${result.rows[0].id_obra} estado ${result.rows[0].estado} activa ${result.rows[0].activa}`);
-    res.json({ success: true, message: 'Obra actualizada exitosamente', data: result.rows[0] });
-
+    logger.info(
+      `Obra actualizada: id ${result.rows[0].id_obra} estado ${result.rows[0].estado} activa ${result.rows[0].activa}`,
+    );
+    res.json({
+      success: true,
+      message: "Obra actualizada exitosamente",
+      data: result.rows[0],
+    });
   } catch (error) {
     logger.error(`Error al actualizar obra: ${error.message}`);
-    res.status(500).json({ success: false, message: 'Error al actualizar la obra' });
+    res
+      .status(500)
+      .json({ success: false, message: "Error al actualizar la obra" });
   }
 };
 
