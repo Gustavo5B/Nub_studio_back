@@ -2,14 +2,39 @@
 import { pool } from "../config/db.js";
 import logger   from "../config/logger.js";
 
-// ── Helper: construye WHERE + params para filtro de fechas ────────────────────
-// Devuelve { where: string, params: any[], nextIdx: number }
-// existingWhere: si ya hay un WHERE en la query, se añade AND en lugar de WHERE
-function buildDateFilter(query, startIdx = 1, existingWhere = false) {
+// ── Helper: construye WHERE + JOIN + params (fecha + rol opcional) ────────────
+// col: columna de fecha (alias incluido, p.ej. "h.fecha")
+// Devuelve { join, where, params }
+function buildFilters(query, col = "fecha") {
+  const { fecha_inicio, fecha_fin, rol } = query;
+  const params = [];
+  const conditions = [];
+
+  if (fecha_inicio) {
+    params.push(fecha_inicio);
+    conditions.push(`(${col} AT TIME ZONE 'America/Mexico_City')::date >= $${params.length}::date`);
+  }
+  if (fecha_fin) {
+    params.push(fecha_fin);
+    conditions.push(`(${col} AT TIME ZONE 'America/Mexico_City')::date <= $${params.length}::date`);
+  }
+
+  // JOIN con usuarios solo cuando se filtra por rol
+  const join = rol ? ` LEFT JOIN usuarios u ON h.id_usuario = u.id_usuario` : "";
+  if (rol) {
+    params.push(rol);
+    conditions.push(`u.rol = $${params.length}`);
+  }
+
+  const where = conditions.length > 0 ? ` WHERE ${conditions.join(" AND ")}` : "";
+  return { join, where, params };
+}
+
+// ── Helper legacy (sin rol) — mantiene compatibilidad con endpoints no migrados ─
+function buildDateFilter(query, startIdx = 1) {
   const { fecha_inicio, fecha_fin } = query;
   const params = [];
   const conditions = [];
-  // Comparar en hora local de México, no en UTC
   if (fecha_inicio) {
     params.push(fecha_inicio);
     conditions.push(`(fecha AT TIME ZONE 'America/Mexico_City')::date >= $${startIdx + params.length - 1}::date`);
@@ -18,8 +43,7 @@ function buildDateFilter(query, startIdx = 1, existingWhere = false) {
     params.push(fecha_fin);
     conditions.push(`(fecha AT TIME ZONE 'America/Mexico_City')::date <= $${startIdx + params.length - 1}::date`);
   }
-  const prefix = existingWhere ? " AND " : " WHERE ";
-  const clause = conditions.length === 0 ? "" : prefix + conditions.join(" AND ");
+  const clause = conditions.length === 0 ? "" : ` WHERE ${conditions.join(" AND ")}`;
   return { where: clause, params, nextIdx: startIdx + params.length };
 }
 
@@ -143,14 +167,20 @@ function predecir(modelo, ultimoX, n, maxHistorico = Infinity) {
 // ══════════════════════════════════════════════════════════════════════════════
 export async function getResumen(req, res) {
   try {
-    const { where, params } = buildDateFilter(req.query);
+    const { join, where, params } = buildFilters(req.query, "h.fecha");
+    const { rol } = req.query;
+    // Para hoy/ayer: solo filtro de rol (sin rango de fechas del usuario)
+    const { join: jRol, where: wRol, params: pRol } = buildFilters({ rol }, "h.fecha");
+    // Agrega condición extra respetando WHERE ya existente
+    const addCond = (w, cond) => w ? `${w} AND ${cond}` : ` WHERE ${cond}`;
+
     const [total, exitosos, fallidos, unicos, hoy, ayer] = await Promise.all([
-      pool.query(`SELECT COUNT(*) AS total FROM historial_login${where}`, params),
-      pool.query(`SELECT COUNT(*) AS total FROM historial_login${where}${where ? " AND" : " WHERE"} tipo_evento = 'LOGIN_EXITOSO'`, params),
-      pool.query(`SELECT COUNT(*) AS total FROM historial_login${where}${where ? " AND" : " WHERE"} tipo_evento = 'LOGIN_FALLIDO'`, params),
-      pool.query(`SELECT COUNT(DISTINCT id_usuario) AS total FROM historial_login${where}${where ? " AND" : " WHERE"} tipo_evento = 'LOGIN_EXITOSO'`, params),
-      pool.query(`SELECT COUNT(*) AS total FROM historial_login WHERE (fecha AT TIME ZONE 'America/Mexico_City')::date = (NOW() AT TIME ZONE 'America/Mexico_City')::date`),
-      pool.query(`SELECT COUNT(*) AS total FROM historial_login WHERE (fecha AT TIME ZONE 'America/Mexico_City')::date = (NOW() AT TIME ZONE 'America/Mexico_City')::date - 1`),
+      pool.query(`SELECT COUNT(*) AS total FROM historial_login h${join}${where}`, params),
+      pool.query(`SELECT COUNT(*) AS total FROM historial_login h${join}${addCond(where, "h.tipo_evento = 'LOGIN_EXITOSO'")}`, params),
+      pool.query(`SELECT COUNT(*) AS total FROM historial_login h${join}${addCond(where, "h.tipo_evento = 'LOGIN_FALLIDO'")}`, params),
+      pool.query(`SELECT COUNT(DISTINCT h.id_usuario) AS total FROM historial_login h${join}${addCond(where, "h.tipo_evento = 'LOGIN_EXITOSO'")}`, params),
+      pool.query(`SELECT COUNT(*) AS total FROM historial_login h${jRol}${addCond(wRol, "(h.fecha AT TIME ZONE 'America/Mexico_City')::date = (NOW() AT TIME ZONE 'America/Mexico_City')::date")}`, pRol),
+      pool.query(`SELECT COUNT(*) AS total FROM historial_login h${jRol}${addCond(wRol, "(h.fecha AT TIME ZONE 'America/Mexico_City')::date = (NOW() AT TIME ZONE 'America/Mexico_City')::date - 1")}`, pRol),
     ]);
     const totalHoy  = Number.parseInt(hoy.rows[0].total);
     const totalAyer = Number.parseInt(ayer.rows[0].total);
@@ -176,13 +206,13 @@ export async function getResumen(req, res) {
 // ══════════════════════════════════════════════════════════════════════════════
 export async function getPorHora(req, res) {
   try {
-    const { where, params } = buildDateFilter(req.query);
+    const { join, where, params } = buildFilters(req.query, "h.fecha");
     const result = await pool.query(`
-      SELECT EXTRACT(HOUR FROM fecha AT TIME ZONE 'America/Mexico_City')::int AS hora,
+      SELECT EXTRACT(HOUR FROM h.fecha AT TIME ZONE 'America/Mexico_City')::int AS hora,
         COUNT(*)::int AS total,
-        COUNT(*) FILTER (WHERE tipo_evento = 'LOGIN_EXITOSO')::int AS exitosos,
-        COUNT(*) FILTER (WHERE tipo_evento = 'LOGIN_FALLIDO')::int AS fallidos
-      FROM historial_login${where} GROUP BY hora ORDER BY hora ASC
+        COUNT(*) FILTER (WHERE h.tipo_evento = 'LOGIN_EXITOSO')::int AS exitosos,
+        COUNT(*) FILTER (WHERE h.tipo_evento = 'LOGIN_FALLIDO')::int AS fallidos
+      FROM historial_login h${join}${where} GROUP BY hora ORDER BY hora ASC
     `, params);
     const mapa = {};
     result.rows.forEach(r => { mapa[r.hora] = r; });
@@ -203,13 +233,13 @@ export async function getPorHora(req, res) {
 // ══════════════════════════════════════════════════════════════════════════════
 export async function getPorDiaSemana(req, res) {
   try {
-    const { where, params } = buildDateFilter(req.query);
+    const { join, where, params } = buildFilters(req.query, "h.fecha");
     const result = await pool.query(`
-      SELECT EXTRACT(DOW FROM fecha AT TIME ZONE 'America/Mexico_City')::int AS dia_num,
+      SELECT EXTRACT(DOW FROM h.fecha AT TIME ZONE 'America/Mexico_City')::int AS dia_num,
         COUNT(*)::int AS total,
-        COUNT(*) FILTER (WHERE tipo_evento = 'LOGIN_EXITOSO')::int AS exitosos,
-        COUNT(*) FILTER (WHERE tipo_evento = 'LOGIN_FALLIDO')::int AS fallidos
-      FROM historial_login${where} GROUP BY dia_num ORDER BY dia_num ASC
+        COUNT(*) FILTER (WHERE h.tipo_evento = 'LOGIN_EXITOSO')::int AS exitosos,
+        COUNT(*) FILTER (WHERE h.tipo_evento = 'LOGIN_FALLIDO')::int AS fallidos
+      FROM historial_login h${join}${where} GROUP BY dia_num ORDER BY dia_num ASC
     `, params);
     const DIAS = ["Domingo","Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"];
     const mapa  = {};
@@ -231,41 +261,57 @@ export async function getPorDiaSemana(req, res) {
 // ══════════════════════════════════════════════════════════════════════════════
 export async function getPorSemana(req, res) {
   try {
-    const { where, params } = buildDateFilter(req.query);
-    // Sin filtro personalizado → últimas 12 semanas por defecto
-    const defaultWhere = where || ` WHERE fecha >= NOW() - INTERVAL '12 weeks'`;
-    const result = await pool.query(`
-      SELECT DATE_TRUNC('week', fecha AT TIME ZONE 'America/Mexico_City')::date AS semana,
+    const { join, where, params } = buildFilters(req.query, "h.fecha");
+    const { rol } = req.query;
+
+    const baseSQL = (j, w) => `
+      SELECT DATE_TRUNC('week', h.fecha AT TIME ZONE 'America/Mexico_City')::date AS semana,
         COUNT(*)::int AS total,
-        COUNT(*) FILTER (WHERE tipo_evento = 'LOGIN_EXITOSO')::int AS exitosos,
-        COUNT(*) FILTER (WHERE tipo_evento = 'LOGIN_FALLIDO')::int AS fallidos,
-        COUNT(DISTINCT id_usuario)::int AS usuarios_unicos
-      FROM historial_login${defaultWhere}
-      GROUP BY semana ORDER BY semana ASC
-    `, params);
-    const data = result.rows.map((r, i) => ({
+        COUNT(*) FILTER (WHERE h.tipo_evento = 'LOGIN_EXITOSO')::int AS exitosos,
+        COUNT(*) FILTER (WHERE h.tipo_evento = 'LOGIN_FALLIDO')::int AS fallidos,
+        COUNT(DISTINCT h.id_usuario)::int AS usuarios_unicos
+      FROM historial_login h${j}${w}
+      GROUP BY semana ORDER BY semana ASC`;
+
+    // ── Datos de visualización (filtro del usuario) ──────────────────
+    const displayResult = await pool.query(baseSQL(join, where), params);
+    const data = displayResult.rows.map((r, i) => ({
       semana: r.semana, label: `S${i + 1}`,
       fecha_label: new Date(r.semana).toLocaleDateString("es-MX", { day:"2-digit", month:"short" }),
       total: r.total, exitosos: r.exitosos, fallidos: r.fallidos,
       usuarios_unicos: r.usuarios_unicos, x: i,
     }));
-    const puntos       = data.map(d => ({ x: d.x, y: d.total }));
+
+    
+    let modelData = data;
+    let modeloExtendido = false;
+    if (data.length < 4) {
+      // Mantener filtro de rol pero sin filtro de fechas
+      const { join: jRol, where: wRol, params: pRol } = buildFilters({ rol }, "h.fecha");
+      const extResult = await pool.query(baseSQL(jRol, wRol), pRol);
+      modelData = extResult.rows.map((r, i) => ({ semana: r.semana, total: r.total, x: i }));
+      modeloExtendido = true;
+    }
+
+    const puntos       = modelData.map(d => ({ x: d.x, y: d.total }));
     const modelo       = modeloExponencial(puntos);
-    const ultimoX      = data.length - 1;
-    const maxHistorico = data.length > 0 ? Math.max(...data.map(d => d.total)) : 0;
-    // Predicciones sólo con ≥ 4 semanas de datos (modelo estable)
-    const predicciones = data.length >= 4
+    const ultimoX      = modelData.length - 1;
+    const maxHistorico = modelData.length > 0 ? Math.max(...modelData.map(d => d.total)) : 0;
+
+    const predicciones = modelData.length >= 2
       ? predecir(modelo, ultimoX, 4, maxHistorico).map((p, i) => {
-          const fechaBase = new Date(data[data.length - 1]?.semana ?? new Date());
+          const fechaBase = new Date(modelData[modelData.length - 1]?.semana ?? new Date());
           fechaBase.setDate(fechaBase.getDate() + (i + 1) * 7);
           return {
-            semana: fechaBase.toISOString().split("T")[0], label: `S${data.length + i + 1}`,
+            semana: fechaBase.toISOString().split("T")[0],
+            label: `S${modelData.length + i + 1}`,
             fecha_label: fechaBase.toLocaleDateString("es-MX", { day:"2-digit", month:"short" }),
             prediccion: p.y, x: p.x,
           };
         })
       : [];
-    res.json({ success: true, data, modelo, predicciones });
+
+    res.json({ success: true, data, modelo, predicciones, modelo_extendido: modeloExtendido });
   } catch (err) {
     logger.error(`[estadisticas] getPorSemana: ${err.message}`);
     res.status(500).json({ success: false, message: "Error al obtener datos semanales" });
@@ -277,47 +323,69 @@ export async function getPorSemana(req, res) {
 // ══════════════════════════════════════════════════════════════════════════════
 export async function getPorDia(req, res) {
   try {
-    const { where, params } = buildDateFilter(req.query);
-    // Sin filtro personalizado → últimos 30 días por defecto
-    const defaultWhere = where || ` WHERE fecha >= NOW() - INTERVAL '30 days'`;
-    const result = await pool.query(`
-      SELECT (fecha AT TIME ZONE 'America/Mexico_City')::date AS dia,
+    const { join, where, params } = buildFilters(req.query, "h.fecha");
+    const { rol } = req.query;
+
+    const baseSQL = (j, w) => `
+      SELECT (h.fecha AT TIME ZONE 'America/Mexico_City')::date AS dia,
         COUNT(*)::int AS total,
-        COUNT(*) FILTER (WHERE tipo_evento = 'LOGIN_EXITOSO')::int AS exitosos,
-        COUNT(*) FILTER (WHERE tipo_evento = 'LOGIN_FALLIDO')::int AS fallidos,
-        COUNT(DISTINCT id_usuario)::int AS usuarios_unicos
-      FROM historial_login${defaultWhere}
-      GROUP BY dia ORDER BY dia ASC
-    `, params);
-    const data = result.rows.map((r, i) => ({
-      dia: r.dia, label: new Date(r.dia).toLocaleDateString("es-MX", { day:"2-digit", month:"short" }),
+        COUNT(*) FILTER (WHERE h.tipo_evento = 'LOGIN_EXITOSO')::int AS exitosos,
+        COUNT(*) FILTER (WHERE h.tipo_evento = 'LOGIN_FALLIDO')::int AS fallidos,
+        COUNT(DISTINCT h.id_usuario)::int AS usuarios_unicos
+      FROM historial_login h${j}${w}
+      GROUP BY dia ORDER BY dia ASC`;
+
+    // ── Datos de visualización (filtro del usuario) ──────────────────
+    const displayResult = await pool.query(baseSQL(join, where), params);
+    const data = displayResult.rows.map((r, i) => ({
+      dia: r.dia,
+      label: new Date(r.dia).toLocaleDateString("es-MX", { day:"2-digit", month:"short" }),
       total: r.total, exitosos: r.exitosos, fallidos: r.fallidos,
       usuarios_unicos: r.usuarios_unicos, x: i,
     }));
-    // Primero calcular media móvil de 7 días — elimina ruido diario
-    const promedioMovil = data.map((d, i) => {
-      const ventana = data.slice(Math.max(0, i - 6), i + 1);
-      const avg     = ventana.reduce((s, v) => s + v.total, 0) / ventana.length;
+
+    let modelRows = data;
+    let modeloExtendido = false;
+    if (data.length < 4) {
+      const { join: jRol, where: wRol, params: pRol } = buildFilters({ rol }, "h.fecha");
+      const extResult = await pool.query(baseSQL(jRol, wRol), pRol);
+      modelRows = extResult.rows.map((r, i) => ({ dia: r.dia, total: r.total, x: i }));
+      modeloExtendido = true;
+    }
+
+    // Media móvil sobre los datos del modelo (suaviza picos)
+    const modelMovil = modelRows.map((d, i) => {
+      const ventana = modelRows.slice(Math.max(0, i - 6), i + 1);
+      const avg = ventana.reduce((s, v) => s + v.total, 0) / ventana.length;
       return { ...d, promedio_movil: Number.parseFloat(avg.toFixed(1)) };
     });
-    // Ajustar el modelo exponencial a la media móvil, no a los datos crudos.
-    // La media móvil revela la tendencia subyacente eliminando picos aislados,
-    // lo que produce un R² significativamente mejor y predicciones más estables.
-    const puntos       = promedioMovil.map(d => ({ x: d.x, y: d.promedio_movil }));
+
+    // Media móvil también sobre datos de display (para la gráfica)
+    const promedioMovil = data.map((d, i) => {
+      const ventana = data.slice(Math.max(0, i - 6), i + 1);
+      const avg = ventana.reduce((s, v) => s + v.total, 0) / ventana.length;
+      return { ...d, promedio_movil: Number.parseFloat(avg.toFixed(1)) };
+    });
+
+    const puntos       = modelMovil.map(d => ({ x: d.x, y: d.promedio_movil }));
     const modelo       = modeloExponencial(puntos);
-    const ultimoX      = data.length - 1;
-    const maxHistorico = promedioMovil.length > 0 ? Math.max(...promedioMovil.map(d => d.promedio_movil)) : 0;
-    // Predicciones sólo con ≥ 4 días de datos (modelo estable)
-    const predicciones = promedioMovil.length >= 4
+    const ultimoX      = modelMovil.length - 1;
+    const maxHistorico = modelMovil.length > 0 ? Math.max(...modelMovil.map(d => d.promedio_movil)) : 0;
+
+    // Predicciones siempre disponibles si el modelo tiene ≥ 4 puntos
+    const predicciones = modelMovil.length >= 2
       ? predecir(modelo, ultimoX, 7, maxHistorico).map((p, i) => {
           const fecha = new Date();
           fecha.setDate(fecha.getDate() + i + 1);
-          return { dia: fecha.toISOString().split("T")[0],
+          return {
+            dia: fecha.toISOString().split("T")[0],
             label: fecha.toLocaleDateString("es-MX", { day:"2-digit", month:"short" }),
-            prediccion: p.y, x: p.x };
+            prediccion: p.y, x: p.x,
+          };
         })
       : [];
-    res.json({ success: true, data: promedioMovil, modelo, predicciones });
+
+    res.json({ success: true, data: promedioMovil, modelo, predicciones, modelo_extendido: modeloExtendido });
   } catch (err) {
     logger.error(`[estadisticas] getPorDia: ${err.message}`);
     res.status(500).json({ success: false, message: "Error al obtener datos diarios" });
@@ -330,14 +398,14 @@ export async function getPorDia(req, res) {
 // ══════════════════════════════════════════════════════════════════════════════
 export async function getDistribucion(req, res) {
   try {
-    const { where, params } = buildDateFilter(req.query);
+    const { join, where, params } = buildFilters(req.query, "h.fecha");
     const result = await pool.query(`
       SELECT
-        tipo_evento,
+        h.tipo_evento,
         COUNT(*)::int AS total,
         ROUND(COUNT(*)::numeric / SUM(COUNT(*)) OVER () * 100, 1) AS porcentaje
-      FROM historial_login${where}
-      GROUP BY tipo_evento
+      FROM historial_login h${join}${where}
+      GROUP BY h.tipo_evento
       ORDER BY total DESC
     `, params);
     res.json({ success: true, data: result.rows });
@@ -353,13 +421,13 @@ export async function getDistribucion(req, res) {
 // ══════════════════════════════════════════════════════════════════════════════
 export async function getMapaCalor(req, res) {
   try {
-    const { where, params } = buildDateFilter(req.query);
+    const { join, where, params } = buildFilters(req.query, "h.fecha");
     const result = await pool.query(`
       SELECT
-        EXTRACT(DOW  FROM fecha AT TIME ZONE 'America/Mexico_City')::int AS dia,
-        EXTRACT(HOUR FROM fecha AT TIME ZONE 'America/Mexico_City')::int AS hora,
+        EXTRACT(DOW  FROM h.fecha AT TIME ZONE 'America/Mexico_City')::int AS dia,
+        EXTRACT(HOUR FROM h.fecha AT TIME ZONE 'America/Mexico_City')::int AS hora,
         COUNT(*)::int AS total
-      FROM historial_login${where}
+      FROM historial_login h${join}${where}
       GROUP BY dia, hora ORDER BY dia, hora
     `, params);
 
@@ -402,13 +470,14 @@ export async function getMapaCalor(req, res) {
 // ══════════════════════════════════════════════════════════════════════════════
 export async function getHistorial(req, res) {
   try {
-    const { limite = 500, tipo, fecha_inicio, fecha_fin } = req.query;
+    const { limite = 500, tipo, fecha_inicio, fecha_fin, rol } = req.query;
     const params = [];
     const conditions = [];
 
     if (tipo)         { params.push(tipo);         conditions.push(`h.tipo_evento = $${params.length}`); }
     if (fecha_inicio) { params.push(fecha_inicio);  conditions.push(`h.fecha >= $${params.length}::date`); }
     if (fecha_fin)    { params.push(fecha_fin);     conditions.push(`h.fecha < ($${params.length}::date + INTERVAL '1 day')`); }
+    if (rol)          { params.push(rol);            conditions.push(`u.rol = $${params.length}`); }
 
     const where = conditions.length > 0 ? `WHERE ${conditions.join(" AND ")}` : "";
     const result = await pool.query(`
