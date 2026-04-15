@@ -36,6 +36,7 @@ import {
   cleanupExpiredCodes,
   sendRecoveryCode,
   generateCode,
+  sendContactEmail,
 } from "./services/emailService.js";
 import { cleanupExpiredSessions } from "./services/sessionService.js";
 import { sanitizeInput } from "./middlewares/sanitize.middleware.js";
@@ -196,6 +197,23 @@ app.use("/api/carrito",        carritoRoutes);
 app.use("/api/favoritos",      favoritosRoutes);
 app.use("/api/ventas",         ventasRoutes);
 app.use("/api/blog",           blogRoutes);
+
+// ── Contacto público ──────────────────────────────────────
+app.post("/api/contacto", async (req, res) => {
+  const { nombre, email, mensaje } = req.body;
+  if (!nombre?.trim() || !email?.trim() || !mensaje?.trim())
+    return res.status(400).json({ success: false, message: "Todos los campos son requeridos" });
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email))
+    return res.status(400).json({ success: false, message: "Correo inválido" });
+  if (mensaje.trim().length < 10)
+    return res.status(400).json({ success: false, message: "El mensaje es muy corto" });
+  try {
+    await sendContactEmail(nombre.trim(), email.trim(), mensaje.trim());
+    res.json({ success: true, message: "Mensaje enviado correctamente" });
+  } catch {
+    res.status(500).json({ success: false, message: "Error al enviar el mensaje, intenta más tarde" });
+  }
+});
 
 // =========================================================
 // RUTA DE PRUEBA

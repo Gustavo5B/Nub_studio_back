@@ -717,6 +717,64 @@ export const sendVerificacionEmailArtista = async (correo, nombre, token) => {
 };
 
 // =========================================================
+// =========================================================
+// CORREO DE CONTACTO PÚBLICO
+// =========================================================
+export const sendContactEmail = async (nombre, email, mensaje) => {
+  try {
+    const esc = (s) => s.replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;");
+    const sendSmtpEmail = {
+      sender: SENDER,
+      to: [{ email: SENDER.email, name: "NU-B Studio" }],
+      replyTo: { email, name: nombre },
+      subject: `Nuevo mensaje de contacto — ${nombre}`,
+      htmlContent: `
+        <!DOCTYPE html>
+        <html lang="es">
+        <head><meta charset="UTF-8" /><style>
+          body { font-family: 'Outfit', Arial, sans-serif; background: #F9F8FC; margin: 0; padding: 0; }
+          .wrap { max-width: 520px; margin: 40px auto; background: #fff; border-radius: 12px; overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.08); }
+          .header { background: #14121E; padding: 28px 32px; }
+          .header h1 { color: #fff; font-size: 20px; margin: 0; }
+          .header span { color: #E8640C; }
+          .body { padding: 28px 32px; }
+          .field { margin-bottom: 18px; }
+          .label { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: #9896A8; margin-bottom: 4px; }
+          .value { font-size: 14px; color: #14121E; line-height: 1.6; }
+          .mensaje { background: #F9F8FC; border-left: 3px solid #E8640C; padding: 14px 16px; border-radius: 0 8px 8px 0; white-space: pre-wrap; }
+          .footer { padding: 16px 32px; border-top: 1px solid #E6E4EF; font-size: 11px; color: #9896A8; }
+        </style></head>
+        <body>
+          <div class="wrap">
+            <div class="header"><h1>NU<span>★</span>B Studio — Contacto</h1></div>
+            <div class="body">
+              <div class="field">
+                <div class="label">Nombre</div>
+                <div class="value">${esc(nombre)}</div>
+              </div>
+              <div class="field">
+                <div class="label">Correo</div>
+                <div class="value">${esc(email)}</div>
+              </div>
+              <div class="field">
+                <div class="label">Mensaje</div>
+                <div class="value mensaje">${esc(mensaje)}</div>
+              </div>
+            </div>
+            <div class="footer">Responde directamente a este correo para contactar a ${esc(nombre)}.</div>
+          </div>
+        </body></html>
+      `,
+    };
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    logger.info(`Correo de contacto recibido de ${email}`);
+  } catch (error) {
+    logger.error(`Error al enviar correo de contacto: ${error.message}`);
+    throw error;
+  }
+};
+
+// =========================================================
 // LIMPIEZA AUTOMATICA DE CODIGOS EXPIRADOS
 // =========================================================
 export const cleanupExpiredCodes = async () => {
