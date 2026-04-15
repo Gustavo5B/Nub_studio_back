@@ -422,11 +422,41 @@ export const crearObra = async (req, res) => {
 
     const id_usuario = req.user?.id_usuario || 1;
 
-    if (!titulo || !descripcion || !id_categoria || !id_artista)
-      return res.status(400).json({
-        success: false,
-        message: "Titulo, descripcion, categoria y artista son obligatorios",
-      });
+    const XSS_RE  = /<script|<iframe|<object|<embed|javascript:|on\w+\s*=|eval\(|vbscript:/i;
+    const SQLI_RE = /('|(OR|AND)\s+\d+=\d+|UNION\s+SELECT|DROP\s+TABLE|INSERT\s+INTO|DELETE\s+FROM|--\s|\/\*)/i;
+    const isMalicious = (v) => XSS_RE.test(v) || SQLI_RE.test(v);
+
+    if (!titulo?.trim())
+      return res.status(400).json({ success: false, message: "El título es requerido" });
+    if (titulo.trim().length < 5)
+      return res.status(400).json({ success: false, message: "El título debe tener al menos 5 caracteres" });
+    if (titulo.trim().length > 200)
+      return res.status(400).json({ success: false, message: "El título no puede superar 200 caracteres" });
+    if (isMalicious(titulo))
+      return res.status(400).json({ success: false, message: "El título contiene caracteres no permitidos" });
+
+    if (!descripcion?.trim())
+      return res.status(400).json({ success: false, message: "La descripción es requerida" });
+    if (descripcion.trim().length < 20)
+      return res.status(400).json({ success: false, message: "La descripción debe tener al menos 20 caracteres" });
+    if (descripcion.trim().length > 2000)
+      return res.status(400).json({ success: false, message: "La descripción no puede superar 2000 caracteres" });
+    if (isMalicious(descripcion))
+      return res.status(400).json({ success: false, message: "La descripción contiene caracteres no permitidos" });
+
+    if (historia?.trim()) {
+      if (historia.trim().length < 20)
+        return res.status(400).json({ success: false, message: "La historia debe tener al menos 20 caracteres" });
+      if (historia.trim().length > 2000)
+        return res.status(400).json({ success: false, message: "La historia no puede superar 2000 caracteres" });
+      if (isMalicious(historia))
+        return res.status(400).json({ success: false, message: "La historia contiene caracteres no permitidos" });
+    }
+
+    if (!id_categoria)
+      return res.status(400).json({ success: false, message: "La categoría es obligatoria" });
+    if (!id_artista)
+      return res.status(400).json({ success: false, message: "El artista es obligatorio" });
 
     const imagen_principal =
       req.file?.path || req.body.imagen_principal || null;
@@ -527,6 +557,37 @@ export const actualizarObra = async (req, res) => {
     } = req.body;
 
     const imagen_principal = req.file?.path || req.body.imagen_principal;
+
+    const XSS_RE  = /<script|<iframe|<object|<embed|javascript:|on\w+\s*=|eval\(|vbscript:/i;
+    const SQLI_RE = /('|(OR|AND)\s+\d+=\d+|UNION\s+SELECT|DROP\s+TABLE|INSERT\s+INTO|DELETE\s+FROM|--\s|\/\*)/i;
+    const isMalicious = (v) => XSS_RE.test(v) || SQLI_RE.test(v);
+
+    if (!titulo?.trim())
+      return res.status(400).json({ success: false, message: "El título es requerido" });
+    if (titulo.trim().length < 5)
+      return res.status(400).json({ success: false, message: "El título debe tener al menos 5 caracteres" });
+    if (titulo.trim().length > 200)
+      return res.status(400).json({ success: false, message: "El título no puede superar 200 caracteres" });
+    if (isMalicious(titulo))
+      return res.status(400).json({ success: false, message: "El título contiene caracteres no permitidos" });
+
+    if (!descripcion?.trim())
+      return res.status(400).json({ success: false, message: "La descripción es requerida" });
+    if (descripcion.trim().length < 20)
+      return res.status(400).json({ success: false, message: "La descripción debe tener al menos 20 caracteres" });
+    if (descripcion.trim().length > 2000)
+      return res.status(400).json({ success: false, message: "La descripción no puede superar 2000 caracteres" });
+    if (isMalicious(descripcion))
+      return res.status(400).json({ success: false, message: "La descripción contiene caracteres no permitidos" });
+
+    if (historia?.trim()) {
+      if (historia.trim().length < 20)
+        return res.status(400).json({ success: false, message: "La historia debe tener al menos 20 caracteres" });
+      if (historia.trim().length > 2000)
+        return res.status(400).json({ success: false, message: "La historia no puede superar 2000 caracteres" });
+      if (isMalicious(historia))
+        return res.status(400).json({ success: false, message: "La historia contiene caracteres no permitidos" });
+    }
 
     // Obtener el estado actual de la obra
     const obraActual = await db.query(
