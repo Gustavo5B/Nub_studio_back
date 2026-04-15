@@ -397,14 +397,46 @@ export const crearPost = async (req, res) => {
     const autor_rol = req.user.rol; // 'admin' o 'artista'
     const db = pools[req.user?.rol] || pool;
 
-    if (!titulo || !contenido)
-      return res.status(400).json({ success: false, message: 'El título y el contenido son obligatorios' });
+    // ── Validaciones ──────────────────────────────────────
+    const XSS_RE  = /<script|<iframe|<object|<embed|javascript:|on\w+\s*=|eval\(|vbscript:/i;
+    const SQLI_RE = /('|(OR|AND)\s+\d+=\d+|UNION\s+SELECT|DROP\s+TABLE|INSERT\s+INTO|DELETE\s+FROM|--\s|\/\*)/i;
+    const stripHtml = (html) => html?.replace(/<[^>]*>/g, '').trim() || '';
+    const isMalicious = (v) => XSS_RE.test(v) || SQLI_RE.test(v);
+
+    if (!titulo?.trim())
+      return res.status(400).json({ success: false, message: 'El título es obligatorio' });
+    if (titulo.trim().length < 5)
+      return res.status(400).json({ success: false, message: 'El título debe tener al menos 5 caracteres' });
+    if (titulo.trim().length > 200)
+      return res.status(400).json({ success: false, message: 'El título no puede superar 200 caracteres' });
+    if (isMalicious(titulo))
+      return res.status(400).json({ success: false, message: 'El título contiene caracteres no permitidos' });
+
+    if (!contenido?.trim())
+      return res.status(400).json({ success: false, message: 'El contenido es obligatorio' });
+    const contenidoPlain = stripHtml(contenido);
+    if (contenidoPlain.length < 50)
+      return res.status(400).json({ success: false, message: 'El contenido debe tener al menos 50 caracteres' });
+    if (XSS_RE.test(contenido))
+      return res.status(400).json({ success: false, message: 'El contenido contiene código no permitido' });
+
+    if (extracto?.trim()) {
+      if (extracto.trim().length < 20)
+        return res.status(400).json({ success: false, message: 'El extracto debe tener al menos 20 caracteres' });
+      if (extracto.trim().length > 400)
+        return res.status(400).json({ success: false, message: 'El extracto no puede superar 400 caracteres' });
+      if (isMalicious(extracto))
+        return res.status(400).json({ success: false, message: 'El extracto contiene caracteres no permitidos' });
+    }
+    if (meta_description?.trim() && meta_description.trim().length > 160)
+      return res.status(400).json({ success: false, message: 'La meta descripción no puede superar 160 caracteres' });
 
     const estadosValidos = ['borrador', 'publicado', 'oculto'];
     if (!estadosValidos.includes(estado))
       return res.status(400).json({ success: false, message: `Estado inválido. Valores permitidos: ${estadosValidos.join(', ')}` });
+    // ──────────────────────────────────────────────────────
 
-    const textoPost = `${titulo} ${contenido}`;
+    const textoPost = `${titulo} ${contenidoPlain}`;
     if (await contienepalabrasProhibidas(db, textoPost))
       return res.status(422).json({ success: false, message: 'El contenido contiene palabras no permitidas' });
 
@@ -462,10 +494,42 @@ export const editarPost = async (req, res) => {
     if (rol === 'artista' && postExiste.rows[0].autor_id !== id_usuario)
       return res.status(403).json({ success: false, message: 'No tienes permiso para editar este post' });
 
-    if (!titulo || !contenido)
-      return res.status(400).json({ success: false, message: 'El título y el contenido son obligatorios' });
+    // ── Validaciones ──────────────────────────────────────
+    const XSS_RE  = /<script|<iframe|<object|<embed|javascript:|on\w+\s*=|eval\(|vbscript:/i;
+    const SQLI_RE = /('|(OR|AND)\s+\d+=\d+|UNION\s+SELECT|DROP\s+TABLE|INSERT\s+INTO|DELETE\s+FROM|--\s|\/\*)/i;
+    const stripHtml = (html) => html?.replace(/<[^>]*>/g, '').trim() || '';
+    const isMalicious = (v) => XSS_RE.test(v) || SQLI_RE.test(v);
 
-    const textoPost = `${titulo} ${contenido}`;
+    if (!titulo?.trim())
+      return res.status(400).json({ success: false, message: 'El título es obligatorio' });
+    if (titulo.trim().length < 5)
+      return res.status(400).json({ success: false, message: 'El título debe tener al menos 5 caracteres' });
+    if (titulo.trim().length > 200)
+      return res.status(400).json({ success: false, message: 'El título no puede superar 200 caracteres' });
+    if (isMalicious(titulo))
+      return res.status(400).json({ success: false, message: 'El título contiene caracteres no permitidos' });
+
+    if (!contenido?.trim())
+      return res.status(400).json({ success: false, message: 'El contenido es obligatorio' });
+    const contenidoPlain = stripHtml(contenido);
+    if (contenidoPlain.length < 50)
+      return res.status(400).json({ success: false, message: 'El contenido debe tener al menos 50 caracteres' });
+    if (XSS_RE.test(contenido))
+      return res.status(400).json({ success: false, message: 'El contenido contiene código no permitido' });
+
+    if (extracto?.trim()) {
+      if (extracto.trim().length < 20)
+        return res.status(400).json({ success: false, message: 'El extracto debe tener al menos 20 caracteres' });
+      if (extracto.trim().length > 400)
+        return res.status(400).json({ success: false, message: 'El extracto no puede superar 400 caracteres' });
+      if (isMalicious(extracto))
+        return res.status(400).json({ success: false, message: 'El extracto contiene caracteres no permitidos' });
+    }
+    if (meta_description?.trim() && meta_description.trim().length > 160)
+      return res.status(400).json({ success: false, message: 'La meta descripción no puede superar 160 caracteres' });
+    // ──────────────────────────────────────────────────────
+
+    const textoPost = `${titulo} ${contenidoPlain}`;
     if (await contienepalabrasProhibidas(db, textoPost))
       return res.status(422).json({ success: false, message: 'El contenido contiene palabras no permitidas' });
 

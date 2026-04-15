@@ -162,8 +162,29 @@ export const crearColeccion = async (req, res) => {
     const { id_artista } = artistaRes.rows[0];
     const { nombre, historia } = req.body;
 
+    // ── Validaciones ──────────────────────────────────────
+    const XSS_RE  = /<script|<iframe|<object|<embed|javascript:|on\w+\s*=|eval\(|vbscript:|data:text\/html/i;
+    const SQLI_RE = /('|(OR|AND)\s+\d+=\d+|UNION\s+SELECT|DROP\s+TABLE|INSERT\s+INTO|DELETE\s+FROM|--\s|\/\*)/i;
+    const isMalicious = (v) => XSS_RE.test(v) || SQLI_RE.test(v);
+
     if (!nombre?.trim())
       return res.status(400).json({ message: 'El nombre de la colección es requerido' });
+    if (nombre.trim().length < 3)
+      return res.status(400).json({ message: 'El nombre debe tener al menos 3 caracteres' });
+    if (nombre.trim().length > 200)
+      return res.status(400).json({ message: 'El nombre no puede superar 200 caracteres' });
+    if (isMalicious(nombre))
+      return res.status(400).json({ message: 'El nombre contiene caracteres no permitidos' });
+
+    if (historia?.trim()) {
+      if (historia.trim().length < 20)
+        return res.status(400).json({ message: 'La historia debe tener al menos 20 caracteres' });
+      if (historia.trim().length > 1000)
+        return res.status(400).json({ message: 'La historia no puede superar 1000 caracteres' });
+      if (isMalicious(historia))
+        return res.status(400).json({ message: 'La historia contiene caracteres no permitidos' });
+    }
+    // ──────────────────────────────────────────────────────
 
     const slugBase = nombre.toLowerCase()
       .normalize('NFD').replaceAll(/[\u0300-\u036f]/g, '')
@@ -224,6 +245,33 @@ export const actualizarColeccion = async (req, res) => {
       return res.status(404).json({ message: 'Colección no encontrada' });
 
     const { nombre, historia, estado } = req.body;
+
+    // ── Validaciones ──────────────────────────────────────
+    const XSS_RE  = /<script|<iframe|<object|<embed|javascript:|on\w+\s*=|eval\(|vbscript:|data:text\/html/i;
+    const SQLI_RE = /('|(OR|AND)\s+\d+=\d+|UNION\s+SELECT|DROP\s+TABLE|INSERT\s+INTO|DELETE\s+FROM|--\s|\/\*)/i;
+    const isMalicious = (v) => XSS_RE.test(v) || SQLI_RE.test(v);
+
+    if (nombre !== undefined) {
+      if (!nombre.trim())
+        return res.status(400).json({ message: 'El nombre no puede estar vacío' });
+      if (nombre.trim().length < 3)
+        return res.status(400).json({ message: 'El nombre debe tener al menos 3 caracteres' });
+      if (nombre.trim().length > 200)
+        return res.status(400).json({ message: 'El nombre no puede superar 200 caracteres' });
+      if (isMalicious(nombre))
+        return res.status(400).json({ message: 'El nombre contiene caracteres no permitidos' });
+    }
+    if (historia?.trim()) {
+      if (historia.trim().length < 20)
+        return res.status(400).json({ message: 'La historia debe tener al menos 20 caracteres' });
+      if (historia.trim().length > 1000)
+        return res.status(400).json({ message: 'La historia no puede superar 1000 caracteres' });
+      if (isMalicious(historia))
+        return res.status(400).json({ message: 'La historia contiene caracteres no permitidos' });
+    }
+    if (estado && !['borrador', 'publicada'].includes(estado))
+      return res.status(400).json({ message: 'Estado no válido' });
+    // ──────────────────────────────────────────────────────
 
     let imagen_portada = req.body.imagen_portada || null;
     if (req.file) {
