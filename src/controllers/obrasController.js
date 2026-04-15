@@ -123,6 +123,7 @@ export const obtenerObraPorId = async (req, res) => {
     const resultObra = await db.query(`
       SELECT o.*, a.nombre_completo AS artista_nombre, a.nombre_artistico AS artista_alias,
         a.biografia AS artista_biografia, a.foto_perfil AS artista_foto,
+        a.matricula AS artista_matricula,
         c.nombre AS categoria_nombre, c.slug AS categoria_slug,
         COALESCE(i.stock_actual, 0) AS stock_actual,
         COALESCE(i.stock_reservado, 0) AS stock_reservado,
