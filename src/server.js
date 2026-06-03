@@ -26,10 +26,12 @@ import estadisticasRoutes from "./routes/estadisticasRoutes.js";
 import sobreNosotrosRoutes from "./routes/sobreNosotrosRoutes.js";
 import municipiosRoutes from "./routes/municipiosRoutes.js";
 import coleccionesRoutes from "./routes/coleccionesRoutes.js";
-import carritoRoutes   from "./routes/carritoRoutes.js";
+import carritoRoutes from "./routes/carritoRoutes.js";
 import favoritosRoutes from "./routes/favoritosRoutes.js";
-import ventasRoutes    from "./routes/ventasRoutes.js";
+import ventasRoutes from "./routes/ventasRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
+import direccionesRoutes from './routes/direccionesRoutes.js';
+
 
 import { testConnection } from "./config/db.js";
 import {
@@ -71,8 +73,8 @@ app.use(
     contentSecurityPolicy: {
       directives: {
         defaultSrc: ["'self'"],
-        scriptSrc:  ["'self'"],
-        styleSrc:   ["'self'", "'unsafe-inline'"],
+        scriptSrc: ["'self'"],
+        styleSrc: ["'self'", "'unsafe-inline'"],
         imgSrc: [
           "'self'",
           "data:",
@@ -86,7 +88,7 @@ app.use(
           "https://fonts.googleapis.com",
           "https://fonts.gstatic.com",
         ],
-        objectSrc:      ["'none'"],
+        objectSrc: ["'none'"],
         frameAncestors: ["'none'"],
       },
     },
@@ -95,11 +97,11 @@ app.use(
       includeSubDomains: true,
       preload: true,
     },
-    hidePoweredBy:            true,
+    hidePoweredBy: true,
     crossOriginEmbedderPolicy: false,
-    noSniff:                  true,
-    frameguard:               { action: "deny" },
-    referrerPolicy:           { policy: "strict-origin-when-cross-origin" },
+    noSniff: true,
+    frameguard: { action: "deny" },
+    referrerPolicy: { policy: "strict-origin-when-cross-origin" },
   }),
 );
 
@@ -143,9 +145,9 @@ app.use(
 app.use((err, req, res, next) => {
   if (err.message === "Origen no autorizado por CORS") {
     return res.status(403).json({
-      error:   "Acceso denegado",
+      error: "Acceso denegado",
       message: "Origen no autorizado por política CORS",
-      origin:  req.headers.origin || "desconocido",
+      origin: req.headers.origin || "desconocido",
     });
   }
   next(err);
@@ -173,30 +175,31 @@ app.use((req, res, next) => {
 // =========================================================
 // RUTAS
 // =========================================================
-app.use("/api/auth",            authRoutes);
-app.use("/api/recovery",        recoveryRoutes);
-app.use("/api/2fa",             twoFactorRoutes);
-app.use("/api/gmail-2fa",       gmail2faRoutes);
-app.use("/api/imagenes",        imagenesRoutes);
-app.use("/api/obras",           obrasRoutes);
-app.use("/api/categorias",      categoriasRoutes);
-app.use("/api/artistas",        artistasRoutes);
-app.use("/api/etiquetas",       etiquetasRoutes);
-app.use("/api/artista-portal",  artistaPortalRoutes);
-app.use("/api/tecnicas",        tecnicasRoutes);
-app.use("/api/stats",           statsRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/recovery", recoveryRoutes);
+app.use("/api/2fa", twoFactorRoutes);
+app.use("/api/gmail-2fa", gmail2faRoutes);
+app.use("/api/imagenes", imagenesRoutes);
+app.use("/api/obras", obrasRoutes);
+app.use("/api/categorias", categoriasRoutes);
+app.use("/api/artistas", artistasRoutes);
+app.use("/api/etiquetas", etiquetasRoutes);
+app.use("/api/artista-portal", artistaPortalRoutes);
+app.use("/api/tecnicas", tecnicasRoutes);
+app.use("/api/stats", statsRoutes);
 app.use("/api/admin/monitoreo", monitoreoRoutes);
-app.use("/api/admin",           adminRoutes);
-app.use("/api/reportes",        reportesRoutes);
-app.use("/api/estados",         estadosRoutes);
-app.use("/api/estadisticas",    estadisticasRoutes);
-app.use("/api/sobre-nosotros",  sobreNosotrosRoutes);
-app.use("/api/municipios",      municipiosRoutes);
-app.use("/api/colecciones",     coleccionesRoutes);
-app.use("/api/carrito",        carritoRoutes);
-app.use("/api/favoritos",      favoritosRoutes);
-app.use("/api/ventas",         ventasRoutes);
-app.use("/api/blog",           blogRoutes);
+app.use("/api/admin", adminRoutes);
+app.use("/api/reportes", reportesRoutes);
+app.use("/api/estados", estadosRoutes);
+app.use("/api/estadisticas", estadisticasRoutes);
+app.use("/api/sobre-nosotros", sobreNosotrosRoutes);
+app.use("/api/municipios", municipiosRoutes);
+app.use("/api/colecciones", coleccionesRoutes);
+app.use("/api/carrito", carritoRoutes);
+app.use("/api/favoritos", favoritosRoutes);
+app.use("/api/ventas", ventasRoutes);
+app.use("/api/blog", blogRoutes);
+app.use('/api/direcciones', direccionesRoutes);
 
 // ── Contacto público ──────────────────────────────────────
 app.post("/api/contacto", async (req, res) => {
@@ -225,15 +228,15 @@ app.get("/", (req, res) => {
     ...(isProd
       ? {}
       : {
-          database: "PostgreSQL",
-          cors: allowedOrigins,
-          security: {
-            xss:          "enabled",
-            sqlInjection: "enabled",
-            csrf:         "not-needed (JWT-based)",
-            helmet:       "enabled",
-          },
-        }),
+        database: "PostgreSQL",
+        cors: allowedOrigins,
+        security: {
+          xss: "enabled",
+          sqlInjection: "enabled",
+          csrf: "not-needed (JWT-based)",
+          helmet: "enabled",
+        },
+      }),
     timestamp: new Date().toISOString(),
   });
 });
