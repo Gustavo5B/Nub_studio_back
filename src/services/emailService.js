@@ -775,6 +775,176 @@ export const sendContactEmail = async (nombre, email, mensaje) => {
 };
 
 // =========================================================
+// CONFIRMACION DE PEDIDO — se llama desde webhookPago cuando status = approved
+// params: email, nombre, id_pedido, items[], total
+//   items[]: { titulo, artista_alias, cantidad, precio_unitario, imagen_principal }
+// =========================================================
+export const sendConfirmacionPedidoEmail = async (email, nombre, id_pedido, items, total) => {
+  try {
+    const codigo  = `NUB-${String(id_pedido).padStart(5, "0")}`;
+    const frontUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const fmtMXN  = (n) => new Intl.NumberFormat("es-MX", { style: "currency", currency: "MXN", maximumFractionDigits: 0 }).format(n);
+
+    const itemsHtml = items.map(it => `
+      <tr>
+        <td style="padding:14px 0;border-bottom:1px solid #ECEAF4;vertical-align:middle;">
+          <div style="display:flex;align-items:center;gap:14px;">
+            ${it.imagen_principal
+              ? `<img src="${it.imagen_principal}" alt="${it.titulo}" width="52" height="64" style="border-radius:6px;object-fit:cover;display:block;flex-shrink:0;" />`
+              : `<div style="width:52px;height:64px;background:#EDE9E3;border-radius:6px;flex-shrink:0;"></div>`
+            }
+            <div>
+              <div style="font-size:14px;font-weight:700;color:#14121E;margin-bottom:3px;">${it.titulo}</div>
+              <div style="font-size:12px;color:#9896A8;">${it.artista_alias}</div>
+              ${it.cantidad > 1 ? `<div style="font-size:11px;color:#C4C2D0;margin-top:2px;">Cantidad: ${it.cantidad}</div>` : ""}
+            </div>
+          </div>
+        </td>
+        <td style="padding:14px 0;border-bottom:1px solid #ECEAF4;text-align:right;vertical-align:middle;white-space:nowrap;">
+          <span style="font-size:14px;font-weight:800;color:#14121E;font-family:Georgia,serif;">${fmtMXN(Number(it.precio_unitario) * it.cantidad)}</span>
+        </td>
+      </tr>
+    `).join("");
+
+    const sendSmtpEmail = {
+      sender: SENDER,
+      to: [{ email, name: nombre }],
+      subject: `Pedido confirmado ${codigo} — NU★B Studio`,
+      htmlContent: `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pedido ${codigo}</title>
+</head>
+<body style="margin:0;padding:0;background:#F9F8FC;font-family:'Segoe UI',Arial,sans-serif;">
+
+  <!-- Wrapper -->
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F9F8FC;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(20,18,30,.09);">
+
+        <!-- Barra superior de color -->
+        <tr><td style="height:4px;background:linear-gradient(90deg,#E8640C,#A83B90,#6028AA);"></td></tr>
+
+        <!-- Header -->
+        <tr>
+          <td style="background:#14121E;padding:36px 40px;text-align:center;">
+            <div style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-.02em;margin-bottom:4px;">NU<span style="color:#E8640C;">★</span>B Studio</div>
+            <div style="font-size:11px;color:#9896A8;letter-spacing:.2em;text-transform:uppercase;">Arte de la Huasteca Hidalguense</div>
+          </td>
+        </tr>
+
+        <!-- Confirmación hero -->
+        <tr>
+          <td style="padding:36px 40px 0;text-align:center;">
+            <div style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;background:#F0FDF4;border-radius:50%;border:2px solid #86EFAC;margin-bottom:18px;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 13L9 17L19 7" stroke="#16A34A" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h1 style="font-size:22px;font-weight:900;color:#14121E;margin:0 0 8px;">¡Pago confirmado!</h1>
+            <p style="font-size:14px;color:#9896A8;margin:0;line-height:1.6;">Hola <strong style="color:#14121E;">${nombre}</strong>, tu pedido ha sido recibido y está siendo procesado.</p>
+          </td>
+        </tr>
+
+        <!-- Código de pedido -->
+        <tr>
+          <td style="padding:24px 40px 0;">
+            <div style="background:#F9F8FC;border:1.5px solid #E6E4EF;border-radius:12px;padding:18px 20px;display:flex;align-items:center;justify-content:space-between;">
+              <div>
+                <div style="font-size:10px;font-weight:700;color:#9896A8;letter-spacing:.14em;text-transform:uppercase;margin-bottom:5px;">Número de pedido</div>
+                <div style="font-size:20px;font-weight:900;color:#14121E;letter-spacing:.06em;font-family:'Courier New',monospace;">${codigo}</div>
+              </div>
+              <div style="width:40px;height:40px;background:#FFF4ED;border-radius:10px;display:flex;align-items:center;justify-content:center;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2" stroke="#E8640C" stroke-width="1.8" stroke-linecap="round"/>
+                </svg>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- Items -->
+        <tr>
+          <td style="padding:28px 40px 0;">
+            <div style="font-size:11px;font-weight:700;color:#9896A8;letter-spacing:.14em;text-transform:uppercase;margin-bottom:14px;">Obras adquiridas</div>
+            <table width="100%" cellpadding="0" cellspacing="0">
+              ${itemsHtml}
+            </table>
+          </td>
+        </tr>
+
+        <!-- Total -->
+        <tr>
+          <td style="padding:20px 40px 0;">
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#14121E;border-radius:12px;overflow:hidden;">
+              <tr>
+                <td style="padding:18px 22px;">
+                  <span style="font-size:13px;font-weight:700;color:#9896A8;text-transform:uppercase;letter-spacing:.08em;">Total pagado</span>
+                </td>
+                <td style="padding:18px 22px;text-align:right;">
+                  <span style="font-size:24px;font-weight:900;color:#E8640C;font-family:Georgia,serif;">${fmtMXN(total)}</span>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+
+        <!-- Envío info -->
+        <tr>
+          <td style="padding:20px 40px 0;">
+            <div style="background:#FFF4ED;border:1px solid #FDDAB3;border-radius:12px;padding:16px 20px;display:flex;gap:14px;align-items:flex-start;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0;margin-top:1px;">
+                <path d="M5 17H3a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11a2 2 0 0 1 2 2v2m-1 10H7m0 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0Zm10 0a2 2 0 1 0 4 0 2 2 0 0 0-4 0Zm4-10h-7l-1.5-5H13v13h8V9l-4-2Z" stroke="#E8640C" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+              <div>
+                <div style="font-size:13px;font-weight:700;color:#14121E;margin-bottom:3px;">Coordinaremos el envío contigo</div>
+                <div style="font-size:12px;color:#9896A8;line-height:1.6;">Nos pondremos en contacto para coordinar la entrega de tus obras. Las piezas originales requieren embalaje especial.</div>
+              </div>
+            </div>
+          </td>
+        </tr>
+
+        <!-- CTA -->
+        <tr>
+          <td style="padding:28px 40px 0;text-align:center;">
+            <a href="${frontUrl}/mi-cuenta/pedidos" style="display:inline-block;background:#E8640C;color:#fff;text-decoration:none;padding:14px 36px;border-radius:100px;font-size:12px;font-weight:800;letter-spacing:.16em;text-transform:uppercase;font-family:'Segoe UI',Arial,sans-serif;">
+              Ver mis pedidos
+            </a>
+          </td>
+        </tr>
+
+        <!-- Footer -->
+        <tr>
+          <td style="padding:32px 40px;text-align:center;border-top:1px solid #E6E4EF;margin-top:28px;">
+            <div style="font-size:11px;color:#9896A8;line-height:1.7;">
+              Este es un correo automático, por favor no respondas directamente.<br/>
+              © ${new Date().getFullYear()} NU★B Studio · Arte de la Huasteca Hidalguense
+            </div>
+          </td>
+        </tr>
+
+      </table>
+    </td></tr>
+  </table>
+
+</body>
+</html>
+      `,
+    };
+
+    const result = await apiInstance.sendTransacEmail(sendSmtpEmail);
+    logger.info(`Email confirmacion pedido ${codigo} enviado a ${email.substring(0, 3)}*** (ID: ${result.messageId})`);
+    return { success: true, messageId: result.messageId };
+  } catch (error) {
+    logger.error(`Error al enviar email confirmacion pedido #${id_pedido}: ${error.message}`);
+    // No lanzar — el pago ya fue aprobado, el email es secundario
+  }
+};
+
+// =========================================================
 // LIMPIEZA AUTOMATICA DE CODIGOS EXPIRADOS
 // =========================================================
 export const cleanupExpiredCodes = async () => {
