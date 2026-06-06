@@ -129,9 +129,9 @@ export const checkout = async (req, res) => {
       notification_url:     `${backendUrl}/api/ventas/webhook`,
       statement_descriptor: 'NUB Studio',
       back_urls: {
-        success: `${frontendUrl}/mis-pedidos?status=success`,
-        failure: `${frontendUrl}/mis-pedidos?status=failure`,
-        pending: `${frontendUrl}/mis-pedidos?status=pending`,
+        success: `${frontendUrl}/mi-cuenta/pedidos?status=success`,
+        failure: `${frontendUrl}/mi-cuenta/pedidos?status=failure`,
+        pending: `${frontendUrl}/mi-cuenta/pedidos?status=pending`,
       },
     };
 
