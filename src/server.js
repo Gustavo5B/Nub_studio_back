@@ -45,6 +45,7 @@ import { sanitizeInput } from "./middlewares/sanitize.middleware.js";
 import { preventSQLInjection } from "./middlewares/sql-injection.middleware.js";
 import logger from "./config/logger.js";
 import { iniciarCron } from "./controllers/backupController.js";
+import vinculacionRoutes from './routes/vinculacion.js';
 
 // =========================================================
 // MANEJO DE ERRORES NO CAPTURADOS
@@ -200,6 +201,7 @@ app.use("/api/favoritos", favoritosRoutes);
 app.use("/api/ventas", ventasRoutes);
 app.use("/api/blog", blogRoutes);
 app.use('/api/direcciones', direccionesRoutes);
+app.use(vinculacionRoutes);
 
 // ── Contacto público ──────────────────────────────────────
 app.post("/api/contacto", async (req, res) => {
