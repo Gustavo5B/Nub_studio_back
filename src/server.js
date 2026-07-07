@@ -31,7 +31,7 @@ import favoritosRoutes from "./routes/favoritosRoutes.js";
 import ventasRoutes from "./routes/ventasRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import direccionesRoutes from './routes/direccionesRoutes.js';
-
+import alexaCarritoRoutes from './routes/alexaCarritoRoutes.js';
 
 import { testConnection } from "./config/db.js";
 import {
@@ -202,6 +202,7 @@ app.use("/api/ventas", ventasRoutes);
 app.use("/api/blog", blogRoutes);
 app.use('/api/direcciones', direccionesRoutes);
 app.use(vinculacionRoutes);
+app.use('/api/alexa/carrito', alexaCarritoRoutes);
 
 // ── Contacto público ──────────────────────────────────────
 app.post("/api/contacto", async (req, res) => {
