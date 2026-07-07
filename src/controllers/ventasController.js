@@ -9,7 +9,7 @@ import { sendConfirmacionPedidoEmail } from '../services/emailService.js';
 // =========================================================
 export const getMisPedidos = async (req, res) => {
   try {
-    const db         = pools[req.user?.rol] || pool;
+    const db = pools[req.user?.rol] || pool;
     const id_usuario = req.user?.id_usuario;
 
     const result = await db.query(`
@@ -44,12 +44,61 @@ export const getMisPedidos = async (req, res) => {
   }
 };
 
+export const getMisPedidosAlexa = async (req, res) => {
+  try {
+    const { alexa_user_id } = req.query;
+
+    if (!alexa_user_id) {
+      return res.status(400).json({ success: false, message: 'alexa_user_id es requerido', code: 'MISSING_ALEXA_ID' });
+    }
+
+    const vinculacion = await pool.query(
+      `SELECT usuario_id FROM vinculaciones WHERE alexa_user_id = $1`,
+      [alexa_user_id]
+    );
+    if (vinculacion.rows.length === 0) {
+      return res.status(401).json({ success: false, message: 'Cuenta no vinculada', code: 'NOT_LINKED' });
+    }
+    const id_usuario = vinculacion.rows[0].usuario_id;
+
+    const result = await pool.query(`
+      SELECT
+        p.id_pedido,
+        p.estado           AS estado_pedido,
+        p.total            AS total_pedido,
+        p.fecha_pedido,
+        v.id_venta,
+        v.estado           AS estado_venta,
+        v.cantidad,
+        v.precio_unitario,
+        v.subtotal,
+        v.total,
+        o.titulo,
+        o.slug,
+        o.imagen_principal,
+        COALESCE(a.nombre_artistico, a.nombre_completo) AS artista_alias
+      FROM   pedidos p
+      INNER JOIN ventas   v ON v.id_pedido  = p.id_pedido
+      INNER JOIN obras    o ON o.id_obra    = v.id_obra
+      INNER JOIN artistas a ON a.id_artista = v.id_artista
+      WHERE  p.id_cliente = $1
+      ORDER BY p.fecha_pedido DESC, v.id_venta ASC
+      LIMIT  200
+    `, [id_usuario]);
+
+    return res.json({ success: true, data: result.rows });
+  } catch (err) {
+    logger.error('getMisPedidosAlexa error:', err?.message || err);
+    return res.status(500).json({ success: false, message: 'Error al obtener pedidos' });
+  }
+};
+
 // =========================================================
 // POST /api/ventas/checkout
 // Crea preferencia de pago en MercadoPago desde el carrito
 // =========================================================
 export const checkout = async (req, res) => {
-  const db         = pools[req.user?.rol] || pool;
+  const db = pools[req.user?.rol] || pool;
   const id_cliente = req.user.id_usuario;
   const { id_direccion_envio } = req.body;
 
@@ -117,7 +166,7 @@ export const checkout = async (req, res) => {
     const ventasIds = [];
     for (const item of carritoRes.rows) {
       const precio_unitario = Number(item.precio_base);
-      const subtotal        = precio_unitario * item.cantidad;
+      const subtotal = precio_unitario * item.cantidad;
 
       const ventaRes = await db.query(`
         INSERT INTO ventas
@@ -126,7 +175,7 @@ export const checkout = async (req, res) => {
         VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', NOW(), $8, $9)
         RETURNING id_venta
       `, [id_cliente, item.id_obra, item.id_artista, item.cantidad,
-          precio_unitario, subtotal, subtotal, id_direccion_envio || null, id_pedido]);
+        precio_unitario, subtotal, subtotal, id_direccion_envio || null, id_pedido]);
 
       ventasIds.push(ventaRes.rows[0].id_venta);
 
@@ -147,22 +196,22 @@ export const checkout = async (req, res) => {
 
     // 7. Crear preferencia en MercadoPago
     const items = carritoRes.rows.map(item => ({
-      id:          String(item.id_obra),
-      title:       item.titulo,
-      quantity:    item.cantidad,
-      unit_price:  Number(item.precio_base),
+      id: String(item.id_obra),
+      title: item.titulo,
+      quantity: item.cantidad,
+      unit_price: Number(item.precio_base),
       currency_id: 'MXN',
       picture_url: item.imagen_principal || undefined,
     }));
 
-    const isProd       = process.env.NODE_ENV === 'production';
-    const frontendUrl  = process.env.FRONTEND_URL || 'http://localhost:5173';
-    const backendUrl   = process.env.BACKEND_URL  || 'http://localhost:4000';
+    const isProd = process.env.NODE_ENV === 'production';
+    const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
+    const backendUrl = process.env.BACKEND_URL || 'http://localhost:4000';
 
     const prefBody = {
       items,
-      external_reference:   String(id_pedido),   // ← ID único del pedido
-      notification_url:     `${backendUrl}/api/ventas/webhook`,
+      external_reference: String(id_pedido),   // ← ID único del pedido
+      notification_url: `${backendUrl}/api/ventas/webhook`,
       statement_descriptor: 'NUB Studio',
       back_urls: {
         success: `${frontendUrl}/mi-cuenta/pedidos?status=success`,
@@ -178,12 +227,12 @@ export const checkout = async (req, res) => {
     logger.info(`Checkout OK: cliente=${id_cliente} pedido=#${id_pedido} ventas=[${ventasIds.join(',')}] preferencia=${prefResult.id}`);
 
     return res.json({
-      success:            true,
+      success: true,
       id_pedido,
-      preference_id:      prefResult.id,
-      init_point:         prefResult.init_point,
+      preference_id: prefResult.id,
+      init_point: prefResult.init_point,
       sandbox_init_point: prefResult.sandbox_init_point,
-      ventas_ids:         ventasIds,
+      ventas_ids: ventasIds,
     });
   } catch (error) {
     logger.error(`Error en checkout: ${error.message}`);
@@ -206,21 +255,21 @@ export const webhookPago = async (req, res) => {
 
     // Consultar el pago en MercadoPago
     const { MercadoPagoConfig, Payment: MPPayment } = await import('mercadopago');
-    const client    = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
+    const client = new MercadoPagoConfig({ accessToken: process.env.MP_ACCESS_TOKEN });
     const mpPayment = new MPPayment(client);
-    const pagoInfo  = await mpPayment.get({ id: paymentId });
+    const pagoInfo = await mpPayment.get({ id: paymentId });
 
-    const status       = pagoInfo.status;             // approved | rejected | pending
+    const status = pagoInfo.status;             // approved | rejected | pending
     const external_ref = pagoInfo.external_reference; // id_pedido como string
 
     if (!external_ref) return res.sendStatus(200);
 
-    const id_pedido   = Number(external_ref);
-    if (!id_pedido)   return res.sendStatus(200);
+    const id_pedido = Number(external_ref);
+    if (!id_pedido) return res.sendStatus(200);
 
     const nuevoEstado = status === 'approved' ? 'pagado'
-                      : status === 'rejected' ? 'cancelado'
-                      : 'pendiente';
+      : status === 'rejected' ? 'cancelado'
+        : 'pendiente';
 
     // Actualizar estado del pedido
     await pool.query(
