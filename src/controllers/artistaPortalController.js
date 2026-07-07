@@ -1,5 +1,8 @@
 import { pool, pools } from '../config/db.js';
 import logger from '../config/logger.js';
+import { parseFechaProgramada } from './coleccionesController.js';
+import { detectXSS } from '../middlewares/sanitize.middleware.js';
+import { detectSQLInjection } from '../middlewares/sql-injection.middleware.js';
 
 // =========================================================
 // GET /api/artista-portal/mi-perfil
@@ -295,7 +298,7 @@ export const getMisObras = async (req, res) => {
         o.dimensiones_alto, o.dimensiones_ancho, o.dimensiones_profundidad,
         o.dimensiones_unidad, o.anio_creacion, o.tecnica,
         o.permite_marco, o.con_certificado,
-        o.id_coleccion,
+        o.id_coleccion, o.fecha_publicacion_programada,
         c.nombre AS categoria,
         col.nombre AS nombre_coleccion,
         COALESCE(i.stock_actual, 0) AS stock_actual,
@@ -373,10 +376,18 @@ export const nuevaObra = async (req, res) => {
       titulo, descripcion, historia, id_categoria, id_coleccion, tecnica, anio_creacion,
       dimensiones_alto, dimensiones_ancho, dimensiones_profundidad,
       precio_base, stock, permite_marco, con_certificado, etiquetas: etiquetasRaw,
+      fecha_publicacion_programada,
     } = req.body;
 
     if (!titulo || !descripcion || !id_categoria || !precio_base)
       return res.status(400).json({ message: 'Faltan campos requeridos: titulo, descripcion, id_categoria, precio_base' });
+
+    let fechaProgramada = null;
+    if (fecha_publicacion_programada) {
+      const parsed = parseFechaProgramada(fecha_publicacion_programada);
+      if (parsed.error) return res.status(400).json({ message: parsed.error });
+      fechaProgramada = parsed.fecha;
+    }
 
     if (stock !== undefined && stock !== null && stock !== '') {
       const stockVal = parseInt(stock);
@@ -408,9 +419,9 @@ export const nuevaObra = async (req, res) => {
         id_coleccion, tecnica, anio_creacion,
         dimensiones_alto, dimensiones_ancho, dimensiones_profundidad,
         precio_base, permite_marco, con_certificado,
-        imagen_principal, estado, activa, visible,
+        imagen_principal, fecha_publicacion_programada, estado, activa, visible,
         fecha_creacion, fecha_actualizacion
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,'pendiente',false,false,NOW(),NOW())
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,'pendiente',false,false,NOW(),NOW())
       RETURNING id_obra, titulo, slug, estado, imagen_principal`,
       [
         titulo, slug, descripcion, historia || null,
@@ -425,6 +436,7 @@ export const nuevaObra = async (req, res) => {
         permite_marco   === 'true' || permite_marco   === true,
         con_certificado === 'true' || con_certificado === true,
         imagenPrincipal,
+        fechaProgramada,
       ]
     );
 
@@ -676,5 +688,195 @@ export const getMisColecciones = async (req, res) => {
   } catch (error) {
     logger.error(`Error en getMisColecciones: ${error.message}`);
     res.status(500).json({ message: 'Error interno del servidor' });
+  }
+};
+// =========================================================
+// POST /api/artista-portal/colecciones/:id/obras-lote
+// Sube varias obras "de un jalón" a una colección.
+// multipart: imagenes[] (archivos, en el mismo orden que `obras`)
+//            obras = JSON string: [{ titulo, descripcion, historia?,
+//              id_categoria, tecnica?, anio_creacion?, precio_base, stock? }]
+//            fecha_publicacion_programada? (aplica a todas las obras del lote)
+// Las imágenes se suben a Cloudinary primero; los INSERT van en una
+// transacción: o se crean todas las obras o ninguna.
+// =========================================================
+export const subirObrasLote = async (req, res) => {
+  try {
+    const db = pools[req.user.rol] || pool;
+    const usuarioId = req.user.id_usuario;
+    const idColeccion = Number.parseInt(req.params.id);
+
+    if (Number.isNaN(idColeccion))
+      return res.status(400).json({ message: 'Id de colección no válido' });
+
+    // ── Artista activo y perfil completo (mismo criterio que nueva-obra) ──
+    const artistaRes = await db.query(
+      `SELECT id_artista, estado,
+        nombre_artistico, biografia, telefono, foto_perfil,
+        ciudad, id_estado_base, codigo_postal, direccion_taller,
+        id_categoria_principal
+      FROM artistas WHERE id_usuario = $1`,
+      [usuarioId]
+    );
+    if (artistaRes.rows.length === 0)
+      return res.status(403).json({ message: 'No eres un artista registrado' });
+
+    const artista = artistaRes.rows[0];
+    if (artista.estado !== 'activo')
+      return res.status(403).json({ message: 'Tu cuenta de artista aún no está aprobada' });
+
+    const camposFaltantes = [];
+    if (!artista.nombre_artistico)       camposFaltantes.push('nombre artístico');
+    if (!artista.biografia)              camposFaltantes.push('biografía');
+    if (!artista.telefono)               camposFaltantes.push('teléfono');
+    if (!artista.foto_perfil)            camposFaltantes.push('foto de perfil');
+    if (!artista.ciudad)                 camposFaltantes.push('ciudad');
+    if (!artista.id_estado_base)         camposFaltantes.push('estado');
+    if (!artista.codigo_postal)          camposFaltantes.push('código postal');
+    if (!artista.direccion_taller)       camposFaltantes.push('dirección del taller');
+    if (!artista.id_categoria_principal) camposFaltantes.push('categoría principal');
+    if (camposFaltantes.length > 0)
+      return res.status(403).json({ message: 'Completa tu perfil antes de subir obras', camposFaltantes });
+
+    const idArtista = artista.id_artista;
+
+    // ── Colección del artista ─────────────────────────────
+    const colCheck = await db.query(
+      'SELECT id_coleccion FROM colecciones WHERE id_coleccion = $1 AND id_artista = $2 AND activa = TRUE AND eliminada = FALSE LIMIT 1',
+      [idColeccion, idArtista]
+    );
+    if (colCheck.rows.length === 0)
+      return res.status(404).json({ message: 'Colección no encontrada' });
+
+    // ── Parseo y validación del lote ──────────────────────
+    let obras;
+    try {
+      obras = typeof req.body.obras === 'string' ? JSON.parse(req.body.obras) : req.body.obras;
+    } catch {
+      return res.status(400).json({ message: 'El formato de las obras no es válido' });
+    }
+    if (!Array.isArray(obras) || obras.length === 0)
+      return res.status(400).json({ message: 'Indica al menos una obra' });
+    if (obras.length > 10)
+      return res.status(400).json({ message: 'Máximo 10 obras por lote' });
+
+    const files = req.files || [];
+    if (files.length !== obras.length)
+      return res.status(400).json({ message: 'Cada obra debe incluir su imagen (en el mismo orden)' });
+
+    let fechaProgramada = null;
+    if (req.body.fecha_publicacion_programada) {
+      const parsed = parseFechaProgramada(req.body.fecha_publicacion_programada);
+      if (parsed.error) return res.status(400).json({ message: parsed.error });
+      fechaProgramada = parsed.fecha;
+    }
+
+    for (const [i, obra] of obras.entries()) {
+      const n = i + 1;
+      if (!obra || typeof obra !== 'object')
+        return res.status(400).json({ message: `Obra ${n}: datos incompletos` });
+      const { titulo, descripcion, id_categoria, precio_base } = obra;
+      if (!titulo?.trim() || titulo.trim().length < 5 || titulo.trim().length > 255)
+        return res.status(400).json({ message: `Obra ${n}: el título debe tener entre 5 y 255 caracteres` });
+      if (!descripcion?.trim() || descripcion.trim().length < 20)
+        return res.status(400).json({ message: `Obra ${n}: la descripción debe tener al menos 20 caracteres` });
+      if (!id_categoria || Number.isNaN(Number.parseInt(id_categoria)))
+        return res.status(400).json({ message: `Obra ${n}: selecciona una categoría` });
+      const precio = Number.parseFloat(precio_base);
+      if (Number.isNaN(precio) || precio <= 0 || precio > 10_000_000)
+        return res.status(400).json({ message: `Obra ${n}: el precio no es válido` });
+      if (obra.stock !== undefined && obra.stock !== null && obra.stock !== '') {
+        const stockVal = Number.parseInt(obra.stock);
+        if (Number.isNaN(stockVal) || stockVal < 1)
+          return res.status(400).json({ message: `Obra ${n}: el stock debe ser al menos 1` });
+      }
+      for (const campo of ['titulo', 'descripcion', 'historia', 'tecnica']) {
+        const valor = obra[campo];
+        if (typeof valor !== 'string' || !valor) continue;
+        if (detectXSS(valor) || detectSQLInjection(valor))
+          return res.status(400).json({ message: `Obra ${n}: el campo "${campo}" contiene contenido no permitido` });
+      }
+    }
+
+    // ── Subir imágenes a Cloudinary (antes de abrir la transacción) ──
+    const { cloudinary } = await import('../config/cloudinaryConfig.js');
+    const uploadImagen = (buffer) => new Promise((resolve, reject) => {
+      const stream = cloudinary.uploader.upload_stream(
+        { folder: 'nub_studio/obras', resource_type: 'image', quality: 'auto:good', fetch_format: 'auto' },
+        (error, result) => { if (error) reject(new Error(error.message)); else resolve(result); }
+      );
+      stream.end(buffer);
+    });
+
+    const urls = [];
+    for (const file of files) {
+      const r = await uploadImagen(file.buffer);
+      urls.push(r.secure_url);
+    }
+
+    // ── Transacción: todas las obras o ninguna ────────────
+    const client = await db.connect();
+    const creadas = [];
+    try {
+      await client.query('BEGIN');
+
+      for (const [i, obra] of obras.entries()) {
+        const slugBase = obra.titulo.toLowerCase()
+          .normalize('NFD').replaceAll(/[\u0300-\u036f]/g, '')
+          .replaceAll(/[^a-z0-9]+/g, '-').replaceAll(/(^-|-$)/g, '');
+        const slug = `${slugBase}-${Date.now()}-${i}`;
+
+        const obraRes = await client.query(
+          `INSERT INTO obras (
+            titulo, slug, descripcion, historia,
+            id_categoria, id_artista, id_usuario_creacion,
+            id_coleccion, tecnica, anio_creacion,
+            precio_base, permite_marco, con_certificado,
+            imagen_principal, fecha_publicacion_programada,
+            estado, activa, visible, fecha_creacion, fecha_actualizacion
+          ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,'pendiente',false,false,NOW(),NOW())
+          RETURNING id_obra, titulo, slug, estado, imagen_principal`,
+          [
+            obra.titulo.trim(), slug, obra.descripcion.trim(), obra.historia?.trim() || null,
+            Number.parseInt(obra.id_categoria), idArtista, usuarioId,
+            idColeccion,
+            obra.tecnica?.trim() || null,
+            obra.anio_creacion ? Number.parseInt(obra.anio_creacion) : null,
+            Number.parseFloat(obra.precio_base),
+            obra.permite_marco   === 'true' || obra.permite_marco   === true,
+            obra.con_certificado === 'true' || obra.con_certificado === true,
+            urls[i],
+            fechaProgramada,
+          ]
+        );
+
+        const stockInicial = obra.stock && Number.parseInt(obra.stock) > 0 ? Number.parseInt(obra.stock) : 1;
+        await client.query(
+          `INSERT INTO inventario (id_obra, stock_actual, stock_reservado, stock_vendido, activo)
+           VALUES ($1, $2, 0, 0, true)
+           ON CONFLICT (id_obra) DO UPDATE SET stock_actual = $2, ultima_actualizacion = NOW()`,
+          [obraRes.rows[0].id_obra, stockInicial]
+        );
+
+        creadas.push(obraRes.rows[0]);
+      }
+
+      await client.query('COMMIT');
+    } catch (txError) {
+      await client.query('ROLLBACK');
+      throw txError;
+    } finally {
+      client.release();
+    }
+
+    logger.info(`Lote de ${creadas.length} obras creado en colección ${idColeccion} por artista ${idArtista}`);
+    res.status(201).json({
+      success: true,
+      message: `${creadas.length} obra${creadas.length !== 1 ? 's' : ''} enviada${creadas.length !== 1 ? 's' : ''}. Quedarán en revisión hasta que el admin las apruebe.`,
+      obras: creadas,
+    });
+  } catch (error) {
+    logger.error(`Error en subirObrasLote: ${error.message}`);
+    res.status(500).json({ message: 'Error al subir las obras de la colección' });
   }
 };

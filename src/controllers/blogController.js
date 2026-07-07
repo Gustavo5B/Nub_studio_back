@@ -5,6 +5,32 @@ import logger from "../config/logger.js";
 // HELPERS INTERNOS
 // =========================================================
 
+// Emojis permitidos como reacción (lista blanca — validar SIEMPRE en servidor)
+export const EMOJIS_PERMITIDOS = ['❤️', '👏', '🔥', '😍', '🌟', '🤝'];
+
+// Sustituciones típicas para evadir el filtro (leetspeak)
+const LEET_MAP = { '0': 'o', '1': 'i', '3': 'e', '4': 'a', '5': 's', '7': 't', '@': 'a', '$': 's' };
+
+// Normaliza texto para comparar contra palabras prohibidas:
+// minúsculas, sin acentos (ñ→n incluida) y sin sustituciones leet.
+export const normalizarTexto = (texto) =>
+  String(texto)
+    .toLowerCase()
+    .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+    .replace(/[013457@$]/g, (c) => LEET_MAP[c]);
+
+// Función pura (testeable sin BD): detecta si el texto contiene alguna
+// palabra prohibida, incluso con acentos, leet o separadores (p.r.o.h.i.b.i.d.a)
+export const textoContieneProhibidas = (texto, palabras) => {
+  if (!palabras.length) return false;
+  const normalizado = normalizarTexto(texto);
+  const compacto = normalizado.replace(/[^a-z0-9n]/g, '');
+  return palabras.some((p) => {
+    const pNorm = normalizarTexto(p);
+    return normalizado.includes(pNorm) || compacto.includes(pNorm.replace(/[^a-z0-9n]/g, ''));
+  });
+};
+
 // Module-level cache for palabras prohibidas (refresh every 5 minutes)
 let _palabrasCache = [];
 let _palabrasCacheAt = 0;
@@ -22,8 +48,7 @@ const contienepalabrasProhibidas = async (db, texto) => {
   if (Date.now() - _palabrasCacheAt > PALABRAS_CACHE_TTL) {
     await refreshPalabrasCache(db);
   }
-  const textoLower = texto.toLowerCase();
-  return _palabrasCache.some(p => textoLower.includes(p));
+  return textoContieneProhibidas(texto, _palabrasCache);
 };
 
 const generarSlug = async (db, titulo) => {
@@ -115,7 +140,7 @@ export const cambiarEstadoPost = async (req, res) => {
   try {
     const db = pools[req.user?.rol] || pool;
     const { id } = req.params;
-    const { estado } = req.body;
+    const { estado } = req.body || {};
 
     const estadosValidos = ['borrador', 'publicado', 'oculto'];
     if (!estadosValidos.includes(estado))
@@ -241,7 +266,7 @@ export const moderarComentario = async (req, res) => {
   try {
     const db = pools[req.user?.rol] || pool;
     const { id } = req.params;
-    const { accion } = req.body;
+    const { accion } = req.body || {};
 
     if (!['aprobar', 'rechazar'].includes(accion))
       return res.status(400).json({
@@ -297,7 +322,7 @@ export const listarPalabras = async (req, res) => {
 export const agregarPalabra = async (req, res) => {
   try {
     const db = pools[req.user?.rol] || pool;
-    const { palabra } = req.body;
+    const { palabra } = req.body || {};
 
     if (!palabra || palabra.trim().length === 0)
       return res.status(400).json({ success: false, message: 'La palabra es obligatoria' });
@@ -359,7 +384,7 @@ export const togglePalabra = async (req, res) => {
   try {
     const db = pools[req.user?.rol] || pool;
     const { id } = req.params;
-    const { activa } = req.body;
+    const { activa } = req.body || {};
 
     if (typeof activa !== 'boolean')
       return res.status(400).json({ success: false, message: "El campo 'activa' debe ser true o false" });
@@ -392,7 +417,7 @@ export const togglePalabra = async (req, res) => {
 // =========================================================
 export const crearPost = async (req, res) => {
   try {
-    const { titulo, contenido, extracto, id_categoria, estado = 'borrador', meta_description } = req.body;
+    const { titulo, contenido, extracto, id_categoria, estado = 'borrador', meta_description } = req.body || {};
     const autor_id  = req.user.id_usuario;
     const autor_rol = req.user.rol; // 'admin' o 'artista'
     const db = pools[req.user?.rol] || pool;
@@ -480,7 +505,7 @@ export const editarPost = async (req, res) => {
   try {
     const db = pools[req.user?.rol] || pool;
     const { id } = req.params;
-    const { titulo, contenido, extracto, id_categoria, estado, meta_description } = req.body;
+    const { titulo, contenido, extracto, id_categoria, estado, meta_description } = req.body || {};
     const id_usuario = req.user.id_usuario;
     const rol = req.user.rol;
 
@@ -677,11 +702,14 @@ export const listarMisPosts = async (req, res) => {
 export const crearComentario = async (req, res) => {
   try {
     const db = pools[req.user?.rol] || pool;
-    const { id } = req.params; // id_post
-    const { contenido, padre_id } = req.body;
+    const idNum = parseInt(req.params.id, 10); // id_post
+    const { contenido, padre_id } = req.body || {};
     const id_usuario = req.user.id_usuario;
 
-    if (!contenido || contenido.trim().length === 0)
+    if (isNaN(idNum))
+      return res.status(400).json({ success: false, message: 'ID de post inválido' });
+
+    if (typeof contenido !== 'string' || contenido.trim().length === 0)
       return res.status(400).json({ success: false, message: 'El contenido del comentario es obligatorio' });
 
     if (contenido.trim().length > 2000)
@@ -692,7 +720,7 @@ export const crearComentario = async (req, res) => {
       `SELECT id_post FROM blog_posts
        WHERE id_post = $1 AND estado = 'publicado' AND activo = true AND eliminado = false
        LIMIT 1`,
-      [id]
+      [idNum]
     );
     if (postExiste.rows.length === 0)
       return res.status(404).json({ success: false, message: 'Post no encontrado' });
@@ -709,9 +737,17 @@ export const crearComentario = async (req, res) => {
     let padre_id_val = null;
 
     if (padre_id) {
+      const padreNum = parseInt(padre_id, 10);
+      if (isNaN(padreNum))
+        return res.status(400).json({ success: false, message: 'Comentario padre inválido' });
+
+      // El padre debe pertenecer al MISMO post y estar visible (aprobado);
+      // sin esto se podría colgar una respuesta de un comentario de otro post.
       const padreResult = await db.query(
-        'SELECT id_comentario, nivel FROM blog_comentarios WHERE id_comentario = $1 AND eliminado = false LIMIT 1',
-        [padre_id]
+        `SELECT id_comentario, nivel FROM blog_comentarios
+         WHERE id_comentario = $1 AND id_post = $2 AND estado = 'aprobado' AND eliminado = false
+         LIMIT 1`,
+        [padreNum, idNum]
       );
       if (padreResult.rows.length === 0)
         return res.status(404).json({ success: false, message: 'Comentario padre no encontrado' });
@@ -723,22 +759,28 @@ export const crearComentario = async (req, res) => {
         });
 
       nivel = padreResult.rows[0].nivel + 1;
-      padre_id_val = parseInt(padre_id);
+      padre_id_val = padreNum;
     }
 
     const imagen_url = req.file?.path || null;
 
+    // Comentarios con enlaces van a moderación (anti-spam); el resto se publica directo
+    const tieneEnlaces = /(https?:\/\/|www\.)/i.test(contenido);
+    const estadoInicial = tieneEnlaces ? 'pendiente' : 'aprobado';
+
     const result = await db.query(`
       INSERT INTO blog_comentarios
         (id_post, id_usuario, padre_id, nivel, contenido, imagen_url, estado)
-      VALUES ($1, $2, $3, $4, $5, $6, 'aprobado')
+      VALUES ($1, $2, $3, $4, $5, $6, $7)
       RETURNING id_comentario, estado
-    `, [id, id_usuario, padre_id_val, nivel, contenido.trim(), imagen_url]);
+    `, [idNum, id_usuario, padre_id_val, nivel, contenido.trim(), imagen_url, estadoInicial]);
 
-    logger.info(`Comentario creado: id=${result.rows[0].id_comentario} post=${id} usuario=${id_usuario}`);
+    logger.info(`Comentario creado: id=${result.rows[0].id_comentario} post=${idNum} usuario=${id_usuario} estado=${estadoInicial}`);
     res.status(201).json({
       success: true,
-      message: 'Comentario publicado.',
+      message: tieneEnlaces
+        ? 'Tu comentario contiene enlaces y será revisado antes de publicarse.'
+        : 'Comentario publicado.',
       data: result.rows[0]
     });
   } catch (error) {
@@ -982,7 +1024,7 @@ export const listarComentarios = async (req, res) => {
 
     const result = await db.query(`
       SELECT
-        bc.id_comentario, bc.padre_id, bc.nivel,
+        bc.id_comentario, bc.id_usuario, bc.padre_id, bc.nivel,
         bc.contenido, bc.imagen_url, bc.fecha_creacion,
         u.rol AS usuario_rol,
         CASE u.rol
@@ -1002,13 +1044,15 @@ export const listarComentarios = async (req, res) => {
       ORDER BY bc.fecha_creacion ASC
     `, [idNum]);
 
-    // Construir árbol en memoria
+    // Construir árbol en memoria. Las respuestas cuyo padre ya no es
+    // visible (eliminado o rechazado) se descartan en vez de mostrarse
+    // como raíces con sangría incorrecta.
     const map = {};
     const raices = [];
     result.rows.forEach(c => { map[c.id_comentario] = { ...c, respuestas: [] }; });
     result.rows.forEach(c => {
-      if (c.padre_id && map[c.padre_id]) {
-        map[c.padre_id].respuestas.push(map[c.id_comentario]);
+      if (c.padre_id) {
+        if (map[c.padre_id]) map[c.padre_id].respuestas.push(map[c.id_comentario]);
       } else {
         raices.push(map[c.id_comentario]);
       }
@@ -1018,5 +1062,136 @@ export const listarComentarios = async (req, res) => {
   } catch (error) {
     logger.error(`Error listarComentarios post=${req.params.id}: ${error.message}`);
     res.status(500).json({ success: false, message: 'Error al obtener los comentarios' });
+  }
+};
+
+// =========================================================
+// LISTAR REACCIONES DE UN POST (público)
+// GET /api/blog/posts/:id/reacciones
+// Devuelve conteos por emoji, la reacción del usuario (si hay
+// sesión) y la lista blanca de emojis permitidos.
+// =========================================================
+export const listarReacciones = async (req, res) => {
+  try {
+    const db = pools[req.user?.rol] || pool;
+    const idNum = parseInt(req.params.id, 10);
+    if (isNaN(idNum))
+      return res.status(400).json({ success: false, message: 'ID de post inválido' });
+
+    const postExiste = await db.query(
+      `SELECT id_post FROM blog_posts
+       WHERE id_post = $1 AND estado = 'publicado' AND activo = true AND eliminado = false
+       LIMIT 1`,
+      [idNum]
+    );
+    if (postExiste.rows.length === 0)
+      return res.status(404).json({ success: false, message: 'Post no encontrado' });
+
+    const conteos = await db.query(`
+      SELECT emoji, COUNT(*)::int AS total
+      FROM blog_reacciones
+      WHERE id_post = $1
+      GROUP BY emoji
+    `, [idNum]);
+
+    let mi_reaccion = null;
+    if (req.user?.id_usuario) {
+      const mia = await db.query(
+        'SELECT emoji FROM blog_reacciones WHERE id_post = $1 AND id_usuario = $2 LIMIT 1',
+        [idNum, req.user.id_usuario]
+      );
+      mi_reaccion = mia.rows[0]?.emoji || null;
+    }
+
+    res.json({
+      success: true,
+      data: {
+        conteos: conteos.rows,
+        mi_reaccion,
+        emojis_permitidos: EMOJIS_PERMITIDOS,
+      },
+    });
+  } catch (error) {
+    logger.error(`Error listarReacciones post=${req.params.id}: ${error.message}`);
+    res.status(500).json({ success: false, message: 'Error al obtener las reacciones' });
+  }
+};
+
+// =========================================================
+// REACCIONAR A UN POST (cliente, artista, admin)
+// POST /api/blog/posts/:id/reacciones — Body: emoji
+// Una sola reacción por usuario: el UNIQUE (id_post, id_usuario)
+// convierte el INSERT en UPDATE si ya había una (cambia el emoji).
+// =========================================================
+export const reaccionar = async (req, res) => {
+  try {
+    const db = pools[req.user?.rol] || pool;
+    const idNum = parseInt(req.params.id, 10);
+    const { emoji } = req.body || {};
+    const id_usuario = req.user.id_usuario;
+
+    if (isNaN(idNum))
+      return res.status(400).json({ success: false, message: 'ID de post inválido' });
+
+    if (typeof emoji !== 'string' || !EMOJIS_PERMITIDOS.includes(emoji))
+      return res.status(400).json({
+        success: false,
+        message: `Emoji no permitido. Opciones: ${EMOJIS_PERMITIDOS.join(' ')}`,
+      });
+
+    const postExiste = await db.query(
+      `SELECT id_post FROM blog_posts
+       WHERE id_post = $1 AND estado = 'publicado' AND activo = true AND eliminado = false
+       LIMIT 1`,
+      [idNum]
+    );
+    if (postExiste.rows.length === 0)
+      return res.status(404).json({ success: false, message: 'Post no encontrado' });
+
+    const result = await db.query(`
+      INSERT INTO blog_reacciones (id_post, id_usuario, emoji)
+      VALUES ($1, $2, $3)
+      ON CONFLICT (id_post, id_usuario)
+      DO UPDATE SET emoji = EXCLUDED.emoji, fecha_actualizacion = NOW()
+      RETURNING emoji
+    `, [idNum, id_usuario, emoji]);
+
+    logger.info(`Reacción '${emoji}' en post=${idNum} por usuario=${id_usuario}`);
+    res.status(201).json({
+      success: true,
+      message: 'Reacción registrada',
+      data: result.rows[0],
+    });
+  } catch (error) {
+    logger.error(`Error reaccionar post=${req.params.id}: ${error.message}`);
+    res.status(500).json({ success: false, message: 'Error al registrar la reacción' });
+  }
+};
+
+// =========================================================
+// QUITAR MI REACCIÓN (cliente, artista, admin)
+// DELETE /api/blog/posts/:id/reacciones
+// Solo elimina la reacción propia (WHERE id_usuario del token).
+// =========================================================
+export const quitarReaccion = async (req, res) => {
+  try {
+    const db = pools[req.user?.rol] || pool;
+    const idNum = parseInt(req.params.id, 10);
+    const id_usuario = req.user.id_usuario;
+
+    if (isNaN(idNum))
+      return res.status(400).json({ success: false, message: 'ID de post inválido' });
+
+    const result = await db.query(
+      'DELETE FROM blog_reacciones WHERE id_post = $1 AND id_usuario = $2 RETURNING id_reaccion',
+      [idNum, id_usuario]
+    );
+    if (result.rows.length === 0)
+      return res.status(404).json({ success: false, message: 'No tienes una reacción en este post' });
+
+    res.json({ success: true, message: 'Reacción eliminada' });
+  } catch (error) {
+    logger.error(`Error quitarReaccion post=${req.params.id}: ${error.message}`);
+    res.status(500).json({ success: false, message: 'Error al eliminar la reacción' });
   }
 };

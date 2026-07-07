@@ -1,6 +1,7 @@
 import express from 'express';
 import { upload } from '../config/cloudinaryConfig.js';
 import { authenticateToken, requireRole, optionalAuth } from '../middlewares/authMiddleware.js';
+import { rateLimit } from '../middlewares/rateLimit.middleware.js';
 import {
   // Admin
   listarTodosPostsAdmin,
@@ -21,6 +22,10 @@ import {
   // Cliente / Artista
   crearComentario,
   eliminarComentario,
+  // Reacciones
+  listarReacciones,
+  reaccionar,
+  quitarReaccion,
   // Público
   listarPosts,
   obtenerPostPorSlug,
@@ -29,12 +34,40 @@ import {
 
 const router = express.Router();
 
+// Límites anti-spam (por usuario autenticado; por IP si no hay sesión)
+const limiteComentarios = rateLimit({
+  nombre: 'blog-comentarios',
+  windowMs: 60_000,
+  max: 5,
+  mensaje: 'Estás comentando muy rápido. Espera un momento e intenta de nuevo.',
+});
+const limiteReacciones = rateLimit({
+  nombre: 'blog-reacciones',
+  windowMs: 60_000,
+  max: 20,
+  mensaje: 'Demasiadas reacciones seguidas. Espera un momento.',
+});
+
 // ── PÚBLICO — POSTS ───────────────────────────────────────
 router.get('/posts',       optionalAuth, listarPosts);
 router.get('/posts/:slug', optionalAuth, obtenerPostPorSlug);
 
 // ── PÚBLICO — COMENTARIOS ─────────────────────────────────
 router.get('/posts/:id/comentarios', optionalAuth, listarComentarios);
+
+// ── REACCIONES ────────────────────────────────────────────
+router.get('/posts/:id/reacciones', optionalAuth, listarReacciones);
+router.post(
+  '/posts/:id/reacciones',
+  authenticateToken, requireRole('cliente', 'artista', 'admin'),
+  limiteReacciones,
+  reaccionar
+);
+router.delete(
+  '/posts/:id/reacciones',
+  authenticateToken, requireRole('cliente', 'artista', 'admin'),
+  quitarReaccion
+);
 
 // ── ADMIN — GESTIÓN DE POSTS ──────────────────────────────
 router.get(
@@ -120,6 +153,7 @@ router.delete(
 router.post(
   '/posts/:id/comentarios',
   authenticateToken, requireRole('cliente', 'artista'),
+  limiteComentarios,
   upload.single('imagen'),
   crearComentario
 );

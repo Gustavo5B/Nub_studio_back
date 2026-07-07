@@ -7,7 +7,9 @@ import {
   crearColeccion,
   actualizarColeccion,
   eliminarColeccion,
-} from '../controllers/coleccionesController.js';  // 👈 Verifica: sin 's' al final
+  agregarObrasAColeccion,
+  quitarObraDeColeccion,
+} from '../controllers/coleccionesController.js';
 import { authenticateToken, requireRole } from '../middlewares/authMiddleware.js';
 
 const router = Router();
@@ -36,5 +38,9 @@ router.get('/slug/:slug', obtenerColeccionPorSlug);  // ✅ Cambiado a /slug/:sl
 router.post('/', authenticateToken, requireRole('artista'), upload.single('imagen_portada'), crearColeccion);
 router.put('/:id', authenticateToken, requireRole('artista'), upload.single('imagen_portada'), actualizarColeccion);
 router.delete('/:id', authenticateToken, requireRole('artista'), eliminarColeccion);
+
+// ── Obras dentro de una colección (artista) ─────────────────
+router.post('/:id/obras', authenticateToken, requireRole('artista'), agregarObrasAColeccion);
+router.delete('/:id/obras/:idObra', authenticateToken, requireRole('artista'), quitarObraDeColeccion);
 
 export default router;

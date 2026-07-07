@@ -41,6 +41,7 @@ import {
   sendContactEmail,
 } from "./services/emailService.js";
 import { cleanupExpiredSessions } from "./services/sessionService.js";
+import { publicarProgramadas } from "./services/publicacionService.js";
 import { sanitizeInput } from "./middlewares/sanitize.middleware.js";
 import { preventSQLInjection } from "./middlewares/sql-injection.middleware.js";
 import logger from "./config/logger.js";
@@ -289,6 +290,15 @@ cron.schedule("0 0 * * *", async () => {
   }
 });
 
+// Publicación programada de obras y colecciones (cada 5 minutos)
+cron.schedule("*/5 * * * *", async () => {
+  try {
+    await publicarProgramadas();
+  } catch (err) {
+    logger.error(`Error en publicación programada: ${err.message}`);
+  }
+});
+
 // =========================================================
 // INICIO DEL SERVIDOR
 // =========================================================
@@ -311,5 +321,12 @@ app.listen(PORT, async () => {
     logger.info("Cron de backups inicializado.");
   } catch (err) {
     logger.warn(`Cron de backups no pudo inicializarse: ${err.message}`);
+  }
+
+  // Recupera publicaciones programadas perdidas durante el downtime
+  try {
+    await publicarProgramadas();
+  } catch (err) {
+    logger.warn(`Publicación programada inicial falló: ${err.message}`);
   }
 });

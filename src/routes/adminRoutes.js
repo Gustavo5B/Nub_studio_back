@@ -8,7 +8,7 @@ import {
   obtenerConfigCron,
   guardarConfigCron,
 } from '../controllers/backupController.js';
-import { listarColeccionesAdmin, actualizarColeccionAdmin } from '../controllers/coleccionesController.js';
+import { listarColeccionesAdmin, actualizarColeccionAdmin, obtenerColeccionAdmin } from '../controllers/coleccionesController.js';
 import { listarClientes, toggleEstadoCliente } from '../controllers/clientesAdminController.js';
 
 const router = Router();
@@ -24,6 +24,7 @@ router.post('/backups/cron',       guardarConfigCron);   // ← nuevo
 router.delete('/backups/:id',      eliminarBackup);
 
 router.get('/colecciones',              listarColeccionesAdmin);
+router.get('/colecciones/:id',          obtenerColeccionAdmin);
 router.put('/colecciones/:id',          actualizarColeccionAdmin);
 
 router.get('/clientes',                 listarClientes);

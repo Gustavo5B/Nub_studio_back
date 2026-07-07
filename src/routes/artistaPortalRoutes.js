@@ -5,7 +5,8 @@ import {
   agregarFotoPersonal, eliminarFotoPersonal,
   getMisObras, nuevaObra,
   getObraById, actualizarObraArtista,
-  getMisColecciones,  // 👈 NUEVA IMPORTACIÓN
+  getMisColecciones,
+  subirObrasLote,
 } from '../controllers/artistaPortalController.js';
 import {
   getRedesSociales, agregarRedSocial,
@@ -67,7 +68,11 @@ router.post('/fotos-personales',       authenticateToken, requireRole('artista')
 router.delete('/fotos-personales/:id', authenticateToken, requireRole('artista'), eliminarFotoPersonal);
 
 // ── Colecciones del artista ────────────────────────────────────
-router.get('/mis-colecciones', authenticateToken, requireRole('artista'), getMisColecciones);  // 👈 NUEVA RUTA
+router.get('/mis-colecciones', authenticateToken, requireRole('artista'), getMisColecciones);
+// Subida de obras en lote a una colección (la validación XSS/SQLi del
+// JSON `obras` se hace dentro del controlador, campo por campo)
+router.post('/colecciones/:id/obras-lote', authenticateToken, requireRole('artista'),
+  upload.array('imagenes', 10), subirObrasLote);
 
 // ── Obras ────────────────────────────────────────────────────
 router.get('/mis-obras',   authenticateToken, requireRole('artista'), getMisObras);

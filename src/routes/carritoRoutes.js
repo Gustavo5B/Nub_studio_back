@@ -4,6 +4,7 @@ import {
   agregarAlCarrito,
   actualizarCantidad,
   eliminarDelCarrito,
+  agregarColeccionAlCarrito,
 } from '../controllers/carritoController.js';
 import { authenticateToken, requireRole } from '../middlewares/authMiddleware.js';
 
@@ -15,6 +16,7 @@ router.use(requireRole('cliente'));
 
 router.get('/',              getCarrito);
 router.post('/',             agregarAlCarrito);
+router.post('/coleccion',    agregarColeccionAlCarrito);
 router.put('/:id_carrito',   actualizarCantidad);
 router.delete('/:id_carrito', eliminarDelCarrito);
 

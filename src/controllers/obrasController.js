@@ -701,7 +701,24 @@ export const cambiarEstadoObra = async (req, res) => {
     if (!estadosValidos.includes(estado))
       return res.status(400).json({ success: false, message: "Estado inválido" });
 
-    const activa = estado === "publicada";
+    // Si el artista programó la publicación y el admin aprueba antes de esa
+    // fecha, la obra queda 'programada' y el cron la publica automáticamente.
+    let estadoFinal = estado;
+    let activa = estado === "publicada";
+    let programadaPara = null;
+
+    if (estado === "publicada") {
+      const fechaRes = await db.query(
+        `SELECT fecha_publicacion_programada FROM obras WHERE id_obra = $1 AND eliminada IS NOT TRUE LIMIT 1`,
+        [id]
+      );
+      const fechaProg = fechaRes.rows[0]?.fecha_publicacion_programada;
+      if (fechaProg && new Date(fechaProg).getTime() > Date.now()) {
+        estadoFinal = "programada";
+        activa = false;
+        programadaPara = fechaProg;
+      }
+    }
 
     const result = await db.query(`
       UPDATE obras
@@ -710,7 +727,7 @@ export const cambiarEstadoObra = async (req, res) => {
           fecha_actualizacion = NOW()
       WHERE id_obra = $3 AND eliminada IS NOT TRUE
       RETURNING id_obra, titulo, estado, activa, id_artista
-    `, [estado, activa, id]);
+    `, [estadoFinal, activa, id]);
 
     if (result.rows.length === 0)
       return res.status(404).json({ success: false, message: "Obra no encontrada" });
@@ -718,17 +735,20 @@ export const cambiarEstadoObra = async (req, res) => {
     const obra = result.rows[0];
 
     logger.info(
-      `Estado obra ${id} → "${estado}" | activa=${activa} | admin_id=${id_admin}`
+      `Estado obra ${id} → "${estadoFinal}" | activa=${activa} | admin_id=${id_admin}`
       + (motivo_rechazo ? ` | motivo="${motivo_rechazo}"` : "")
     );
 
     res.json({
       success: true,
-      message: `Obra ${estado === "publicada" ? "publicada" : estado} correctamente`,
+      message: estadoFinal === "programada"
+        ? `Obra aprobada. Se publicará automáticamente el ${new Date(programadaPara).toLocaleString("es-MX", { timeZone: "America/Mexico_City" })}`
+        : `Obra ${estadoFinal === "publicada" ? "publicada" : estadoFinal} correctamente`,
       data: obra,
     });
 
     // Email en background — usa pool base porque req ya no está disponible
+    // (una obra 'programada' también fue aprobada: se notifica igual)
     if (estado === "publicada" || estado === "rechazada") {
       pool.query(
         `SELECT correo, nombre_completo, nombre_artistico

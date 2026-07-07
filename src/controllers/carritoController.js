@@ -197,3 +197,86 @@ export const eliminarDelCarrito = async (req, res) => {
     res.status(500).json({ success: false, message: 'Error al eliminar del carrito' });
   }
 };
+
+// =========================================================
+// POST /api/carrito/coleccion
+// Agrega todas las obras disponibles de una colección al carrito
+// (omite las agotadas y respeta las que ya están en el carrito)
+// =========================================================
+export const agregarColeccionAlCarrito = async (req, res) => {
+  try {
+    const db         = pools[req.user.rol] || pool;
+    const id_usuario = req.user.id_usuario;
+    const idColeccion = Number.parseInt(req.body.id_coleccion);
+
+    if (Number.isNaN(idColeccion)) {
+      return res.status(400).json({ success: false, message: 'El id_coleccion es requerido' });
+    }
+
+    // Solo colecciones publicadas y activas
+    const colRes = await db.query(
+      `SELECT id_coleccion, nombre FROM colecciones
+       WHERE id_coleccion = $1 AND estado = 'publicada' AND activa = TRUE AND eliminada = FALSE LIMIT 1`,
+      [idColeccion]
+    );
+    if (colRes.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Colección no disponible' });
+    }
+
+    // Obras compradas: publicadas, activas y con stock disponible
+    const obrasRes = await db.query(`
+      SELECT o.id_obra,
+        GREATEST(COALESCE(i.stock_actual, 0) - COALESCE(i.stock_reservado, 0), 0) AS stock_disponible
+      FROM obras o
+      LEFT JOIN inventario i ON i.id_obra = o.id_obra
+      WHERE o.id_coleccion = $1 AND o.estado = 'publicada'
+        AND o.activa = TRUE AND o.eliminada IS NOT TRUE
+    `, [idColeccion]);
+
+    if (obrasRes.rows.length === 0) {
+      return res.status(400).json({ success: false, message: 'Esta colección no tiene obras disponibles' });
+    }
+
+    let agregadas = 0;
+    let omitidas  = 0;
+
+    for (const obra of obrasRes.rows) {
+      if (Number(obra.stock_disponible) <= 0) { omitidas++; continue; }
+
+      const existing = await db.query(
+        `SELECT id_carrito, activo FROM carritos
+         WHERE id_usuario = $1 AND id_obra = $2
+           AND id_obra_tamaño IS NULL AND id_tipo_marco IS NULL`,
+        [id_usuario, obra.id_obra]
+      );
+
+      if (existing.rows.length > 0) {
+        if (existing.rows[0].activo) { omitidas++; continue; }
+        await db.query(
+          `UPDATE carritos SET activo = TRUE, cantidad = 1, fecha_agregado = NOW() WHERE id_carrito = $1`,
+          [existing.rows[0].id_carrito]
+        );
+        agregadas++;
+      } else {
+        await db.query(
+          `INSERT INTO carritos (id_usuario, id_obra, cantidad, activo, fecha_agregado)
+           VALUES ($1, $2, 1, TRUE, NOW())`,
+          [id_usuario, obra.id_obra]
+        );
+        agregadas++;
+      }
+    }
+
+    logger.info(`Carrito: usuario ${id_usuario} agregó colección ${idColeccion} (${agregadas} obras, ${omitidas} omitidas)`);
+    res.json({
+      success: true,
+      message: agregadas > 0
+        ? `${agregadas} obra${agregadas !== 1 ? 's' : ''} de la colección agregada${agregadas !== 1 ? 's' : ''} al carrito${omitidas > 0 ? ` (${omitidas} ya estaban o sin stock)` : ''}`
+        : 'Las obras de esta colección ya están en tu carrito o no tienen stock',
+      data: { agregadas, omitidas },
+    });
+  } catch (error) {
+    logger.error(`Error en agregarColeccionAlCarrito: ${error.message}`);
+    res.status(500).json({ success: false, message: 'Error al agregar la colección al carrito' });
+  }
+};
