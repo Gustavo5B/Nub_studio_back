@@ -104,3 +104,50 @@ export const requireRole = (...roles) => {
     next();
   };
 };
+
+
+
+// Middleware híbrido: acepta JWT (app web) O alexa_user_id (skill de Alexa).
+// Si viene un token, se comporta EXACTAMENTE igual que authenticateToken
+// (delega en ella, mismo código, mismos errores). Si no hay token, intenta
+// resolver el usuario a partir de un alexa_user_id ya vinculado.
+export const resolveUsuario = async (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1];
+
+  // Camino normal (app web): idéntico a como funciona hoy.
+  if (token) {
+    return authenticateToken(req, res, next);
+  }
+
+  // Camino Alexa: sin JWT, se identifica con alexa_user_id.
+  try {
+    const alexaUserId = (req.body && req.body.alexa_user_id) || (req.query && req.query.alexa_user_id);
+
+    if (!alexaUserId) {
+      logger.warn('resolveUsuario: sin token ni alexa_user_id');
+      return res.status(401).json({ message: 'No autenticado', code: 'NO_AUTH' });
+    }
+
+    const result = await pool.query(
+      'SELECT usuario_id FROM vinculaciones WHERE alexa_user_id = $1',
+      [alexaUserId]
+    );
+
+    if (result.rows.length === 0) {
+      logger.warn(`resolveUsuario: alexa_user_id no vinculado: ${alexaUserId}`);
+      return res.status(401).json({ message: 'Cuenta de Alexa no vinculada', code: 'NOT_LINKED' });
+    }
+
+    req.user = {
+      id_usuario: result.rows[0].usuario_id,
+      rol: 'cliente',
+      viaAlexa: true
+    };
+
+    next();
+  } catch (error) {
+    logger.error(`resolveUsuario error: ${error.message}`);
+    return res.status(500).json({ message: 'Error al verificar autenticación', code: 'AUTH_ERROR' });
+  }
+};
