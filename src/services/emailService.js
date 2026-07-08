@@ -945,6 +945,190 @@ export const sendConfirmacionPedidoEmail = async (email, nombre, id_pedido, item
 };
 
 // =========================================================
+// NOTIFICAR PEDIDO ENVIADO — número de guía al cliente
+// =========================================================
+export const sendEnvioEmail = async (email, nombre, id_pedido, numero_guia) => {
+  try {
+    const codigo   = `NUB-${String(id_pedido).padStart(5, "0")}`;
+    const frontUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+    const guiaHtml = numero_guia
+      ? `<div style="background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:12px;padding:16px 20px;margin-top:24px;">
+           <div style="font-size:10px;font-weight:700;color:#166534;letter-spacing:.14em;text-transform:uppercase;margin-bottom:6px;">Número de guía</div>
+           <div style="font-size:20px;font-weight:900;color:#14121E;letter-spacing:.06em;font-family:'Courier New',monospace;">${numero_guia}</div>
+           <div style="font-size:11px;color:#166534;margin-top:4px;">Usa este número para rastrear tu paquete con la paquetería.</div>
+         </div>`
+      : `<div style="background:#F9F8FC;border:1.5px solid #E6E4EF;border-radius:12px;padding:16px 20px;margin-top:24px;">
+           <div style="font-size:13px;color:#5A5870;">El número de guía será compartido próximamente por la galería.</div>
+         </div>`;
+
+    const sendSmtpEmail = {
+      sender: SENDER,
+      to: [{ email, name: nombre }],
+      subject: `¡Tu pedido ${codigo} está en camino! — NU★B Studio`,
+      htmlContent: `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pedido enviado ${codigo}</title>
+</head>
+<body style="margin:0;padding:0;background:#F9F8FC;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F9F8FC;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(20,18,30,.09);">
+        <tr><td style="height:4px;background:linear-gradient(90deg,#E8640C,#A83B90,#6028AA);"></td></tr>
+        <tr>
+          <td style="background:#14121E;padding:36px 40px;text-align:center;">
+            <div style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-.02em;margin-bottom:4px;">NU<span style="color:#E8640C;">★</span>B Studio</div>
+            <div style="font-size:11px;color:#9896A8;letter-spacing:.2em;text-transform:uppercase;">Arte de la Huasteca Hidalguense</div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:36px 40px 0;text-align:center;">
+            <div style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;background:#EFF6FF;border-radius:50%;border:2px solid #BFDBFE;margin-bottom:18px;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M5 12L12 5L19 12" stroke="#2D6FBE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M5 19L12 12L19 19" stroke="#2D6FBE" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".4"/>
+              </svg>
+            </div>
+            <h1 style="font-size:22px;font-weight:900;color:#14121E;margin:0 0 8px;">¡Tu pedido está en camino!</h1>
+            <p style="font-size:14px;color:#9896A8;margin:0;line-height:1.6;">
+              Hola <strong style="color:#14121E;">${nombre}</strong>, tu pedido <strong style="color:#14121E;">${codigo}</strong> ha sido enviado y está de camino a ti.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px 40px;">
+            ${guiaHtml}
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 40px 36px;text-align:center;">
+            <a href="${frontUrl}/mi-cuenta/pedidos/${id_pedido}"
+               style="display:inline-block;background:#E8640C;color:#fff;text-decoration:none;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:14px 32px;border-radius:100px;margin-top:12px;">
+              Ver detalle del pedido
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px 40px;border-top:1px solid #ECEAF4;text-align:center;">
+            <div style="font-size:11px;color:#9896A8;line-height:1.7;">
+              Si tienes dudas sobre tu envío, responde este correo o contáctanos.<br/>
+              <strong style="color:#14121E;">NU★B Studio</strong> — Arte de la Huasteca Hidalguense
+            </div>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+    };
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    logger.info(`Email de envío enviado a ${email} para pedido #${id_pedido}`);
+  } catch (err) {
+    logger.error(`sendEnvioEmail error: ${err.message}`);
+    throw err;
+  }
+};
+
+// =========================================================
+// NOTIFICAR PEDIDO LISTO PARA RECOGER EN LOCAL
+// =========================================================
+export const sendListoRecogerEmail = async (email, nombre, id_pedido) => {
+  try {
+    const codigo   = `NUB-${String(id_pedido).padStart(5, "0")}`;
+    const frontUrl = process.env.FRONTEND_URL || "http://localhost:5173";
+
+    const sendSmtpEmail = {
+      sender: SENDER,
+      to: [{ email, name: nombre }],
+      subject: `¡Tu pedido ${codigo} está listo para recoger! — NU★B Studio`,
+      htmlContent: `
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Listo para recoger ${codigo}</title>
+</head>
+<body style="margin:0;padding:0;background:#F9F8FC;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background:#F9F8FC;padding:40px 16px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;background:#fff;border-radius:16px;overflow:hidden;box-shadow:0 4px 24px rgba(20,18,30,.09);">
+        <tr><td style="height:4px;background:linear-gradient(90deg,#E8640C,#A83B90,#6028AA);"></td></tr>
+        <tr>
+          <td style="background:#14121E;padding:36px 40px;text-align:center;">
+            <div style="font-size:28px;font-weight:900;color:#fff;letter-spacing:-.02em;margin-bottom:4px;">NU<span style="color:#E8640C;">★</span>B Studio</div>
+            <div style="font-size:11px;color:#9896A8;letter-spacing:.2em;text-transform:uppercase;">Arte de la Huasteca Hidalguense</div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:36px 40px 0;text-align:center;">
+            <div style="display:inline-flex;align-items:center;justify-content:center;width:56px;height:56px;background:#FEF3C7;border-radius:50%;border:2px solid #FDE68A;margin-bottom:18px;">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 9L12 3L21 9V20C21 20.5523 20.5523 21 20 21H15V15H9V21H4C3.44772 21 3 20.5523 3 20V9Z" stroke="#92400E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <h1 style="font-size:22px;font-weight:900;color:#14121E;margin:0 0 8px;">¡Tu pedido está listo!</h1>
+            <p style="font-size:14px;color:#9896A8;margin:0;line-height:1.6;">
+              Hola <strong style="color:#14121E;">${nombre}</strong>, tu pedido <strong style="color:#14121E;">${codigo}</strong> ya está preparado y te espera en nuestra galería.
+            </p>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px 40px;">
+            <div style="background:#FFFBEB;border:1.5px solid #FDE68A;border-radius:12px;padding:20px 24px;">
+              <div style="font-size:10px;font-weight:700;color:#92400E;letter-spacing:.14em;text-transform:uppercase;margin-bottom:10px;">Cómo recoger tu pedido</div>
+              <div style="display:flex;flex-direction:column;gap:10px;">
+                <div style="font-size:13px;color:#14121E;display:flex;gap:10px;align-items:flex-start;">
+                  <span style="color:#E8640C;font-weight:700;flex-shrink:0;">1.</span>
+                  Presenta tu nombre o el código <strong>${codigo}</strong> al llegar.
+                </div>
+                <div style="font-size:13px;color:#14121E;display:flex;gap:10px;align-items:flex-start;">
+                  <span style="color:#E8640C;font-weight:700;flex-shrink:0;">2.</span>
+                  El horario de atención es coordinado directamente con la galería.
+                </div>
+                <div style="font-size:13px;color:#14121E;display:flex;gap:10px;align-items:flex-start;">
+                  <span style="color:#E8640C;font-weight:700;flex-shrink:0;">3.</span>
+                  Si tienes dudas, responde este correo y te contactamos.
+                </div>
+              </div>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:0 40px 36px;text-align:center;">
+            <a href="${frontUrl}/mi-cuenta/pedidos/${id_pedido}"
+               style="display:inline-block;background:#E8640C;color:#fff;text-decoration:none;font-size:11px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;padding:14px 32px;border-radius:100px;margin-top:4px;">
+              Ver detalle del pedido
+            </a>
+          </td>
+        </tr>
+        <tr>
+          <td style="padding:24px 40px;border-top:1px solid #ECEAF4;text-align:center;">
+            <div style="font-size:11px;color:#9896A8;line-height:1.7;">
+              ¡Gracias por apoyar el arte de la Huasteca!<br/>
+              <strong style="color:#14121E;">NU★B Studio</strong> — Arte de la Huasteca Hidalguense
+            </div>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`,
+    };
+    await apiInstance.sendTransacEmail(sendSmtpEmail);
+    logger.info(`Email listo-recoger enviado a ${email} para pedido #${id_pedido}`);
+  } catch (err) {
+    logger.error(`sendListoRecogerEmail error: ${err.message}`);
+    throw err;
+  }
+};
+
+// =========================================================
 // LIMPIEZA AUTOMATICA DE CODIGOS EXPIRADOS
 // =========================================================
 export const cleanupExpiredCodes = async () => {

@@ -10,6 +10,7 @@ import {
 } from '../controllers/backupController.js';
 import { listarColeccionesAdmin, actualizarColeccionAdmin } from '../controllers/coleccionesController.js';
 import { listarClientes, toggleEstadoCliente } from '../controllers/clientesAdminController.js';
+import { getVentasAdmin, cambiarEstadoVenta } from '../controllers/ventasController.js';
 
 const router = Router();
 
@@ -28,5 +29,8 @@ router.put('/colecciones/:id',          actualizarColeccionAdmin);
 
 router.get('/clientes',                 listarClientes);
 router.put('/clientes/:id/estado',      toggleEstadoCliente);
+
+router.get('/ventas-admin',             getVentasAdmin);
+router.put('/ventas-admin/:id/estado',  cambiarEstadoVenta);
 
 export default router;

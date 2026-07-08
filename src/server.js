@@ -46,6 +46,7 @@ import { sanitizeInput } from "./middlewares/sanitize.middleware.js";
 import { preventSQLInjection } from "./middlewares/sql-injection.middleware.js";
 import logger from "./config/logger.js";
 import { iniciarCron } from "./controllers/backupController.js";
+import { autoCancelarPendientes } from "./controllers/ventasController.js";
 import vinculacionRoutes from './routes/vinculacion.js';
 
 // =========================================================
@@ -291,6 +292,15 @@ cron.schedule("0 0 * * *", async () => {
     logger.info("Sesiones limpiadas.");
   } catch (err) {
     logger.error(`Error limpieza sesiones: ${err.message}`);
+  }
+});
+
+cron.schedule("0 2 * * *", async () => {
+  logger.info("Auto-cancelación de pedidos pendientes vencidos...");
+  try {
+    await autoCancelarPendientes();
+  } catch (err) {
+    logger.error(`Error en auto-cancelación: ${err.message}`);
   }
 });
 

@@ -678,3 +678,49 @@ export const getMisColecciones = async (req, res) => {
     res.status(500).json({ message: 'Error interno del servidor' });
   }
 };
+
+// =========================================================
+// GET /api/artista-portal/mis-ventas
+// Ventas de las obras del artista autenticado (solo lectura)
+// =========================================================
+export const getMisVentas = async (req, res) => {
+  try {
+    const db = pools[req.user.rol] || pool;
+    const id_usuario = req.user.id_usuario;
+
+    // Obtener id_artista desde el usuario autenticado
+    const artistaRes = await db.query(
+      `SELECT id_artista FROM artistas WHERE id_usuario = $1`,
+      [id_usuario]
+    );
+    if (artistaRes.rows.length === 0)
+      return res.status(404).json({ success: false, message: 'Artista no encontrado' });
+
+    const id_artista = artistaRes.rows[0].id_artista;
+
+    const result = await db.query(`
+      SELECT
+        v.id_venta,
+        v.id_pedido,
+        o.titulo             AS obra_titulo,
+        o.imagen_principal,
+        u.nombre_completo    AS comprador_nombre,
+        v.cantidad,
+        v.precio_unitario,
+        v.total,
+        v.estado,
+        v.fecha_venta
+      FROM ventas v
+      JOIN obras    o ON o.id_obra    = v.id_obra
+      JOIN usuarios u ON u.id_usuario = v.id_cliente
+      WHERE v.id_artista = $1
+      ORDER BY v.fecha_venta DESC
+      LIMIT 200
+    `, [id_artista]);
+
+    return res.json({ success: true, data: result.rows });
+  } catch (err) {
+    logger.error(`getMisVentas error: ${err?.message || err}`);
+    return res.status(500).json({ success: false, message: 'Error al obtener ventas' });
+  }
+};
