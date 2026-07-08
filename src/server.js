@@ -31,7 +31,8 @@ import favoritosRoutes from "./routes/favoritosRoutes.js";
 import ventasRoutes from "./routes/ventasRoutes.js";
 import blogRoutes from "./routes/blogRoutes.js";
 import direccionesRoutes from './routes/direccionesRoutes.js';
-
+import alexaCarritoRoutes from './routes/alexaCarritoRoutes.js';
+import alexaVentasRoutes from './routes/alexaVentasRoutes.js';
 
 import { testConnection } from "./config/db.js";
 import {
@@ -46,6 +47,7 @@ import { sanitizeInput } from "./middlewares/sanitize.middleware.js";
 import { preventSQLInjection } from "./middlewares/sql-injection.middleware.js";
 import logger from "./config/logger.js";
 import { iniciarCron } from "./controllers/backupController.js";
+import vinculacionRoutes from './routes/vinculacion.js';
 
 // =========================================================
 // MANEJO DE ERRORES NO CAPTURADOS
@@ -201,6 +203,9 @@ app.use("/api/favoritos", favoritosRoutes);
 app.use("/api/ventas", ventasRoutes);
 app.use("/api/blog", blogRoutes);
 app.use('/api/direcciones', direccionesRoutes);
+app.use(vinculacionRoutes);
+app.use('/api/alexa/carrito', alexaCarritoRoutes);
+app.use('/api/alexa/ventas', alexaVentasRoutes);
 
 // ── Contacto público ──────────────────────────────────────
 app.post("/api/contacto", async (req, res) => {

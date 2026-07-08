@@ -7,7 +7,7 @@ import logger from '../config/logger.js';
 // =========================================================
 export const getCarrito = async (req, res) => {
   try {
-    const db         = pools[req.user.rol] || pool;
+    const db = pools[req.user.rol] || pool;
     const id_usuario = req.user.id_usuario;
 
     const result = await db.query(`
@@ -44,7 +44,7 @@ export const getCarrito = async (req, res) => {
 // =========================================================
 export const agregarAlCarrito = async (req, res) => {
   try {
-    const db         = pools[req.user.rol] || pool;
+    const db = pools[req.user.rol] || pool;
     const id_usuario = req.user.id_usuario;
     const { id_obra, cantidad = 1 } = req.body;
 
@@ -117,15 +117,121 @@ export const agregarAlCarrito = async (req, res) => {
 };
 
 // =========================================================
+// POST /api/alexa/carrito
+// Agrega una obra al carrito vía Alexa Skill (sin JWT).
+// Resuelve el usuario a partir del alexa_user_id vinculado.
+// =========================================================
+export const agregarAlCarritoAlexa = async (req, res) => {
+  try {
+    const { id_obra, cantidad = 1, alexa_user_id } = req.body;
+
+    if (!alexa_user_id) {
+      return res.status(400).json({ success: false, message: 'alexa_user_id es requerido', code: 'MISSING_ALEXA_ID' });
+    }
+    if (!id_obra) {
+      return res.status(400).json({ success: false, message: 'El id_obra es requerido' });
+    }
+
+    const cantidadNum = parseInt(cantidad);
+    if (isNaN(cantidadNum) || cantidadNum < 1) {
+      return res.status(400).json({ success: false, message: 'La cantidad debe ser al menos 1' });
+    }
+
+    // Resolver usuario a partir del alexa_user_id vinculado
+    const vinculacion = await pool.query(
+      `SELECT usuario_id FROM vinculaciones WHERE alexa_user_id = $1`,
+      [alexa_user_id]
+    );
+    if (vinculacion.rows.length === 0) {
+      return res.status(401).json({ success: false, message: 'Cuenta no vinculada', code: 'NOT_LINKED' });
+    }
+    const id_usuario = vinculacion.rows[0].usuario_id;
+
+    const db = pool; // usuarios de Alexa no traen rol de sesión; usamos el pool default
+
+    // Verificar que la obra existe, está publicada y activa
+    const obraRes = await db.query(
+      `SELECT id_obra, titulo FROM obras WHERE id_obra = $1 AND activa = TRUE AND estado = 'publicada' AND eliminada IS NOT TRUE LIMIT 1`,
+      [id_obra]
+    );
+    if (obraRes.rows.length === 0) {
+      return res.status(404).json({ success: false, message: 'Obra no disponible' });
+    }
+
+    // Verificar stock disponible
+    const invRes = await db.query(
+      `SELECT GREATEST(COALESCE(stock_actual, 0) - COALESCE(stock_reservado, 0), 0) AS stock_disponible
+       FROM inventario WHERE id_obra = $1`,
+      [id_obra]
+    );
+    if (invRes.rows.length > 0) {
+      const stockDisp = Number(invRes.rows[0].stock_disponible);
+      if (stockDisp <= 0) {
+        return res.status(400).json({ success: false, message: 'Esta obra está agotada' });
+      }
+      if (cantidadNum > stockDisp) {
+        return res.status(400).json({
+          success: false,
+          message: `Solo hay ${stockDisp} ${stockDisp === 1 ? 'pieza disponible' : 'piezas disponibles'}`,
+        });
+      }
+    }
+
+    // Upsert: si ya existe (mismo usuario+obra sin tamaño ni marco), actualiza cantidad
+    const existing = await db.query(
+      `SELECT id_carrito FROM carritos
+       WHERE id_usuario = $1 AND id_obra = $2
+         AND id_obra_tamaño IS NULL AND id_tipo_marco IS NULL`,
+      [id_usuario, id_obra]
+    );
+
+    let result;
+    if (existing.rows.length > 0) {
+      result = await db.query(
+        `UPDATE carritos SET cantidad = $1, activo = TRUE, fecha_agregado = NOW()
+         WHERE id_carrito = $2 RETURNING id_carrito`,
+        [cantidadNum, existing.rows[0].id_carrito]
+      );
+    } else {
+      result = await db.query(
+        `INSERT INTO carritos (id_usuario, id_obra, cantidad, activo, fecha_agregado)
+         VALUES ($1, $2, $3, TRUE, NOW()) RETURNING id_carrito`,
+        [id_usuario, id_obra, cantidadNum]
+      );
+    }
+
+    // Calcular total actual del carrito para devolvérselo a la skill
+    const totalRes = await db.query(
+      `SELECT COALESCE(SUM(c.cantidad * o.precio_base), 0) AS total
+       FROM carritos c
+       INNER JOIN obras o ON o.id_obra = c.id_obra
+       WHERE c.id_usuario = $1 AND c.activo = TRUE`,
+      [id_usuario]
+    );
+
+    logger.info(`Carrito (Alexa): usuario ${id_usuario} agregó obra ${id_obra} (x${cantidadNum})`);
+    res.json({
+      success: true,
+      message: 'Obra agregada al carrito',
+      id_carrito: result.rows[0].id_carrito,
+      total: totalRes.rows[0].total
+    });
+  } catch (error) {
+    logger.error(`Error en agregarAlCarritoAlexa: ${error.message}`);
+    res.status(500).json({ success: false, message: 'Error al agregar al carrito' });
+  }
+};
+
+// =========================================================
 // PUT /api/carrito/:id_carrito
 // Actualiza la cantidad de un item del carrito
 // =========================================================
 export const actualizarCantidad = async (req, res) => {
   try {
-    const db         = pools[req.user.rol] || pool;
+    const db = pools[req.user.rol] || pool;
     const id_usuario = req.user.id_usuario;
     const { id_carrito } = req.params;
-    const { cantidad }   = req.body;
+    const { cantidad } = req.body;
 
     const cantidadNum = parseInt(cantidad);
     if (isNaN(cantidadNum) || cantidadNum < 1) {
@@ -177,7 +283,7 @@ export const actualizarCantidad = async (req, res) => {
 // =========================================================
 export const eliminarDelCarrito = async (req, res) => {
   try {
-    const db         = pools[req.user.rol] || pool;
+    const db = pools[req.user.rol] || pool;
     const id_usuario = req.user.id_usuario;
     const { id_carrito } = req.params;
 
