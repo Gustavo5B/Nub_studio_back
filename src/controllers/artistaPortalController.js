@@ -299,6 +299,7 @@ export const getMisObras = async (req, res) => {
         o.dimensiones_unidad, o.anio_creacion, o.tecnica,
         o.permite_marco, o.con_certificado,
         o.id_coleccion, o.fecha_publicacion_programada,
+        o.motivo_desactivacion, o.fecha_desactivacion,
         c.nombre AS categoria,
         col.nombre AS nombre_coleccion,
         COALESCE(i.stock_actual, 0) AS stock_actual,

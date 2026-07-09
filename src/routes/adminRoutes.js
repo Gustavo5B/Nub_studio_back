@@ -8,7 +8,7 @@ import {
   obtenerConfigCron,
   guardarConfigCron,
 } from '../controllers/backupController.js';
-import { listarColeccionesAdmin, actualizarColeccionAdmin, obtenerColeccionAdmin } from '../controllers/coleccionesController.js';
+import { listarColeccionesAdmin, actualizarColeccionAdmin, obtenerColeccionAdmin, cambiarActivaColeccionAdmin } from '../controllers/coleccionesController.js';
 import { listarClientes, toggleEstadoCliente } from '../controllers/clientesAdminController.js';
 import { getVentasAdmin, cambiarEstadoVenta } from '../controllers/ventasController.js';
 
@@ -26,6 +26,7 @@ router.delete('/backups/:id',      eliminarBackup);
 
 router.get('/colecciones',              listarColeccionesAdmin);
 router.get('/colecciones/:id',          obtenerColeccionAdmin);
+router.put('/colecciones/:id/activa',   cambiarActivaColeccionAdmin);
 router.put('/colecciones/:id',          actualizarColeccionAdmin);
 
 router.get('/clientes',                 listarClientes);

@@ -144,18 +144,20 @@ export const getMisColecciones = async (req, res) => {
 
     const { id_artista } = artistaRes.rows[0];
 
+    // Incluye colecciones desactivadas por el admin (c.activa = FALSE)
+    // para que el artista sepa que existen pero no puede gestionarlas
     const result = await db.query(`
       SELECT
         c.id_coleccion, c.nombre, c.slug, c.historia,
-        c.imagen_portada, c.estado, c.destacada, c.fecha_creacion,
+        c.imagen_portada, c.estado, c.destacada, c.activa, c.fecha_creacion,
         c.fecha_publicacion_programada,
         COUNT(o.id_obra) AS total_obras
       FROM colecciones c
       LEFT JOIN obras o ON o.id_coleccion = c.id_coleccion
-        AND o.activa = TRUE AND o.eliminada = FALSE
-      WHERE c.id_artista = $1 AND c.activa = TRUE AND c.eliminada = FALSE
+        AND o.eliminada = FALSE
+      WHERE c.id_artista = $1 AND c.eliminada = FALSE
       GROUP BY c.id_coleccion
-      ORDER BY c.fecha_creacion DESC
+      ORDER BY c.activa DESC, c.fecha_creacion DESC
     `, [id_artista]);
 
     res.json({ success: true, data: result.rows });
@@ -497,6 +499,111 @@ export const actualizarColeccionAdmin = async (req, res) => {
   } catch (error) {
     logger.error(`Error en actualizarColeccionAdmin: ${error.message}`);
     res.status(500).json({ message: 'Error al actualizar la colección' });
+  }
+};
+
+// =========================================================
+// PUT /api/admin/colecciones/:id/activa
+// Desactivar / reactivar una colección (admin) con cascada:
+// - Desactivar: oculta la colección Y desactiva sus obras activas
+//   (marcadas con MOTIVO_CASCADA) y las saca de los carritos.
+// - Reactivar: reactiva SOLO las obras que desactivó la cascada
+//   (las que ya estaban inactivas por otra razón no se tocan).
+// Todo en una transacción.
+// =========================================================
+const MOTIVO_CASCADA = 'Colección desactivada por administración';
+
+export const cambiarActivaColeccionAdmin = async (req, res) => {
+  try {
+    const db = pools[req.user?.rol] || pool;
+    const id = Number.parseInt(req.params.id);
+    const { activa } = req.body;
+
+    if (Number.isNaN(id))
+      return res.status(400).json({ message: 'Id de colección no válido' });
+    if (typeof activa !== 'boolean')
+      return res.status(400).json({ message: 'El campo activa debe ser booleano' });
+
+    const colCheck = await db.query(
+      'SELECT id_coleccion, nombre, activa FROM colecciones WHERE id_coleccion = $1 AND eliminada = FALSE LIMIT 1',
+      [id]
+    );
+    if (colCheck.rows.length === 0)
+      return res.status(404).json({ message: 'Colección no encontrada' });
+    if (colCheck.rows[0].activa === activa)
+      return res.status(400).json({ message: `La colección ya está ${activa ? 'activa' : 'desactivada'}` });
+
+    const client = await db.connect();
+    let obrasAfectadas = 0;
+    let carritosAfectados = 0;
+    try {
+      await client.query('BEGIN');
+
+      await client.query(
+        'UPDATE colecciones SET activa = $1, fecha_actualizacion = NOW() WHERE id_coleccion = $2',
+        [activa, id]
+      );
+
+      if (activa) {
+        // Reactivar solo lo que la cascada desactivó y siga aprobado
+        const obrasRes = await client.query(`
+          UPDATE obras
+          SET activa = TRUE, visible = TRUE,
+              fecha_desactivacion = NULL, motivo_desactivacion = NULL,
+              fecha_actualizacion = NOW()
+          WHERE id_coleccion = $1
+            AND motivo_desactivacion = $2
+            AND estado = 'publicada'
+            AND (eliminada IS NULL OR eliminada = FALSE)
+          RETURNING id_obra
+        `, [id, MOTIVO_CASCADA]);
+        obrasAfectadas = obrasRes.rowCount;
+      } else {
+        // Desactivar en cascada las obras actualmente activas
+        const obrasRes = await client.query(`
+          UPDATE obras
+          SET activa = FALSE, visible = FALSE,
+              fecha_desactivacion = NOW(), motivo_desactivacion = $2,
+              fecha_actualizacion = NOW()
+          WHERE id_coleccion = $1
+            AND activa = TRUE
+            AND (eliminada IS NULL OR eliminada = FALSE)
+          RETURNING id_obra
+        `, [id, MOTIVO_CASCADA]);
+        obrasAfectadas = obrasRes.rowCount;
+
+        // Sacar esas obras de los carritos activos de los clientes
+        if (obrasAfectadas > 0) {
+          const ids = obrasRes.rows.map(r => r.id_obra);
+          const carritosRes = await client.query(
+            'UPDATE carritos SET activo = FALSE WHERE id_obra = ANY($1::int[]) AND activo = TRUE',
+            [ids]
+          );
+          carritosAfectados = carritosRes.rowCount;
+        }
+      }
+
+      await client.query('COMMIT');
+    } catch (txError) {
+      await client.query('ROLLBACK');
+      throw txError;
+    } finally {
+      client.release();
+    }
+
+    logger.info(
+      `Colección ${id} ${activa ? 'reactivada' : 'desactivada'} por admin ${req.user?.id_usuario} | obras: ${obrasAfectadas} | carritos: ${carritosAfectados}`
+    );
+    res.json({
+      success: true,
+      message: activa
+        ? `Colección reactivada. ${obrasAfectadas} obra${obrasAfectadas !== 1 ? 's' : ''} volvieron a publicarse.`
+        : `Colección desactivada. ${obrasAfectadas} obra${obrasAfectadas !== 1 ? 's' : ''} ocultada${obrasAfectadas !== 1 ? 's' : ''}${carritosAfectados > 0 ? ` y retirada${obrasAfectadas !== 1 ? 's' : ''} de ${carritosAfectados} carrito${carritosAfectados !== 1 ? 's' : ''}` : ''}.`,
+      data: { activa, obras_afectadas: obrasAfectadas, carritos_afectados: carritosAfectados },
+    });
+  } catch (error) {
+    logger.error(`Error en cambiarActivaColeccionAdmin: ${error.message}`);
+    res.status(500).json({ message: 'Error al cambiar la disponibilidad de la colección' });
   }
 };
 
