@@ -19,15 +19,39 @@ export const normalizarTexto = (texto) =>
     .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
     .replace(/[013457@$]/g, (c) => LEET_MAP[c]);
 
+// Quita sufijos comunes de género/número/diminutivo para comparar variantes:
+// tonto → tont (empata tonta, tontos, tontitas...). Exige raíz de 3+ letras
+// para no generar falsos positivos con palabras cortas.
+const raizPalabra = (palabra) => {
+  for (const suf of ['itas', 'itos', 'ita', 'ito', 'as', 'os', 'es', 'a', 'o']) {
+    if (palabra.endsWith(suf) && palabra.length - suf.length >= 3)
+      return palabra.slice(0, -suf.length);
+  }
+  return palabra;
+};
+
 // Función pura (testeable sin BD): detecta si el texto contiene alguna
-// palabra prohibida, incluso con acentos, leet o separadores (p.r.o.h.i.b.i.d.a)
+// palabra prohibida, incluso con acentos, leet, separadores (t.o.n.t.o)
+// o variantes de género/plural (tonto → tonta, tontos, tontitas).
+// Compara por palabras completas para no marcar palabras legítimas que
+// contienen una prohibida (p. ej. "computadora").
 export const textoContieneProhibidas = (texto, palabras) => {
   if (!palabras.length) return false;
   const normalizado = normalizarTexto(texto);
   const compacto = normalizado.replace(/[^a-z0-9n]/g, '');
+  const tokens = normalizado.split(/[^a-z0-9n]+/).filter(Boolean);
   return palabras.some((p) => {
-    const pNorm = normalizarTexto(p);
-    return normalizado.includes(pNorm) || compacto.includes(pNorm.replace(/[^a-z0-9n]/g, ''));
+    const pNorm = normalizarTexto(p).trim();
+    if (!pNorm) return false;
+    // Frases con espacios u otros separadores: coincidencia directa
+    if (/[^a-z0-9n]/.test(pNorm)) return normalizado.includes(pNorm);
+    // Palabra exacta o variante de género/plural/diminutivo
+    const pRaiz = raizPalabra(pNorm);
+    if (tokens.some((t) => t === pNorm || (pRaiz.length >= 3 && raizPalabra(t) === pRaiz)))
+      return true;
+    // Evasión con separadores: la palabra aparece al quitar separadores
+    // pero no dentro de una sola palabra real del texto
+    return compacto.includes(pNorm) && !tokens.some((t) => t.includes(pNorm));
   });
 };
 
@@ -814,8 +838,7 @@ export const eliminarComentario = async (req, res) => {
       UPDATE blog_comentarios SET
         eliminado = true,
         eliminado_por = $1,
-        fecha_eliminacion = NOW(),
-        fecha_actualizacion = NOW()
+        fecha_eliminacion = NOW()
       WHERE id_comentario = $2
     `, [id_usuario, id]);
 
