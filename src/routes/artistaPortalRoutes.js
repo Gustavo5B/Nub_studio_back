@@ -7,6 +7,7 @@ import {
   getObraById, actualizarObraArtista,
   getMisColecciones,
   subirObrasLote,
+  getMisVentas,
 } from '../controllers/artistaPortalController.js';
 import {
   getRedesSociales, agregarRedSocial,
@@ -73,6 +74,9 @@ router.get('/mis-colecciones', authenticateToken, requireRole('artista'), getMis
 // JSON `obras` se hace dentro del controlador, campo por campo)
 router.post('/colecciones/:id/obras-lote', authenticateToken, requireRole('artista'),
   upload.array('imagenes', 10), subirObrasLote);
+
+// ── Ventas del artista ─────────────────────────────────────────
+router.get('/mis-ventas', authenticateToken, requireRole('artista'), getMisVentas);
 
 // ── Obras ────────────────────────────────────────────────────
 router.get('/mis-obras',   authenticateToken, requireRole('artista'), getMisObras);

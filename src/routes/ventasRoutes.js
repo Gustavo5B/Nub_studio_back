@@ -1,5 +1,5 @@
 import express from 'express';
-import { getMisPedidos, checkout, webhookPago } from '../controllers/ventasController.js';
+import { getMisPedidos, checkout, webhookPago, cancelarMiPedido } from '../controllers/ventasController.js';
 import { authenticateToken, requireRole } from '../middlewares/authMiddleware.js';
 
 const router = express.Router();
@@ -11,7 +11,8 @@ router.post('/webhook', webhookPago);
 router.use(authenticateToken);
 router.use(requireRole('cliente'));
 
-router.get('/mis-pedidos', getMisPedidos);
-router.post('/checkout',   checkout);
+router.get('/mis-pedidos',              getMisPedidos);
+router.post('/checkout',                checkout);
+router.put('/mis-pedidos/:id/cancelar', cancelarMiPedido);
 
 export default router;

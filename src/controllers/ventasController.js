@@ -1,7 +1,7 @@
 import { pool, pools } from '../config/db.js';
 import logger from '../config/logger.js';
 import { preference, payment } from '../config/mercadopagoConfig.js';
-import { sendConfirmacionPedidoEmail } from '../services/emailService.js';
+import { sendConfirmacionPedidoEmail, sendEnvioEmail, sendListoRecogerEmail } from '../services/emailService.js';
 
 // =========================================================
 // GET /api/ventas/mis-pedidos
@@ -24,6 +24,7 @@ export const getMisPedidos = async (req, res) => {
         v.precio_unitario,
         v.subtotal,
         v.total,
+        v.numero_guia,
         o.titulo,
         o.slug,
         o.imagen_principal,
@@ -368,5 +369,219 @@ export const webhookPago = async (req, res) => {
   } catch (error) {
     logger.error(`Error en webhookPago: ${error.message}`);
     return res.sendStatus(500);
+  }
+};
+
+// =========================================================
+// PUT /api/ventas/mis-pedidos/:id/cancelar
+// Cliente cancela su propio pedido pendiente
+// =========================================================
+export const cancelarMiPedido = async (req, res) => {
+  try {
+    const db = pools[req.user?.rol] || pool;
+    const id_usuario = req.user?.id_usuario;
+    const id_pedido  = Number(req.params.id);
+
+    if (!id_pedido)
+      return res.status(400).json({ success: false, message: 'ID de pedido inválido' });
+
+    const pedidoRes = await db.query(
+      `SELECT id_pedido, estado FROM pedidos WHERE id_pedido = $1 AND id_cliente = $2`,
+      [id_pedido, id_usuario]
+    );
+    if (pedidoRes.rows.length === 0)
+      return res.status(404).json({ success: false, message: 'Pedido no encontrado' });
+    if (pedidoRes.rows[0].estado !== 'pendiente')
+      return res.status(400).json({ success: false, message: 'Solo se pueden cancelar pedidos pendientes de pago' });
+
+    const ventasRes = await db.query(
+      `SELECT id_obra, cantidad FROM ventas WHERE id_pedido = $1`,
+      [id_pedido]
+    );
+    for (const row of ventasRes.rows) {
+      await db.query(
+        `UPDATE inventario SET stock_reservado = GREATEST(COALESCE(stock_reservado, 0) - $1, 0) WHERE id_obra = $2`,
+        [row.cantidad, row.id_obra]
+      );
+    }
+    await db.query(`UPDATE pedidos SET estado = 'cancelado' WHERE id_pedido = $1`, [id_pedido]);
+    await db.query(`UPDATE ventas  SET estado = 'cancelado' WHERE id_pedido = $1`, [id_pedido]);
+
+    logger.info(`Pedido #${id_pedido} cancelado por cliente #${id_usuario}`);
+    return res.json({ success: true, message: 'Pedido cancelado correctamente' });
+  } catch (err) {
+    logger.error('cancelarMiPedido error:', err?.message || err);
+    return res.status(500).json({ success: false, message: 'Error al cancelar el pedido' });
+  }
+};
+
+// =========================================================
+// GET /api/admin/ventas-admin
+// Admin: listar ventas con paginación y filtros
+// =========================================================
+export const getVentasAdmin = async (req, res) => {
+  try {
+    const { page = 1, limit = 15, estado } = req.query;
+    const offset = (Number(page) - 1) * Number(limit);
+    const params = [];
+    let where = '';
+
+    if (estado) {
+      params.push(estado);
+      where = `WHERE v.estado = $${params.length}`;
+    }
+
+    const countRes = await pool.query(
+      `SELECT COUNT(*) FROM ventas v ${where}`,
+      params
+    );
+    const total      = Number(countRes.rows[0].count);
+    const totalPages = Math.ceil(total / Number(limit)) || 1;
+
+    const dataParams = [...params, Number(limit), offset];
+    const dataRes = await pool.query(`
+      SELECT
+        v.id_venta,
+        u.nombre_completo                                 AS cliente_nombre,
+        u.correo                                          AS cliente_correo,
+        o.titulo                                          AS obra_titulo,
+        o.imagen_principal,
+        COALESCE(a.nombre_artistico, a.nombre_completo)   AS artista_alias,
+        v.cantidad,
+        v.precio_unitario,
+        v.total,
+        v.estado,
+        v.fecha_venta                                     AS fecha_creacion,
+        v.id_pedido
+      FROM ventas v
+      JOIN usuarios u ON u.id_usuario = v.id_cliente
+      JOIN obras    o ON o.id_obra    = v.id_obra
+      JOIN artistas a ON a.id_artista = v.id_artista
+      ${where}
+      ORDER BY v.fecha_venta DESC
+      LIMIT $${dataParams.length - 1} OFFSET $${dataParams.length}
+    `, dataParams);
+
+    return res.json({
+      success: true,
+      data: dataRes.rows,
+      pagination: { total, page: Number(page), limit: Number(limit), totalPages },
+    });
+  } catch (err) {
+    logger.error('getVentasAdmin error:', err?.message || err);
+    return res.status(500).json({ success: false, message: 'Error al obtener ventas' });
+  }
+};
+
+// =========================================================
+// PUT /api/admin/ventas-admin/:id/estado
+// Admin: cambiar estado de una venta + número de guía opcional
+// =========================================================
+export const cambiarEstadoVenta = async (req, res) => {
+  try {
+    const id_venta = Number(req.params.id);
+    const { estado, numero_guia } = req.body;
+
+    const estadosValidos = ['pendiente', 'pagado', 'procesando', 'enviado', 'listo_recoger', 'entregado', 'cancelado'];
+    if (!estadosValidos.includes(estado))
+      return res.status(400).json({ success: false, message: 'Estado inválido' });
+
+    const ventaRes = await pool.query(
+      `SELECT v.*, u.correo, u.nombre_completo FROM ventas v
+       JOIN usuarios u ON u.id_usuario = v.id_cliente
+       WHERE v.id_venta = $1`,
+      [id_venta]
+    );
+    if (ventaRes.rows.length === 0)
+      return res.status(404).json({ success: false, message: 'Venta no encontrada' });
+
+    const venta = ventaRes.rows[0];
+
+    // Liberar stock reservado si se cancela desde estado activo
+    if (estado === 'cancelado' && ['pendiente', 'pagado', 'procesando'].includes(venta.estado)) {
+      await pool.query(
+        `UPDATE inventario SET stock_reservado = GREATEST(COALESCE(stock_reservado, 0) - $1, 0) WHERE id_obra = $2`,
+        [venta.cantidad, venta.id_obra]
+      );
+    }
+
+    // Actualizar estado — guardar número de guía si se envía
+    if (estado === 'enviado' && numero_guia?.trim()) {
+      await pool.query(
+        `UPDATE ventas SET estado = $1, numero_guia = $2 WHERE id_venta = $3`,
+        [estado, numero_guia.trim(), id_venta]
+      );
+    } else {
+      await pool.query(`UPDATE ventas SET estado = $1 WHERE id_venta = $2`, [estado, id_venta]);
+    }
+
+    // Sincronizar pedido cuando todas sus ventas tienen el mismo estado
+    const pedidoVentasRes = await pool.query(
+      `SELECT DISTINCT estado FROM ventas WHERE id_pedido = $1`,
+      [venta.id_pedido]
+    );
+    if (pedidoVentasRes.rows.length === 1) {
+      await pool.query(
+        `UPDATE pedidos SET estado = $1 WHERE id_pedido = $2`,
+        [pedidoVentasRes.rows[0].estado, venta.id_pedido]
+      );
+    }
+
+    // Email al cliente cuando se marca como enviado
+    if (estado === 'enviado') {
+      try {
+        await sendEnvioEmail(venta.correo, venta.nombre_completo, venta.id_pedido, numero_guia?.trim() || null);
+      } catch (emailErr) {
+        logger.error(`Error enviando email envio venta #${id_venta}: ${emailErr.message}`);
+      }
+    }
+
+    // Email al cliente cuando está listo para recoger
+    if (estado === 'listo_recoger') {
+      try {
+        await sendListoRecogerEmail(venta.correo, venta.nombre_completo, venta.id_pedido);
+      } catch (emailErr) {
+        logger.error(`Error enviando email listo_recoger venta #${id_venta}: ${emailErr.message}`);
+      }
+    }
+
+    logger.info(`Admin: venta #${id_venta} → ${estado}${numero_guia ? ` guía=${numero_guia}` : ''}`);
+    return res.json({ success: true, message: `Estado actualizado a "${estado}"` });
+  } catch (err) {
+    logger.error('cambiarEstadoVenta error:', err?.message || err);
+    return res.status(500).json({ success: false, message: 'Error al actualizar estado' });
+  }
+};
+
+// =========================================================
+// CRON INTERNO: Auto-cancelar pedidos pendientes > 3 días
+// =========================================================
+export const autoCancelarPendientes = async () => {
+  try {
+    const pendientesRes = await pool.query(
+      `SELECT id_pedido FROM pedidos WHERE estado = 'pendiente' AND fecha_pedido < NOW() - INTERVAL '3 days'`
+    );
+    if (pendientesRes.rows.length === 0) {
+      logger.info('Auto-cancelación: sin pedidos pendientes vencidos.');
+      return;
+    }
+    let cancelados = 0;
+    for (const { id_pedido } of pendientesRes.rows) {
+      const ventasRes = await pool.query(
+        `SELECT id_obra, cantidad FROM ventas WHERE id_pedido = $1`, [id_pedido]
+      );
+      for (const v of ventasRes.rows) {
+        await pool.query(
+          `UPDATE inventario SET stock_reservado = GREATEST(COALESCE(stock_reservado, 0) - $1, 0) WHERE id_obra = $2`,
+          [v.cantidad, v.id_obra]
+        );
+      }
+      await pool.query(`UPDATE pedidos SET estado = 'cancelado' WHERE id_pedido = $1`, [id_pedido]);
+      await pool.query(`UPDATE ventas  SET estado = 'cancelado' WHERE id_pedido = $1`, [id_pedido]);
+      cancelados++;
+    }
+    logger.info(`Auto-cancelación: ${cancelados} pedido(s) cancelado(s).`);
+  } catch (err) {
+    logger.error(`autoCancelarPendientes error: ${err.message}`);
   }
 };

@@ -47,6 +47,7 @@ import { sanitizeInput } from "./middlewares/sanitize.middleware.js";
 import { preventSQLInjection } from "./middlewares/sql-injection.middleware.js";
 import logger from "./config/logger.js";
 import { iniciarCron } from "./controllers/backupController.js";
+import { autoCancelarPendientes } from "./controllers/ventasController.js";
 import vinculacionRoutes from './routes/vinculacion.js';
 
 // =========================================================
@@ -301,6 +302,16 @@ cron.schedule("*/5 * * * *", async () => {
     await publicarProgramadas();
   } catch (err) {
     logger.error(`Error en publicación programada: ${err.message}`);
+  }
+});
+
+// Auto-cancelación de pedidos pendientes vencidos (diario 2 AM)
+cron.schedule("0 2 * * *", async () => {
+  logger.info("Auto-cancelación de pedidos pendientes vencidos...");
+  try {
+    await autoCancelarPendientes();
+  } catch (err) {
+    logger.error(`Error en auto-cancelación: ${err.message}`);
   }
 });
 
