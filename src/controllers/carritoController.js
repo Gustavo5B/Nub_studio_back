@@ -38,6 +38,10 @@ export const getCarrito = async (req, res) => {
   }
 };
 
+// =========================================================
+// GET /api/alexa/carrito
+// Obtiene los items del carrito del usuario vinculado (Alexa)
+// =========================================================
 export const getCarritoAlexa = async (req, res) => {
   try {
     const { alexa_user_id } = req.query;
@@ -79,20 +83,7 @@ export const getCarritoAlexa = async (req, res) => {
       ORDER BY c.fecha_agregado DESC
     `, [id_usuario]);
 
-    // Calcular subtotal, impuesto y total igual que espera el APL de la skill
-    const subtotal = result.rows.reduce(
-      (sum, item) => sum + (Number(item.precio_base) * item.cantidad), 0
-    );
-    const impuesto = Math.round(subtotal * 0.16 * 100) / 100;
-    const total = Math.round((subtotal + impuesto) * 100) / 100;
-
-    res.json({
-      success: true,
-      data: result.rows,
-      subtotal,
-      impuesto,
-      total
-    });
+    res.json({ success: true, data: result.rows });
   } catch (error) {
     logger.error(`Error en getCarritoAlexa: ${error.message}`);
     res.status(500).json({ success: false, message: 'Error al obtener el carrito' });
