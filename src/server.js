@@ -49,6 +49,9 @@ import logger from "./config/logger.js";
 import { iniciarCron } from "./controllers/backupController.js";
 import { autoCancelarPendientes } from "./controllers/ventasController.js";
 import vinculacionRoutes from './routes/vinculacion.js';
+import cuponesRoutes from './routes/cuponesRoutes.js';
+import tamañosPublicRoutes from './routes/tamañosPublicRoutes.js';
+import configuracionPublicRoutes from './routes/configuracionPublicRoutes.js';
 
 // =========================================================
 // MANEJO DE ERRORES NO CAPTURADOS
@@ -207,6 +210,9 @@ app.use('/api/direcciones', direccionesRoutes);
 app.use(vinculacionRoutes);
 app.use('/api/alexa/carrito', alexaCarritoRoutes);
 app.use('/api/alexa/ventas', alexaVentasRoutes);
+app.use('/api/cupones', cuponesRoutes);
+app.use('/api', tamañosPublicRoutes);
+app.use('/api', configuracionPublicRoutes);
 
 // ── Contacto público ──────────────────────────────────────
 app.post("/api/contacto", async (req, res) => {

@@ -19,6 +19,20 @@ export const getCarrito = async (req, res) => {
         o.slug,
         o.imagen_principal,
         o.precio_base,
+        o.precio_descuento,
+        o.descuento_expira,
+        CASE
+          WHEN o.precio_descuento IS NOT NULL
+            AND (o.descuento_expira IS NULL OR o.descuento_expira > NOW())
+          THEN o.precio_descuento
+          ELSE o.precio_base
+        END AS precio_efectivo,
+        CASE
+          WHEN o.precio_descuento IS NOT NULL
+            AND (o.descuento_expira IS NULL OR o.descuento_expira > NOW())
+          THEN TRUE
+          ELSE FALSE
+        END AS tiene_descuento,
         COALESCE(a.nombre_artistico, a.nombre_completo) AS artista_alias,
         COALESCE(inv.stock_actual - inv.stock_reservado, 0) AS stock_disponible
       FROM carritos c
