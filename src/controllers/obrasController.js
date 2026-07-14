@@ -12,7 +12,7 @@ export const listarObras = async (req, res) => {
     const {
       page = 1, limit = 12, categoria, artista,
       precio_min, precio_max, destacadas, ordenar = 'recientes',
-      solo_publicadas = 'true'
+      solo_publicadas = 'true', estado, buscar
     } = req.query;
 
     const offset = (page - 1) * limit;
@@ -23,8 +23,13 @@ export const listarObras = async (req, res) => {
     if (solo_publicadas === 'true') {
       whereConditions.push("o.estado = 'publicada'");
       whereConditions.push("o.activa = TRUE");
+    } else if (estado && ['pendiente', 'publicada', 'rechazada'].includes(estado)) {
+      whereConditions.push(`o.estado = $${paramCount}`);
+      queryParams.push(estado);
+      paramCount++;
     }
 
+    if (buscar) { whereConditions.push(`(LOWER(o.titulo) LIKE $${paramCount} OR LOWER(a.nombre_completo) LIKE $${paramCount} OR LOWER(a.nombre_artistico) LIKE $${paramCount})`); queryParams.push(`%${buscar.toLowerCase()}%`); paramCount++; }
     if (categoria) { whereConditions.push(`o.id_categoria = $${paramCount}`); queryParams.push(categoria); paramCount++; }
     if (artista) { whereConditions.push(`o.id_artista = $${paramCount}`); queryParams.push(artista); paramCount++; }
     if (destacadas === 'true') { whereConditions.push('o.destacada = TRUE'); }
@@ -62,12 +67,18 @@ export const listarObras = async (req, res) => {
       SELECT
         o.id_obra, o.titulo, o.descripcion, o.slug, o.imagen_principal,
         o.anio_creacion, o.tecnica, o.destacada, o.vistas, o.fecha_creacion,
-        o.precio_base, o.estado, o.activa,
+        o.precio_base, o.precio_descuento, o.descuento_expira, o.estado, o.activa,
         a.id_artista, a.nombre_completo AS artista_nombre, a.nombre_artistico AS artista_alias,
         c.id_categoria, c.nombre AS categoria_nombre, c.slug AS categoria_slug,
         COALESCE(MIN(ot.precio_base), o.precio_base) AS precio_minimo,
         COALESCE(MAX(ot.precio_base), o.precio_base) AS precio_maximo,
-        COUNT(ot.id) FILTER (WHERE ot.activo = TRUE) AS total_tamaños
+        COUNT(ot.id) FILTER (WHERE ot.activo = TRUE) AS total_tamaños,
+        CASE
+          WHEN o.precio_descuento IS NOT NULL
+            AND (o.descuento_expira IS NULL OR o.descuento_expira > NOW())
+          THEN o.precio_descuento
+          ELSE NULL
+        END AS precio_oferta
       FROM obras o
       INNER JOIN artistas a ON o.id_artista = a.id_artista
       INNER JOIN categorias c ON o.id_categoria = c.id_categoria
@@ -76,7 +87,7 @@ export const listarObras = async (req, res) => {
       GROUP BY
         o.id_obra, o.titulo, o.descripcion, o.slug, o.imagen_principal,
         o.anio_creacion, o.tecnica, o.destacada, o.vistas, o.fecha_creacion,
-        o.precio_base, o.estado, o.activa,
+        o.precio_base, o.precio_descuento, o.descuento_expira, o.estado, o.activa,
         a.id_artista, a.nombre_completo, a.nombre_artistico,
         c.id_categoria, c.nombre, c.slug
       ORDER BY ${orderBy}
@@ -772,5 +783,46 @@ export const cambiarEstadoObra = async (req, res) => {
   } catch (error) {
     logger.error(`Error al cambiar estado obra: ${error.message} | ${error.stack}`);
     res.status(500).json({ success: false, message: "Error al cambiar estado" });
+  }
+};
+
+// =========================================================
+// ADMIN — SET DESCUENTO EN OBRA (cualquier obra)
+// =========================================================
+export const setDescuentoObraAdmin = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { precio_descuento, descuento_expira } = req.body;
+
+    const obraRes = await pool.query(
+      "SELECT id_obra, precio_base FROM obras WHERE id_obra = $1 AND eliminada IS NOT TRUE",
+      [id]
+    );
+    if (!obraRes.rows.length)
+      return res.status(404).json({ success: false, message: "Obra no encontrada" });
+
+    const { precio_base } = obraRes.rows[0];
+
+    if (precio_descuento !== null && precio_descuento !== undefined && precio_descuento !== "") {
+      const pd = Number(precio_descuento);
+      if (pd <= 0)
+        return res.status(400).json({ success: false, message: "El precio con descuento debe ser mayor a cero" });
+      if (pd >= Number(precio_base))
+        return res.status(400).json({ success: false, message: "El precio con descuento debe ser menor al precio base" });
+    }
+
+    const pd = precio_descuento !== "" && precio_descuento !== null && precio_descuento !== undefined
+      ? Number(precio_descuento) : null;
+    const exp = descuento_expira || null;
+
+    await pool.query(
+      "UPDATE obras SET precio_descuento = $1, descuento_expira = $2 WHERE id_obra = $3",
+      [pd, exp, id]
+    );
+
+    res.json({ success: true, message: pd ? "Descuento aplicado" : "Descuento eliminado" });
+  } catch (err) {
+    logger.error(`setDescuentoObraAdmin: ${err.message}`);
+    res.status(500).json({ success: false, message: "Error al actualizar descuento" });
   }
 };

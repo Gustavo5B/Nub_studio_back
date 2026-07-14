@@ -8,7 +8,15 @@ import {
   getMisColecciones,
   subirObrasLote,
   getMisVentas,
+  setDescuentoObra,
 } from '../controllers/artistaPortalController.js';
+import {
+  getTamañosDeObra, asignarTamañoObra,
+  actualizarTamañoObra, eliminarTamañoObra,
+} from '../controllers/tamañosController.js';
+import {
+  getObrasMarcos, asignarMarcoObra, eliminarMarcoObra,
+} from '../controllers/marcosController.js';
 import {
   getRedesSociales, agregarRedSocial,
   actualizarRedSocial, eliminarRedSocial,
@@ -91,5 +99,19 @@ router.get('/redes-sociales',        authenticateToken, requireRole('artista'), 
 router.post('/redes-sociales',       authenticateToken, requireRole('artista'), agregarRedSocial);
 router.put('/redes-sociales/:id',    authenticateToken, requireRole('artista'), actualizarRedSocial);
 router.delete('/redes-sociales/:id', authenticateToken, requireRole('artista'), eliminarRedSocial);
+
+// Descuentos en obras propias
+router.patch('/obras/:id/descuento', authenticateToken, requireRole('artista'), setDescuentoObra);
+
+// Tamaños de obra (artista gestiona sus propias obras)
+router.get(   '/obra/:id_obra/tamanos',     authenticateToken, requireRole('artista'), getTamañosDeObra);
+router.post(  '/obra/:id_obra/tamanos',     authenticateToken, requireRole('artista'), asignarTamañoObra);
+router.put(   '/obra-tamano/:id',           authenticateToken, requireRole('artista'), actualizarTamañoObra);
+router.delete('/obra-tamano/:id',           authenticateToken, requireRole('artista'), eliminarTamañoObra);
+
+// Marcos por obra+tamaño
+router.get(   '/obra-tamano/:id_obra_tamano/marcos', authenticateToken, requireRole('artista'), getObrasMarcos);
+router.post(  '/obra-tamano/:id_obra_tamano/marcos', authenticateToken, requireRole('artista'), asignarMarcoObra);
+router.delete('/obra-marco/:id',                     authenticateToken, requireRole('artista'), eliminarMarcoObra);
 
 export default router;

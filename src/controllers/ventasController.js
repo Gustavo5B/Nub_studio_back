@@ -101,16 +101,16 @@ export const getMisPedidosAlexa = async (req, res) => {
 export const checkout = async (req, res) => {
   const db = pools[req.user?.rol] || pool;
   const id_cliente = req.user.id_usuario;
-  const { id_direccion_envio } = req.body;
 
   try {
     // ids_carrito opcionales: si se mandan, solo procesa esos items
-    const { id_direccion_envio, ids_carrito } = req.body;
+    const { id_direccion_envio, ids_carrito, codigo_cupon, empaque_reforzado, precio_empaque } = req.body;
     const filtroIds = Array.isArray(ids_carrito) && ids_carrito.length > 0
       ? ids_carrito.map(Number).filter(Boolean)
       : null;
+    const costoEmpaque = empaque_reforzado ? Math.max(0, Number(precio_empaque) || 0) : 0;
 
-    // 1. Obtener items del carrito activo con datos de obra
+    // 1. Obtener items del carrito activo con datos de obra (incluyendo precio efectivo)
     let carritoQuery = `
       SELECT
         c.id_carrito,
@@ -120,6 +120,12 @@ export const checkout = async (req, res) => {
         o.titulo,
         o.precio_base,
         o.imagen_principal,
+        CASE
+          WHEN o.precio_descuento IS NOT NULL
+            AND (o.descuento_expira IS NULL OR o.descuento_expira > NOW())
+          THEN o.precio_descuento
+          ELSE o.precio_base
+        END AS precio_efectivo,
         GREATEST(COALESCE(inv.stock_actual, 0) - COALESCE(inv.stock_reservado, 0), 0) AS stock_disponible
       FROM carritos c
       INNER JOIN obras o ON o.id_obra = c.id_obra
@@ -149,24 +155,65 @@ export const checkout = async (req, res) => {
       }
     }
 
-    // 3. Calcular total del pedido
-    const totalPedido = carritoRes.rows.reduce((sum, item) => {
-      return sum + Number(item.precio_base) * item.cantidad;
+    // 3. Calcular total del pedido usando precio_efectivo
+    const subtotalBruto = carritoRes.rows.reduce((sum, item) => {
+      return sum + Number(item.precio_efectivo) * item.cantidad;
     }, 0);
+
+    // 3b. Validar y aplicar cupón si se envió
+    let descuentoCupon = 0;
+    let idCupon = null;
+    if (codigo_cupon?.trim()) {
+      const cuponRes = await pool.query(
+        `SELECT * FROM cupones
+         WHERE codigo = UPPER($1) AND activo = TRUE
+           AND (fecha_inicio IS NULL OR fecha_inicio <= NOW())
+           AND (fecha_fin    IS NULL OR fecha_fin    >  NOW())
+           AND (usos_max     IS NULL OR usos_actuales < usos_max)`,
+        [codigo_cupon.trim()]
+      );
+      if (cuponRes.rows.length > 0) {
+        const cupon = cuponRes.rows[0];
+        const yaUsado = await pool.query(
+          "SELECT id FROM cupones_usados WHERE id_cupon=$1 AND id_usuario=$2",
+          [cupon.id_cupon, id_cliente]
+        );
+        if (yaUsado.rows.length === 0 && subtotalBruto >= Number(cupon.monto_minimo)) {
+          descuentoCupon = cupon.tipo === 'porcentaje'
+            ? (subtotalBruto * Number(cupon.valor)) / 100
+            : Math.min(Number(cupon.valor), subtotalBruto);
+          descuentoCupon = Math.round(descuentoCupon * 100) / 100;
+          idCupon = cupon.id_cupon;
+        }
+      }
+    }
+    const totalPedido = Math.max(0, subtotalBruto - descuentoCupon + costoEmpaque);
 
     // 4. Crear registro en tabla pedidos
     const pedidoRes = await db.query(`
-      INSERT INTO pedidos (id_cliente, id_direccion_envio, estado, total, fecha_pedido)
-      VALUES ($1, $2, 'pendiente', $3, NOW())
+      INSERT INTO pedidos (id_cliente, id_direccion_envio, estado, total, id_cupon, descuento_cupon, fecha_pedido)
+      VALUES ($1, $2, 'pendiente', $3, $4, $5, NOW())
       RETURNING id_pedido
-    `, [id_cliente, id_direccion_envio || null, totalPedido]);
+    `, [id_cliente, id_direccion_envio || null, totalPedido, idCupon, descuentoCupon]);
 
     const id_pedido = pedidoRes.rows[0].id_pedido;
+
+    // 4b. Registrar uso del cupón
+    if (idCupon) {
+      await pool.query(
+        "INSERT INTO cupones_usados (id_cupon, id_usuario, id_pedido, descuento_aplicado) VALUES ($1,$2,$3,$4)",
+        [idCupon, id_cliente, id_pedido, descuentoCupon]
+      );
+      await pool.query(
+        "UPDATE cupones SET usos_actuales = usos_actuales + 1 WHERE id_cupon = $1",
+        [idCupon]
+      );
+    }
 
     // 5. Crear registros de venta vinculados al pedido
     const ventasIds = [];
     for (const item of carritoRes.rows) {
-      const precio_unitario = Number(item.precio_base);
+      const precio_unitario = Number(item.precio_efectivo);
       const subtotal = precio_unitario * item.cantidad;
 
       const ventaRes = await db.query(`
@@ -196,14 +243,23 @@ export const checkout = async (req, res) => {
     `, [id_cliente, idsCarritoProcesados]);
 
     // 7. Crear preferencia en MercadoPago
-    const items = carritoRes.rows.map(item => ({
+    const mpItems = carritoRes.rows.map(item => ({
       id: String(item.id_obra),
       title: item.titulo,
       quantity: item.cantidad,
-      unit_price: Number(item.precio_base),
+      unit_price: Number(item.precio_efectivo),
       currency_id: 'MXN',
       picture_url: item.imagen_principal || undefined,
     }));
+    // Cupón: distribuimos el descuento reduciendo el precio unitario del primer ítem
+    if (descuentoCupon > 0 && mpItems.length > 0) {
+      mpItems[0] = { ...mpItems[0], unit_price: Math.max(0.01, mpItems[0].unit_price - descuentoCupon / mpItems[0].quantity) };
+    }
+    // Empaque reforzado: ítem adicional en MP
+    if (costoEmpaque > 0) {
+      mpItems.push({ id: 'empaque_reforzado', title: 'Empaque reforzado', quantity: 1, unit_price: costoEmpaque, currency_id: 'MXN' });
+    }
+    const items = mpItems;
 
     const isProd = process.env.NODE_ENV === 'production';
     const frontendUrl = process.env.FRONTEND_URL || 'http://localhost:5173';
