@@ -53,6 +53,58 @@ export const getCarrito = async (req, res) => {
 };
 
 // =========================================================
+// GET /api/alexa/carrito
+// Obtiene los items del carrito del usuario vinculado (Alexa)
+// =========================================================
+export const getCarritoAlexa = async (req, res) => {
+  try {
+    const { alexa_user_id } = req.query;
+
+    if (!alexa_user_id) {
+      return res.status(400).json({ success: false, message: 'alexa_user_id es requerido', code: 'MISSING_ALEXA_ID' });
+    }
+
+    // Resolver usuario a partir del alexa_user_id vinculado
+    const vinculacion = await pool.query(
+      `SELECT usuario_id FROM vinculaciones WHERE alexa_user_id = $1`,
+      [alexa_user_id]
+    );
+    if (vinculacion.rows.length === 0) {
+      return res.status(401).json({ success: false, message: 'Cuenta no vinculada', code: 'NOT_LINKED' });
+    }
+    const id_usuario = vinculacion.rows[0].usuario_id;
+
+    const db = pool; // usuarios de Alexa no traen rol de sesión; usamos el pool default
+
+    const result = await db.query(`
+      SELECT
+        c.id_carrito,
+        c.id_obra,
+        c.cantidad,
+        o.titulo,
+        o.slug,
+        o.imagen_principal,
+        o.precio_base,
+        COALESCE(a.nombre_artistico, a.nombre_completo) AS artista_alias,
+        COALESCE(inv.stock_actual - inv.stock_reservado, 0) AS stock_disponible
+      FROM carritos c
+      INNER JOIN obras o  ON o.id_obra     = c.id_obra
+      INNER JOIN artistas a ON a.id_artista = o.id_artista
+      LEFT  JOIN inventario inv ON inv.id_obra = c.id_obra
+      WHERE c.id_usuario = $1
+        AND c.activo      = TRUE
+        AND o.eliminada  IS NOT TRUE
+      ORDER BY c.fecha_agregado DESC
+    `, [id_usuario]);
+
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    logger.error(`Error en getCarritoAlexa: ${error.message}`);
+    res.status(500).json({ success: false, message: 'Error al obtener el carrito' });
+  }
+};
+
+// =========================================================
 // POST /api/carrito
 // Agrega una obra al carrito (o suma cantidad si ya existe)
 // =========================================================
@@ -325,7 +377,7 @@ export const eliminarDelCarrito = async (req, res) => {
 // =========================================================
 export const agregarColeccionAlCarrito = async (req, res) => {
   try {
-    const db         = pools[req.user.rol] || pool;
+    const db = pools[req.user.rol] || pool;
     const id_usuario = req.user.id_usuario;
     const idColeccion = Number.parseInt(req.body.id_coleccion);
 
@@ -358,7 +410,7 @@ export const agregarColeccionAlCarrito = async (req, res) => {
     }
 
     let agregadas = 0;
-    let omitidas  = 0;
+    let omitidas = 0;
 
     for (const obra of obrasRes.rows) {
       if (Number(obra.stock_disponible) <= 0) { omitidas++; continue; }
