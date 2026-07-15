@@ -927,3 +927,48 @@ export const getMisVentas = async (req, res) => {
     return res.status(500).json({ success: false, message: 'Error al obtener ventas' });
   }
 };
+
+// =========================================================
+// ARTISTA — SET DESCUENTO EN SUS PROPIAS OBRAS
+// =========================================================
+export const setDescuentoObra = async (req, res) => {
+  try {
+    const db = pools[req.user?.rol] || pool;
+    const { id } = req.params;
+    const { precio_descuento, descuento_expira } = req.body;
+
+    // Verificar que la obra pertenece al artista autenticado
+    const obraRes = await db.query(
+      `SELECT o.id_obra, o.precio_base FROM obras o
+       INNER JOIN artistas a ON a.id_artista = o.id_artista
+       WHERE o.id_obra = $1 AND a.id_usuario = $2 AND o.eliminada IS NOT TRUE`,
+      [id, req.user.id_usuario]
+    );
+    if (!obraRes.rows.length)
+      return res.status(403).json({ success: false, message: "Obra no encontrada o sin permisos" });
+
+    const { precio_base } = obraRes.rows[0];
+
+    if (precio_descuento !== null && precio_descuento !== undefined && precio_descuento !== "") {
+      const pd = Number(precio_descuento);
+      if (pd <= 0)
+        return res.status(400).json({ success: false, message: "El precio con descuento debe ser mayor a cero" });
+      if (pd >= Number(precio_base))
+        return res.status(400).json({ success: false, message: "El precio con descuento debe ser menor al precio base" });
+    }
+
+    const pd = precio_descuento !== "" && precio_descuento !== null && precio_descuento !== undefined
+      ? Number(precio_descuento) : null;
+    const exp = descuento_expira || null;
+
+    await db.query(
+      "UPDATE obras SET precio_descuento = $1, descuento_expira = $2 WHERE id_obra = $3",
+      [pd, exp, id]
+    );
+
+    res.json({ success: true, message: pd ? "Descuento aplicado" : "Descuento eliminado" });
+  } catch (err) {
+    logger.error(`setDescuentoObra artista: ${err.message}`);
+    res.status(500).json({ success: false, message: "Error al actualizar descuento" });
+  }
+};
