@@ -97,7 +97,7 @@ export const getDetalleArtista = async (req, res) => {
       INNER JOIN obras o ON o.id_obra = v.id_obra
       WHERE v.id_artista=$1
         AND v.id_liquidacion IS NULL
-        AND v.estado IN ('entregado','completado')
+        AND v.estado = 'entregado'
       ORDER BY v.fecha_venta DESC
     `, [id]);
 
