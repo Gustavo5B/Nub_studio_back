@@ -24,6 +24,7 @@ export const getMiPerfil = async (req, res) => {
         a.porcentaje_comision, a.estado, a.fecha_registro,
         a.acepta_envios, a.solo_entrega_personal,
         a.politica_envios, a.politica_devoluciones, a.matricula,
+        a.clabe, a.banco,
         u.correo AS email_usuario
       FROM artistas a
       JOIN usuarios u ON u.id_usuario = a.id_usuario
@@ -81,6 +82,7 @@ export const actualizarMiPerfil = async (req, res) => {
       id_categoria_principal, dias_preparacion_default,
       acepta_envios, solo_entrega_personal,
       politica_envios, politica_devoluciones,
+      clabe, banco,
     } = req.body;
 
     const uploadToCloudinary = async (fileBuffer) => {
@@ -123,6 +125,8 @@ export const actualizarMiPerfil = async (req, res) => {
         politica_devoluciones   = COALESCE($13, politica_devoluciones),
         foto_portada            = COALESCE($14, foto_portada),
         foto_logo               = COALESCE($15, foto_logo),
+        clabe                   = COALESCE($17, clabe),
+        banco                   = COALESCE($18, banco),
         fecha_actualizacion     = NOW()
       WHERE id_artista = $16
     `, [
@@ -142,6 +146,8 @@ export const actualizarMiPerfil = async (req, res) => {
       foto_portada,
       foto_logo,
       id_artista,
+      clabe?.trim()           || null,
+      banco?.trim()           || null,
     ]);
 
     logger.info(`Perfil actualizado: artista ${id_artista} usuario ${usuarioId}`);

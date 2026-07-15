@@ -16,6 +16,8 @@ export const getPendientes = async (req, res) => {
         COALESCE(a.nombre_artistico, a.nombre_completo) AS nombre,
         a.correo,
         a.porcentaje_comision,
+        a.clabe,
+        a.banco,
         COUNT(v.id_venta)                          AS ventas_pendientes,
         COALESCE(SUM(v.monto_artista), 0)          AS monto_pendiente,
         MIN(v.fecha_venta)                          AS venta_mas_antigua
