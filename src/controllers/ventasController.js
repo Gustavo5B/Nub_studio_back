@@ -510,11 +510,15 @@ export const getVentasAdmin = async (req, res) => {
         v.total,
         v.estado,
         v.fecha_venta                                     AS fecha_creacion,
-        v.id_pedido
+        v.id_pedido,
+        p.estado                                          AS estado_pedido,
+        p.descuento_cupon,
+        p.total                                           AS total_pedido
       FROM ventas v
-      JOIN usuarios u ON u.id_usuario = v.id_cliente
-      JOIN obras    o ON o.id_obra    = v.id_obra
-      JOIN artistas a ON a.id_artista = v.id_artista
+      JOIN usuarios u ON u.id_usuario  = v.id_cliente
+      JOIN obras    o ON o.id_obra     = v.id_obra
+      JOIN artistas a ON a.id_artista  = v.id_artista
+      JOIN pedidos  p ON p.id_pedido   = v.id_pedido
       ${where}
       ORDER BY v.fecha_venta DESC
       LIMIT $${dataParams.length - 1} OFFSET $${dataParams.length}
