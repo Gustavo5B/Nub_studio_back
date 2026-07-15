@@ -15,11 +15,13 @@ export const getMisPedidos = async (req, res) => {
     const result = await db.query(`
       SELECT
         p.id_pedido,
-        p.estado           AS estado_pedido,
-        p.total            AS total_pedido,
+        p.estado              AS estado_pedido,
+        p.total               AS total_pedido,
         p.fecha_pedido,
+        p.descuento_cupon,
+        c.codigo              AS codigo_cupon,
         v.id_venta,
-        v.estado           AS estado_venta,
+        v.estado              AS estado_venta,
         v.cantidad,
         v.precio_unitario,
         v.subtotal,
@@ -33,6 +35,7 @@ export const getMisPedidos = async (req, res) => {
       INNER JOIN ventas   v ON v.id_pedido  = p.id_pedido
       INNER JOIN obras    o ON o.id_obra    = v.id_obra
       INNER JOIN artistas a ON a.id_artista = v.id_artista
+      LEFT  JOIN cupones  c ON c.id_cupon   = p.id_cupon
       WHERE  p.id_cliente = $1
       ORDER BY p.fecha_pedido DESC, v.id_venta ASC
       LIMIT  200
