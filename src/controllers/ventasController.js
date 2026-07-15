@@ -123,6 +123,7 @@ export const checkout = async (req, res) => {
         o.titulo,
         o.precio_base,
         o.imagen_principal,
+        COALESCE(a.porcentaje_comision, 70) AS porcentaje_comision,
         CASE
           WHEN o.precio_descuento IS NOT NULL
             AND (o.descuento_expira IS NULL OR o.descuento_expira > NOW())
@@ -132,6 +133,7 @@ export const checkout = async (req, res) => {
         GREATEST(COALESCE(inv.stock_actual, 0) - COALESCE(inv.stock_reservado, 0), 0) AS stock_disponible
       FROM carritos c
       INNER JOIN obras o ON o.id_obra = c.id_obra
+      LEFT  JOIN artistas a ON a.id_artista = o.id_artista
       LEFT  JOIN inventario inv ON inv.id_obra = c.id_obra
       WHERE c.id_usuario = $1 AND c.activo = true AND o.eliminada IS NOT TRUE
     `;
@@ -218,14 +220,16 @@ export const checkout = async (req, res) => {
       const precio_unitario = Number(item.precio_efectivo);
       const subtotal = precio_unitario * item.cantidad;
 
+      const monto_artista = Math.round(subtotal * (Number(item.porcentaje_comision) / 100) * 100) / 100;
+
       const ventaRes = await db.query(`
         INSERT INTO ventas
           (id_cliente, id_obra, id_artista, cantidad, precio_unitario, subtotal, total,
-           estado, fecha_venta, id_direccion_envio, id_pedido)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, 'pendiente', NOW(), $8, $9)
+           monto_artista, estado, fecha_venta, id_direccion_envio, id_pedido)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, 'pendiente', NOW(), $9, $10)
         RETURNING id_venta
       `, [id_cliente, item.id_obra, item.id_artista, item.cantidad,
-        precio_unitario, subtotal, subtotal, id_direccion_envio || null, id_pedido]);
+        precio_unitario, subtotal, subtotal, monto_artista, id_direccion_envio || null, id_pedido]);
 
       ventasIds.push(ventaRes.rows[0].id_venta);
 
