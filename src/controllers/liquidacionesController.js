@@ -22,7 +22,7 @@ export const getPendientes = async (req, res) => {
       FROM artistas a
       INNER JOIN ventas v ON v.id_artista = a.id_artista
       WHERE v.id_liquidacion IS NULL
-        AND v.estado IN ('entregado', 'completado')
+        AND v.estado = 'entregado'
         AND v.monto_artista IS NOT NULL
       GROUP BY a.id_artista
       ORDER BY monto_pendiente DESC
@@ -145,7 +145,7 @@ export const crearLiquidacion = async (req, res) => {
       SELECT id_venta, monto_artista FROM ventas
       WHERE id_artista=$1
         AND id_liquidacion IS NULL
-        AND estado IN ('entregado','completado')
+        AND estado = 'entregado'
         AND monto_artista IS NOT NULL
     `, [id_artista]);
 
