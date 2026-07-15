@@ -167,9 +167,8 @@ export const checkout = async (req, res) => {
       const cuponRes = await pool.query(
         `SELECT * FROM cupones
          WHERE codigo = UPPER($1) AND activo = TRUE
-           AND (fecha_inicio IS NULL OR fecha_inicio <= NOW())
-           AND (fecha_fin    IS NULL OR fecha_fin    >  NOW())
-           AND (usos_max     IS NULL OR usos_actuales < usos_max)`,
+           AND (fecha_fin IS NULL OR fecha_fin > NOW())
+           AND (usos_max  IS NULL OR usos_actuales < usos_max)`,
         [codigo_cupon.trim()]
       );
       if (cuponRes.rows.length > 0) {

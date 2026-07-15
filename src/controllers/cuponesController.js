@@ -103,9 +103,8 @@ export const validarCupon = async (req, res) => {
     const result = await pool.query(
       `SELECT * FROM cupones
        WHERE codigo = UPPER($1) AND activo = TRUE
-         AND (fecha_inicio IS NULL OR fecha_inicio <= NOW())
-         AND (fecha_fin    IS NULL OR fecha_fin    >  NOW())
-         AND (usos_max     IS NULL OR usos_actuales < usos_max)`,
+         AND (fecha_fin IS NULL OR fecha_fin > NOW())
+         AND (usos_max  IS NULL OR usos_actuales < usos_max)`,
       [codigo.trim()]
     );
 
@@ -165,9 +164,8 @@ export const listarCuponesPublicos = async (req, res) => {
       SELECT codigo, descripcion, tipo, valor, monto_minimo, fecha_fin
       FROM cupones
       WHERE activo = TRUE
-        AND (fecha_inicio IS NULL OR fecha_inicio <= NOW())
-        AND (fecha_fin    IS NULL OR fecha_fin    >  NOW())
-        AND (usos_max     IS NULL OR usos_actuales < usos_max)
+        AND (fecha_fin IS NULL OR fecha_fin > NOW())
+        AND (usos_max  IS NULL OR usos_actuales < usos_max)
       ORDER BY creado_en DESC
       LIMIT 10
     `);
