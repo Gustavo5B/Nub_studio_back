@@ -160,15 +160,20 @@ export const validarCupon = async (req, res) => {
 
 export const listarCuponesPublicos = async (req, res) => {
   try {
+    const id_usuario = req.user?.id_usuario ?? null;
     const result = await pool.query(`
-      SELECT codigo, descripcion, tipo, valor, monto_minimo, fecha_fin
-      FROM cupones
-      WHERE activo = TRUE
-        AND (fecha_fin IS NULL OR fecha_fin > NOW())
-        AND (usos_max  IS NULL OR usos_actuales < usos_max)
-      ORDER BY creado_en DESC
+      SELECT c.codigo, c.descripcion, c.tipo, c.valor, c.monto_minimo, c.fecha_fin
+      FROM cupones c
+      WHERE c.activo = TRUE
+        AND (c.fecha_fin IS NULL OR c.fecha_fin > NOW())
+        AND (c.usos_max  IS NULL OR c.usos_actuales < c.usos_max)
+        AND ($1::int IS NULL OR NOT EXISTS (
+          SELECT 1 FROM cupones_usados cu
+          WHERE cu.id_cupon = c.id_cupon AND cu.id_usuario = $1
+        ))
+      ORDER BY c.creado_en DESC
       LIMIT 10
-    `);
+    `, [id_usuario]);
     res.json({ success: true, data: result.rows });
   } catch (err) {
     logger.error(`listarCuponesPublicos: ${err.message}`);
