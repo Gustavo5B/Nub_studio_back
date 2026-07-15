@@ -220,7 +220,7 @@ export const checkout = async (req, res) => {
       const precio_unitario = Number(item.precio_efectivo);
       const subtotal = precio_unitario * item.cantidad;
 
-      const monto_artista = Math.round(subtotal * (Number(item.porcentaje_comision) / 100) * 100) / 100;
+      const monto_artista = Math.round(subtotal * (1 - Number(item.porcentaje_comision) / 100) * 100) / 100;
 
       const ventaRes = await db.query(`
         INSERT INTO ventas
