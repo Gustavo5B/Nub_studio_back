@@ -380,9 +380,9 @@ export const nuevaObra = async (req, res) => {
     const idArtista = artista.id_artista;
 
     const {
-      titulo, descripcion, historia, id_categoria, id_coleccion, tecnica, anio_creacion,
+      titulo, descripcion, historia, id_categoria, id_coleccion, tecnica, material, anio_creacion,
       dimensiones_alto, dimensiones_ancho, dimensiones_profundidad,
-      precio_base, stock, permite_marco, con_certificado, etiquetas: etiquetasRaw,
+      precio_base, stock, permite_marco, con_certificado, disponible_envio, etiquetas: etiquetasRaw,
       fecha_publicacion_programada,
     } = req.body;
 
@@ -423,25 +423,27 @@ export const nuevaObra = async (req, res) => {
       `INSERT INTO obras (
         titulo, slug, descripcion, historia,
         id_categoria, id_artista, id_usuario_creacion,
-        id_coleccion, tecnica, anio_creacion,
+        id_coleccion, tecnica, material, anio_creacion,
         dimensiones_alto, dimensiones_ancho, dimensiones_profundidad,
-        precio_base, permite_marco, con_certificado,
+        precio_base, permite_marco, con_certificado, disponible_envio,
         imagen_principal, fecha_publicacion_programada, estado, activa, visible,
         fecha_creacion, fecha_actualizacion
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,'pendiente',false,false,NOW(),NOW())
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,'pendiente',false,false,NOW(),NOW())
       RETURNING id_obra, titulo, slug, estado, imagen_principal`,
       [
         titulo, slug, descripcion, historia || null,
         Number.parseInt(id_categoria), idArtista, usuarioId,
         id_coleccion ? Number.parseInt(id_coleccion) : null,
         tecnica || null,
+        material || null,
         anio_creacion ? Number.parseInt(anio_creacion) : null,
         dimensiones_alto        ? parseFloat(dimensiones_alto)        : null,
         dimensiones_ancho       ? parseFloat(dimensiones_ancho)       : null,
         dimensiones_profundidad ? parseFloat(dimensiones_profundidad) : null,
         parseFloat(precio_base),
-        permite_marco   === 'true' || permite_marco   === true,
-        con_certificado === 'true' || con_certificado === true,
+        permite_marco      === 'true' || permite_marco      === true,
+        con_certificado    === 'true' || con_certificado    === true,
+        disponible_envio   === 'true' || disponible_envio   === true,
         imagenPrincipal,
         fechaProgramada,
       ]
