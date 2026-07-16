@@ -3,3 +3,6 @@ node_modules/
 dist/ 
 logs/
 *.log
+# pnpm (el equipo usa npm; estos archivos son locales)
+pnpm-lock.yaml
+pnpm-workspace.yaml
