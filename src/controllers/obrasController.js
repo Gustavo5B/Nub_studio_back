@@ -189,7 +189,8 @@ export const obtenerObraPorId = async (req, res) => {
       FROM obras o
       INNER JOIN artistas a ON o.id_artista = a.id_artista
       LEFT JOIN obras_tamaños ot ON o.id_obra = ot.id_obra AND ot.activo = TRUE
-      WHERE o.activa = TRUE AND o.id_obra != $1 AND (o.id_categoria = $2 OR o.id_artista = $3)
+      WHERE o.activa = TRUE AND o.estado = 'publicada' AND o.eliminada IS NOT TRUE
+        AND o.id_obra != $1 AND (o.id_categoria = $2 OR o.id_artista = $3)
       GROUP BY o.id_obra, a.nombre_artistico ORDER BY RANDOM() LIMIT 4
     `, [id, obra.id_categoria, obra.id_artista]);
 
