@@ -302,7 +302,7 @@ export const getMisObras = async (req, res) => {
         o.activa, o.visible, o.destacada, o.vistas,
         o.fecha_creacion, o.fecha_aprobacion, o.motivo_rechazo,
         o.dimensiones_alto, o.dimensiones_ancho, o.dimensiones_profundidad,
-        o.dimensiones_unidad, o.anio_creacion, o.tecnica,
+        o.dimensiones_unidad, o.anio_creacion, t.nombre AS tecnica, o.id_tecnica,
         o.permite_marco, o.con_certificado,
         o.id_coleccion, o.fecha_publicacion_programada,
         o.motivo_desactivacion, o.fecha_desactivacion,
@@ -311,6 +311,7 @@ export const getMisObras = async (req, res) => {
         COALESCE(i.stock_actual, 0) AS stock_actual,
         COALESCE(i.stock_reservado, 0) AS stock_reservado
       FROM obras o
+      LEFT JOIN tecnicas t ON o.id_tecnica = t.id_tecnica
       LEFT JOIN categorias c ON c.id_categoria = o.id_categoria
       LEFT JOIN colecciones col ON col.id_coleccion = o.id_coleccion AND col.eliminada = FALSE
       LEFT JOIN inventario i ON i.id_obra = o.id_obra
@@ -380,10 +381,10 @@ export const nuevaObra = async (req, res) => {
     const idArtista = artista.id_artista;
 
     const {
-      titulo, descripcion, historia, id_categoria, id_coleccion, tecnica, material, anio_creacion,
+      titulo, descripcion, historia, id_categoria, id_coleccion, id_tecnica, id_material, anio_creacion,
       dimensiones_alto, dimensiones_ancho, dimensiones_profundidad,
       precio_base, stock, permite_marco, con_certificado, disponible_envio, etiquetas: etiquetasRaw,
-      fecha_publicacion_programada,
+      fecha_publicacion_programada, es_original, numero_edicion, peso_kg,
     } = req.body;
 
     if (!titulo || !descripcion || !id_categoria || !precio_base)
@@ -423,19 +424,20 @@ export const nuevaObra = async (req, res) => {
       `INSERT INTO obras (
         titulo, slug, descripcion, historia,
         id_categoria, id_artista, id_usuario_creacion,
-        id_coleccion, tecnica, material, anio_creacion,
+        id_coleccion, id_tecnica, id_material, anio_creacion,
         dimensiones_alto, dimensiones_ancho, dimensiones_profundidad,
         precio_base, permite_marco, con_certificado, disponible_envio,
+        es_original, numero_edicion, peso_kg,
         imagen_principal, fecha_publicacion_programada, estado, activa, visible,
         fecha_creacion, fecha_actualizacion
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,'pendiente',false,false,NOW(),NOW())
+      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,'pendiente',false,false,NOW(),NOW())
       RETURNING id_obra, titulo, slug, estado, imagen_principal`,
       [
         titulo, slug, descripcion, historia || null,
         Number.parseInt(id_categoria), idArtista, usuarioId,
         id_coleccion ? Number.parseInt(id_coleccion) : null,
-        tecnica || null,
-        material || null,
+        id_tecnica ? Number.parseInt(id_tecnica) : null,
+        id_material ? Number.parseInt(id_material) : null,
         anio_creacion ? Number.parseInt(anio_creacion) : null,
         dimensiones_alto        ? parseFloat(dimensiones_alto)        : null,
         dimensiones_ancho       ? parseFloat(dimensiones_ancho)       : null,
@@ -444,6 +446,9 @@ export const nuevaObra = async (req, res) => {
         permite_marco      === 'true' || permite_marco      === true,
         con_certificado    === 'true' || con_certificado    === true,
         disponible_envio   === 'true' || disponible_envio   === true,
+        es_original !== undefined ? (es_original === 'true' || es_original === true) : true,
+        numero_edicion ? Number.parseInt(numero_edicion) : null,
+        peso_kg ? parseFloat(peso_kg) : null,
         imagenPrincipal,
         fechaProgramada,
       ]
@@ -563,10 +568,11 @@ export const actualizarObraArtista = async (req, res) => {
       return res.status(404).json({ message: 'Obra no encontrada' });
 
     const {
-      titulo, descripcion, historia, id_categoria, id_coleccion, tecnica, anio_creacion,
+      titulo, descripcion, historia, id_categoria, id_coleccion, id_tecnica, id_material, anio_creacion,
       dimensiones_alto, dimensiones_ancho, dimensiones_profundidad,
       precio_base, permite_marco, con_certificado,
       imagen_principal: imgUrl, etiquetas: etiquetasRaw, stock,
+      es_original, numero_edicion, peso_kg,
     } = req.body;
 
     // Validar stock si viene en el body
@@ -598,25 +604,30 @@ export const actualizarObraArtista = async (req, res) => {
         historia                = $3,
         id_categoria            = $4,
         id_coleccion            = $5,
-        tecnica                 = $6,
-        anio_creacion           = $7,
-        dimensiones_alto        = $8,
-        dimensiones_ancho       = $9,
-        dimensiones_profundidad = $10,
-        precio_base             = $11,
-        permite_marco           = $12,
-        con_certificado         = $13,
-        imagen_principal        = COALESCE($14, imagen_principal),
+        id_tecnica              = $6,
+        id_material             = $7,
+        anio_creacion           = $8,
+        dimensiones_alto        = $9,
+        dimensiones_ancho       = $10,
+        dimensiones_profundidad = $11,
+        precio_base             = $12,
+        permite_marco           = $13,
+        con_certificado         = $14,
+        es_original             = $15,
+        numero_edicion          = $16,
+        peso_kg                 = $17,
+        imagen_principal        = COALESCE($18, imagen_principal),
         estado                  = 'pendiente',
         activa                  = FALSE,
         visible                 = FALSE,
         fecha_actualizacion     = NOW()
-      WHERE id_obra = $15
+      WHERE id_obra = $19
     `, [
       titulo, descripcion || null, historia || null,
       id_categoria ? Number.parseInt(id_categoria) : null,
       id_coleccion ? Number.parseInt(id_coleccion) : null,
-      tecnica || null,
+      id_tecnica ? Number.parseInt(id_tecnica) : null,
+      id_material ? Number.parseInt(id_material) : null,
       anio_creacion ? Number.parseInt(anio_creacion) : null,
       dimensiones_alto        ? Number.parseFloat(dimensiones_alto)        : null,
       dimensiones_ancho       ? Number.parseFloat(dimensiones_ancho)       : null,
@@ -624,6 +635,9 @@ export const actualizarObraArtista = async (req, res) => {
       Number.parseFloat(precio_base),
       permite_marco   === 'true' || permite_marco   === true,
       con_certificado === 'true' || con_certificado === true,
+      es_original !== undefined ? (es_original === 'true' || es_original === true) : true,
+      numero_edicion ? Number.parseInt(numero_edicion) : null,
+      peso_kg ? parseFloat(peso_kg) : null,
       imagen_principal, id,
     ]);
 
