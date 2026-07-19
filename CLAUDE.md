@@ -51,6 +51,51 @@ PostgreSQL on Neon via raw `pg` — no ORM. `src/config/db.js` exposes **5 pools
 
 Row-level security is enforced at the database level through these role-specific users. Use the correct pool in controllers based on the role performing the action.
 
+### ⚠️ Las migraciones del repo NO reflejan el esquema real de Neon
+
+Varias tablas fueron editadas a mano en Neon y **no coinciden** con los `.sql` de `migrations/`. Antes de escribir cualquier INSERT/UPDATE, **verifica las columnas reales contra la BD**, no contra la migración. Diferencias confirmadas:
+
+- `obras_tamaños` → columnas reales: `id`, `id_obra`, **`id_tamaño`** (FK a la tabla catálogo **`tamaños_disponibles`**), `precio_base`, `cantidad_disponible`, `activo`. (La migración decía `etiqueta/ancho_cm/alto_cm/precio`.)
+- `tipos_marco` → PK **`id_tipo_marco`** y precio **`precio_adicional`** (no `id_marco`/`precio`).
+- `obras_marcos` → FK `id_obra_tamaño` apunta a `obras_tamaños.id`.
+- `cupones.tipo` → CHECK real es `('porcentaje', 'fijo')` (no `'monto'`).
+- `ventas.estado` es el **enum `estado_venta`** (`pendiente|pagado|procesando|enviado|entregado|cancelado`) → requiere cast `::estado_venta`. `pedidos.estado` en cambio es varchar.
+- `artistas_redes_sociales.red_social` es el enum **`tipo_red_social`** (`instagram|facebook|tiktok|twitter|youtube|website|pinterest|behance`).
+- `pgcrypto` está instalado pero **en el esquema `extensions`**, fuera del `search_path` (`"$user", public`). Por eso `gen_salt()`/`crypt()` fallan sin calificar. Para hashear contraseñas en scripts, usa **`bcrypt` costo 12** (igual que `authController`), no pgcrypto.
+- `tecnicas` ya trae **`id_categoria`** → el mapeo técnica→categoría existe en la BD; no lo inventes.
+- `npm run migrate` está **roto**: `package.json` apunta a `migrate/migrate.js`, carpeta que no existe. Aplica los `.sql` a mano (Neon SQL Editor o script con `pg`).
+
+## Datos sintéticos (seed para ML)
+
+La BD contiene un seed grande para trabajar **clustering** y **sistemas de recomendación** (además de los datos reales, que quedan intactos). Se identifica por marcas y **convive** con los datos reales:
+
+| Entidad | Marca para filtrar | Cantidad aprox. |
+|---------|--------------------|-----------------|
+| Artistas | `correo LIKE 'artista_seed_%@nub.mx'` | 25 |
+| Clientes | `correo LIKE 'cliente_seed_%@nub.mx'` | 400 |
+| Admin seed | `correo = 'admin_seed@nub.mx'` | 1 |
+| Obras | `slug LIKE 'seed-obra-%'` | 300 |
+| Obras dimensionadas (Pintura/Escultura) | `slug LIKE 'seed-dim-obra-%'` | +40 |
+| Colecciones | `slug LIKE 'seed-col-%'` | 50 |
+
+Contraseña de **todas** las cuentas seed: `Seed2024!` (hash bcrypt costo 12).
+
+**Diseño pensado para ML:**
+- Los 400 clientes se reparten en **6 arquetipos de gusto** por categoría → estructura latente que un clustering debe redescubrir (ground truth para validar).
+- Señales de 3 fuerzas para recomendación: **favorito < carrito < compra**. Nadie compra ni pone en el carrito algo que no marcó como favorito.
+- Carritos con **distribución de cola larga** realista (≈53% vacíos, resto de 1 a 8 ítems), no cantidad fija.
+- Coherencia verificada: técnica real del catálogo → hereda su categoría → imagen del tema correcto; ninguna venta antes de crear la obra; `pedido.total` = suma de sus ventas; municipio/estado consistentes; Pintura/Escultura con dimensiones y precio escalado por tamaño (30×40 ≈ $1.5k → 150×200 ≈ $12k).
+- Imágenes: fotos de la Huasteca con licencia libre (Wikimedia Commons) en Cloudinary bajo `nub-studio/seed/{retratos,pintura,ceramica,textil,grabado,paisaje}`.
+
+**Scripts** (`scripts/`, ejecutar desde `Nub_studio_back/`):
+- `seedCompleto.mjs` — sube imágenes a Cloudinary y **genera** `migrations/2026-07-15_seed_completo.sql`. Flags: `--reuse-imagenes` (regenera SQL sin re-subir), `--solo-retratos`, `--sin-imagenes` (placeholders).
+- `dryRunSeed.mjs` — ejecuta un `.sql` dentro de una transacción y hace **ROLLBACK** (valida sin escribir). Patrón recomendado antes de aplicar cualquier seed.
+- `aplicarSeed.mjs` — aplica con COMMIT.
+
+Migraciones de seed: `2026-07-15_seed_completo.sql`, `2026-07-16_obras_dimensiones.sql`, `2026-07-16_carritos_realistas.sql`.
+
+Para **limpiar** el seed: borrar por las marcas de la tabla de arriba (y la carpeta `nub-studio/seed/` en Cloudinary).
+
 ## Authentication & Sessions
 
 - JWT (HS256, 24h TTL) — claims: `sub` (user id), `jti` (token id), `rol`

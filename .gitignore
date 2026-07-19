@@ -6,3 +6,10 @@ logs/
 # pnpm (el equipo usa npm; estos archivos son locales)
 pnpm-lock.yaml
 pnpm-workspace.yaml
+
+# Python (ML: notebooks y microservicio)
+.venv/
+__pycache__/
+*.pyc
+# Archivo scratch, no forma parte del proyecto
+PROMPT_para_otro_chat.txt

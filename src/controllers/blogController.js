@@ -87,6 +87,52 @@ const generarSlug = async (db, titulo) => {
   return slug;
 };
 
+// Parsea el campo 'etiquetas' que llega del form-data: acepta array,
+// JSON ("[1,2]") o lista separada por comas ("1,2,3"). Devuelve ids únicos
+// (máx. 5). Retorna null si el campo NO se envió (para no tocar las existentes)
+// y [] si se envió vacío (para limpiarlas).
+const parseEtiquetas = (raw) => {
+  if (raw == null) return null;
+  let arr = raw;
+  if (typeof raw === 'string') {
+    const s = raw.trim();
+    if (!s) return [];
+    try {
+      const parsed = JSON.parse(s);
+      arr = Array.isArray(parsed) ? parsed : [parsed];
+    } catch {
+      arr = s.split(',');
+    }
+  }
+  if (!Array.isArray(arr)) arr = [arr];
+  return [...new Set(
+    arr.map((v) => parseInt(v, 10)).filter((n) => Number.isInteger(n) && n > 0)
+  )].slice(0, 5);
+};
+
+// Sincroniza las etiquetas de un post en blog_posts_etiquetas: valida que los
+// ids existan y estén activos, borra las anteriores e inserta las nuevas.
+// ids=null → no modifica; ids=[] → limpia todas.
+const sincronizarEtiquetas = async (db, id_post, ids) => {
+  if (ids == null) return;
+  let validos = [];
+  if (ids.length) {
+    const r = await db.query(
+      'SELECT id_blog_etiqueta FROM blog_etiquetas WHERE id_blog_etiqueta = ANY($1::int[]) AND activo = true',
+      [ids]
+    );
+    validos = r.rows.map((x) => x.id_blog_etiqueta);
+  }
+  await db.query('DELETE FROM blog_posts_etiquetas WHERE id_post = $1', [id_post]);
+  if (validos.length) {
+    await db.query(
+      `INSERT INTO blog_posts_etiquetas (id_post, id_blog_etiqueta)
+       SELECT $1, unnest($2::int[])`,
+      [id_post, validos]
+    );
+  }
+};
+
 // =========================================================
 // ADMIN — LISTAR TODOS LOS POSTS (incluye borradores)
 // GET /api/blog/admin/posts
@@ -441,7 +487,7 @@ export const togglePalabra = async (req, res) => {
 // =========================================================
 export const crearPost = async (req, res) => {
   try {
-    const { titulo, contenido, extracto, id_categoria, estado = 'borrador', meta_description } = req.body || {};
+    const { titulo, contenido, extracto, id_categoria, estado = 'borrador', meta_description, etiquetas } = req.body || {};
     const autor_id  = req.user.id_usuario;
     const autor_rol = req.user.rol; // 'admin' o 'artista'
     const db = pools[req.user?.rol] || pool;
@@ -510,6 +556,16 @@ export const crearPost = async (req, res) => {
       estado, fecha_publicacion
     ]);
 
+    // Asignar etiquetas (secundario: si falla, el post ya quedó creado)
+    try {
+      await sincronizarEtiquetas(db, result.rows[0].id_post, parseEtiquetas(etiquetas));
+    } catch (e) {
+      logger.warn(`Post ${result.rows[0].id_post} creado pero fallaron las etiquetas: ${e.message}`);
+    }
+
+    // Si nace publicado, recalcular relacionados al instante (sin bloquear)
+    if (estado === 'publicado') dispararRecalculoRelacionados();
+
     logger.info(`Post creado: id=${result.rows[0].id_post} autor=${autor_id} rol=${autor_rol}`);
     res.status(201).json({ success: true, message: 'Post creado exitosamente', data: result.rows[0] });
   } catch (error) {
@@ -529,7 +585,7 @@ export const editarPost = async (req, res) => {
   try {
     const db = pools[req.user?.rol] || pool;
     const { id } = req.params;
-    const { titulo, contenido, extracto, id_categoria, estado, meta_description } = req.body || {};
+    const { titulo, contenido, extracto, id_categoria, estado, meta_description, etiquetas } = req.body || {};
     const id_usuario = req.user.id_usuario;
     const rol = req.user.rol;
 
@@ -611,6 +667,17 @@ export const editarPost = async (req, res) => {
     params.push(id);
 
     const result = await db.query(query, params);
+
+    // Actualizar etiquetas (solo si el campo se envió)
+    try {
+      await sincronizarEtiquetas(db, parseInt(id, 10), parseEtiquetas(etiquetas));
+    } catch (e) {
+      logger.warn(`Post ${id} editado pero fallaron las etiquetas: ${e.message}`);
+    }
+
+    // Al editar un post publicado, recalcular relacionados al instante (sin bloquear)
+    if (publicando) dispararRecalculoRelacionados();
+
     logger.info(`Post editado: id=${id} por usuario=${id_usuario} rol=${rol}`);
     res.json({ success: true, message: 'Post actualizado exitosamente', data: result.rows[0] });
   } catch (error) {
@@ -952,7 +1019,12 @@ export const obtenerPostParaEditar = async (req, res) => {
         bp.id_post, bp.titulo, bp.slug, bp.extracto, bp.contenido,
         bp.imagen_destacada, bp.meta_description, bp.autor_id, bp.autor_rol,
         bp.id_categoria, bp.estado, bp.activo, bp.vistas,
-        bp.fecha_publicacion, bp.fecha_creacion, bp.fecha_actualizacion
+        bp.fecha_publicacion, bp.fecha_creacion, bp.fecha_actualizacion,
+        COALESCE(
+          (SELECT array_agg(bpe.id_blog_etiqueta)
+           FROM blog_posts_etiquetas bpe WHERE bpe.id_post = bp.id_post),
+          '{}'
+        ) AS etiquetas
       FROM blog_posts bp
       WHERE ${conditions.join(' AND ')}
       LIMIT 1
@@ -996,7 +1068,16 @@ export const obtenerPostPorSlug = async (req, res) => {
         CASE bp.autor_rol
           WHEN 'artista' THEN a.id_artista
           ELSE NULL
-        END AS autor_artista_id
+        END AS autor_artista_id,
+        COALESCE(
+          (SELECT json_agg(json_build_object(
+             'id_blog_etiqueta', be.id_blog_etiqueta, 'nombre', be.nombre, 'slug', be.slug)
+             ORDER BY be.nombre)
+           FROM blog_posts_etiquetas bpe
+           JOIN blog_etiquetas be ON be.id_blog_etiqueta = bpe.id_blog_etiqueta
+           WHERE bpe.id_post = bp.id_post),
+          '[]'
+        ) AS etiquetas
       FROM blog_posts bp
       JOIN usuarios u ON bp.autor_id = u.id_usuario
       LEFT JOIN artistas a ON bp.autor_rol = 'artista' AND a.id_usuario = bp.autor_id
@@ -1216,5 +1297,126 @@ export const quitarReaccion = async (req, res) => {
   } catch (error) {
     logger.error(`Error quitarReaccion post=${req.params.id}: ${error.message}`);
     res.status(500).json({ success: false, message: 'Error al eliminar la reacción' });
+  }
+};
+
+// =========================================================
+// ETIQUETAS DEL BLOG
+// =========================================================
+
+// URL del microservicio de ML (auto-etiquetado). Configurable por entorno.
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+
+// Dispara el recálculo de posts relacionados en el microservicio (fire-and-forget:
+// no bloquea la respuesta; si falla, solo se registra). Se llama al publicar/editar
+// un post para que los relacionados se actualicen al instante.
+const dispararRecalculoRelacionados = () => {
+  fetch(`${ML_SERVICE_URL}/recalcular-relacionados`, {
+    method: 'POST',
+    signal: AbortSignal.timeout(30000),
+  })
+    .then((r) => r.ok
+      ? logger.info('Relacionados recalculados tras publicar/editar')
+      : logger.warn(`Recálculo de relacionados respondió ${r.status}`))
+    .catch((e) => logger.warn(`No se pudo recalcular relacionados: ${e.message}`));
+};
+
+// LISTAR ETIQUETAS DISPONIBLES (público)
+// GET /api/blog/etiquetas → las 12 etiquetas activas para poblar los chips
+export const listarEtiquetasBlog = async (req, res) => {
+  try {
+    const db = pools[req.user?.rol] || pool;
+    const result = await db.query(
+      `SELECT id_blog_etiqueta, nombre, slug
+       FROM blog_etiquetas WHERE activo = true ORDER BY nombre`
+    );
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    logger.error(`Error listarEtiquetasBlog: ${error.message}`);
+    res.status(500).json({ success: false, message: 'Error al obtener las etiquetas' });
+  }
+};
+
+// SUGERIR ETIQUETAS CON IA (artista/admin)
+// POST /api/blog/sugerir-etiquetas  body: { titulo, extracto, contenido }
+// Proxy al microservicio Python: el modelo clasifica el texto EN VIVO y
+// devolvemos las etiquetas reales de la BD (id + nombre) que sugirió.
+export const sugerirEtiquetas = async (req, res) => {
+  try {
+    const { titulo = '', extracto = '', contenido = '' } = req.body || {};
+    const texto = `${titulo}. ${extracto}. ${contenido}`;
+    if (texto.replace(/<[^>]*>/g, '').trim().length < 20)
+      return res.status(400).json({ success: false, message: 'Escribe un poco más para sugerir etiquetas' });
+
+    let ml;
+    try {
+      const resp = await fetch(`${ML_SERVICE_URL}/predecir-etiquetas`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ texto, umbral: 0.30, top: 4 }),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!resp.ok) throw new Error(`ML respondió ${resp.status}`);
+      ml = await resp.json();
+    } catch (e) {
+      logger.warn(`Servicio de sugerencias no disponible: ${e.message}`);
+      return res.status(503).json({ success: false, message: 'El servicio de sugerencias no está disponible' });
+    }
+
+    // Mapear los slugs que sugirió el modelo a las etiquetas reales de la BD
+    const db = pools[req.user?.rol] || pool;
+    const cat = await db.query(
+      'SELECT id_blog_etiqueta, nombre, slug FROM blog_etiquetas WHERE activo = true'
+    );
+    const porSlug = new Map(cat.rows.map((e) => [e.slug, e]));
+    const sugeridas = (ml.etiquetas_sugeridas || [])
+      .map((s) => {
+        const e = porSlug.get(s.etiqueta);
+        return e ? { ...e, probabilidad: s.probabilidad } : null;
+      })
+      .filter(Boolean);
+
+    res.json({ success: true, data: sugeridas });
+  } catch (error) {
+    logger.error(`Error sugerirEtiquetas: ${error.message}`);
+    res.status(500).json({ success: false, message: 'Error al sugerir etiquetas' });
+  }
+};
+
+// POSTS RELACIONADOS (público)
+// GET /api/blog/posts/:slug/relacionados?n=4
+// Lee la tabla precalculada blog_posts_relacionados (generada por el notebook
+// vía similitud coseno). Solo devuelve posts publicados, ordenados por score.
+export const obtenerRelacionados = async (req, res) => {
+  try {
+    const db = pools[req.user?.rol] || pool;
+    const { slug } = req.params;
+    const n = Math.min(parseInt(req.query.n, 10) || 4, 12);
+
+    const result = await db.query(`
+      SELECT bp.id_post, bp.slug, bp.titulo, bp.extracto, bp.imagen_destacada,
+             r.score,
+             COALESCE(
+               (SELECT json_agg(be.nombre ORDER BY be.nombre)
+                FROM blog_posts_etiquetas bpe
+                JOIN blog_etiquetas be ON be.id_blog_etiqueta = bpe.id_blog_etiqueta
+                WHERE bpe.id_post = bp.id_post),
+               '[]'
+             ) AS etiquetas
+      FROM blog_posts_relacionados r
+      JOIN blog_posts bp ON bp.id_post = r.id_post_relacionado
+      WHERE r.id_post = (
+              SELECT id_post FROM blog_posts
+              WHERE slug = $1 AND eliminado = false LIMIT 1
+            )
+        AND bp.estado = 'publicado' AND bp.activo = true AND bp.eliminado = false
+      ORDER BY r.score DESC
+      LIMIT $2
+    `, [slug, n]);
+
+    res.json({ success: true, data: result.rows });
+  } catch (error) {
+    logger.error(`Error obtenerRelacionados '${req.params.slug}': ${error.message}`);
+    res.status(500).json({ success: false, message: 'Error al obtener posts relacionados' });
   }
 };

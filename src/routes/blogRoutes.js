@@ -30,6 +30,11 @@ import {
   listarPosts,
   obtenerPostPorSlug,
   listarComentarios,
+  // Etiquetas
+  listarEtiquetasBlog,
+  sugerirEtiquetas,
+  // Relacionados
+  obtenerRelacionados,
 } from '../controllers/blogController.js';
 
 const router = express.Router();
@@ -48,8 +53,19 @@ const limiteReacciones = rateLimit({
   mensaje: 'Demasiadas reacciones seguidas. Espera un momento.',
 });
 
+// ── PÚBLICO — ETIQUETAS ───────────────────────────────────
+router.get('/etiquetas', optionalAuth, listarEtiquetasBlog);
+
+// ── ARTISTA / ADMIN — SUGERENCIA DE ETIQUETAS (IA) ────────
+router.post(
+  '/sugerir-etiquetas',
+  authenticateToken, requireRole('admin', 'artista'),
+  sugerirEtiquetas
+);
+
 // ── PÚBLICO — POSTS ───────────────────────────────────────
 router.get('/posts',       optionalAuth, listarPosts);
+router.get('/posts/:slug/relacionados', optionalAuth, obtenerRelacionados);
 router.get('/posts/:slug', optionalAuth, obtenerPostPorSlug);
 
 // ── PÚBLICO — COMENTARIOS ─────────────────────────────────
