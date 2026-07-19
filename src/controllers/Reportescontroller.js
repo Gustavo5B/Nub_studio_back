@@ -4,87 +4,128 @@ import logger           from "../config/logger.js";
 import ExcelJS          from "exceljs";
 import path             from "path";
 import { fileURLToPath } from "url";
-import https            from "https";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const BRAND = {
-  orange:   "FFFF840E",
-  purple:   "FF8D4CCD",
-  pink:     "FFCC59AD",
-  dark:     "FFFFF8EE",
-  darkCard: "FFFFF0DC",
-  cream:    "FF1A1A1A",
-  creamSub: "FFD8CABC",
-  rowAlt:   "FFFDECD8",
+  orange:   "FFE8640C",
+  purple:   "FF6028AA",
+  pink:     "FFA83B90",
+  ink:      "FF14121E",   // fondo oscuro portada
+  inkMid:   "FF1E1C2A",   // fondo oscuro medio
+  cream:    "FF14121E",   // texto principal
+  creamSub: "FF5A5870",
+  creamMut: "FF9896A8",
+  bg:       "FFF5F5F7",   // fila alt — gris muy claro neutro
   white:    "FFFFFFFF",
-  gray:     "FF888888",
-  greenNum: "FF16A34A",
-  border:   "FFDDCCBB",
+  border:   "FFE6E4EF",
+  gray:     "FF9896A8",
+  greenNum: "FF0E8A50",
 };
-
-async function cargarLogo() {
-  return new Promise((resolve) => {
-    const url = "https://res.cloudinary.com/dkc7af4hy/image/upload/v1772928337/logo_eeecou.png";
-    https.get(url, (res) => {
-      const chunks = [];
-      res.on("data", chunk => chunks.push(chunk));
-      res.on("end", () => resolve(Buffer.concat(chunks)));
-      res.on("error", () => resolve(null));
-    }).on("error", () => resolve(null));
-  });
-}
 
 async function crearPortada(wb, titulo, subtitulo, accentHex = BRAND.orange) {
   const ws = wb.addWorksheet("Portada");
   ws.views = [{ showGridLines: false }];
-  const logoBuffer = await cargarLogo();
-  if (logoBuffer) {
-    const logoId = wb.addImage({ buffer: logoBuffer, extension: "png" });
-    ws.addImage(logoId, { tl: { col: 1, row: 1 }, ext: { width: 220, height: 72 } });
+  ws.columns = [{ width: 2 }, { width: 48 }, { width: 20 }, { width: 10 }];
+
+  const fillInk    = { type: "pattern", pattern: "solid", fgColor: { argb: BRAND.ink    } };
+  const fillMid    = { type: "pattern", pattern: "solid", fgColor: { argb: BRAND.inkMid } };
+  const fillAccent = { type: "pattern", pattern: "solid", fgColor: { argb: accentHex    } };
+
+  // Fondo oscuro en toda la portada (40 filas)
+  for (let r = 1; r <= 40; r++) {
+    const row = ws.getRow(r);
+    row.height = r <= 6 ? 14 : 18;
+    for (let c = 1; c <= 4; c++) row.getCell(c).fill = fillInk;
   }
-  for (let i = 1; i <= 7; i++) ws.addRow([]);
-  const lineRow = ws.addRow(["", ""]);
-  lineRow.height = 4;
-  lineRow.getCell(2).fill = { type: "pattern", pattern: "solid", fgColor: { argb: accentHex } };
-  ws.addRow([]);
-  const titleRow = ws.addRow(["", titulo]);
-  titleRow.height = 36;
-  titleRow.getCell(2).font = { bold: true, size: 22, color: { argb: BRAND.cream }, name: "Calibri" };
-  titleRow.getCell(2).alignment = { vertical: "middle" };
-  const subRow = ws.addRow(["", subtitulo]);
-  subRow.height = 20;
-  subRow.getCell(2).font = { size: 12, color: { argb: BRAND.creamSub }, italic: true };
-  ws.addRow([]);
+
+  // ── Banda de color superior ─────────────────────────────
+  const banda = ws.getRow(1);
+  banda.height = 8;
+  for (let c = 1; c <= 4; c++) banda.getCell(c).fill = fillAccent;
+
+  // ── Espaciado ───────────────────────────────────────────
+  ws.getRow(2).height = 36;
+  ws.getRow(3).height = 12;
+
+  // ── Logo tipográfico: "NU★B" ────────────────────────────
+  const logoRow = ws.getRow(4);
+  logoRow.height = 52;
+  const logoCell = logoRow.getCell(2);
+  logoCell.value = "NU★B STUDIO";
+  logoCell.font  = { bold: true, size: 32, color: { argb: "FFFFFFFF" }, name: "Calibri" };
+  logoCell.alignment = { vertical: "middle" };
+
+  const logoAccent = logoRow.getCell(3);
+  logoAccent.value = "";
+  logoAccent.fill  = fillInk;
+
+  // ── Subtítulo empresa ────────────────────────────────────
+  const brandRow = ws.getRow(5);
+  brandRow.height = 22;
+  const brandCell = brandRow.getCell(2);
+  brandCell.value = "GALERÍA ALTAR  ·  PANEL ADMINISTRATIVO";
+  brandCell.font  = { size: 10, color: { argb: BRAND.gray }, name: "Calibri", bold: true };
+  brandCell.alignment = { vertical: "middle" };
+
+  // ── Línea separadora naranja ─────────────────────────────
+  ws.getRow(6).height = 3;
+  for (let c = 1; c <= 4; c++) ws.getRow(6).getCell(c).fill = fillAccent;
+
+  // ── Espacio ──────────────────────────────────────────────
+  ws.getRow(7).height = 28;
+  ws.getRow(8).height = 14;
+
+  // ── Título del reporte ───────────────────────────────────
+  const titleRow = ws.getRow(9);
+  titleRow.height = 44;
+  const titleCell = titleRow.getCell(2);
+  titleCell.value = titulo.toUpperCase();
+  titleCell.font  = { bold: true, size: 24, color: { argb: accentHex }, name: "Calibri" };
+  titleCell.alignment = { vertical: "middle" };
+
+  // ── Subtítulo del reporte ────────────────────────────────
+  const subRow = ws.getRow(10);
+  subRow.height = 22;
+  const subCell = subRow.getCell(2);
+  subCell.value = subtitulo;
+  subCell.font  = { size: 11, color: { argb: "FFFFFFFF" }, italic: true, name: "Calibri" };
+  subCell.alignment = { vertical: "middle" };
+
+  // ── Espaciado ────────────────────────────────────────────
+  ws.getRow(11).height = 20;
+
+  // ── Fecha de generación ──────────────────────────────────
   const fecha = new Date().toLocaleString("es-MX", {
     day: "2-digit", month: "long", year: "numeric", hour: "2-digit", minute: "2-digit",
   });
-  const dateRow = ws.addRow(["", `Generado el ${fecha}`]);
-  dateRow.getCell(2).font = { size: 10, color: { argb: BRAND.gray } };
-  ws.addRow([]);
-  const firmRow = ws.addRow(["", "Nu-B Studio · Galería Altar · Panel Administrativo"]);
-  firmRow.getCell(2).font = { size: 11, color: { argb: accentHex }, bold: true };
-  for (let r = 1; r <= 30; r++) {
-    const row = ws.getRow(r);
-    for (let c = 1; c <= 10; c++) {
-      const cell = row.getCell(c);
-      if (!cell.fill || cell.fill.fgColor?.argb === undefined) {
-        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: BRAND.dark } };
-      }
-    }
-  }
-  ws.columns = [{ width: 3 }, { width: 70 }];
+  const dateRow = ws.getRow(12);
+  dateRow.height = 20;
+  const dateCell = dateRow.getCell(2);
+  dateCell.value = `Generado el ${fecha}`;
+  dateCell.font  = { size: 10, color: { argb: BRAND.gray }, name: "Calibri" };
+  dateCell.alignment = { vertical: "middle" };
+
+  // ── Caja "confidencial" al fondo ─────────────────────────
+  const confRow = ws.getRow(38);
+  confRow.height = 20;
+  for (let c = 1; c <= 4; c++) confRow.getCell(c).fill = fillMid;
+  const confCell = confRow.getCell(2);
+  confCell.value = "Documento de uso interno · NU★B Studio";
+  confCell.font  = { size: 9, color: { argb: BRAND.gray }, name: "Calibri" };
+  confCell.alignment = { vertical: "middle" };
+
   return ws;
 }
 
 function applyHeaderStyle(ws, accentHex = BRAND.orange) {
   const row = ws.getRow(1);
-  row.height = 24;
+  row.height = 26;
   row.eachCell(cell => {
-    cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: accentHex } };
-    cell.font = { bold: true, color: { argb: "FF000000" }, size: 11, name: "Calibri" };
-    cell.alignment = { vertical: "middle", horizontal: "center", wrapText: false };
-    cell.border = { bottom: { style: "medium", color: { argb: BRAND.white } } };
+    cell.fill      = { type: "pattern", pattern: "solid", fgColor: { argb: accentHex } };
+    cell.font      = { bold: true, color: { argb: "FFFFFFFF" }, size: 10.5, name: "Calibri" };
+    cell.alignment = { vertical: "middle", horizontal: "left", wrapText: false, indent: 1 };
+    cell.border    = { bottom: { style: "thin", color: { argb: "FF000000" } } };
   });
 }
 
@@ -94,21 +135,22 @@ function applyRowStyles(ws, firstDataRow = 2, lastRow = null, numCols = null) {
   for (let r = firstDataRow; r <= end; r++) {
     const row   = ws.getRow(r);
     const isAlt = (r - firstDataRow) % 2 === 1;
-    row.height  = 18;
+    row.height  = 19;
     for (let c = 1; c <= cols; c++) {
-      const cell = row.getCell(c);
-      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: isAlt ? BRAND.rowAlt : BRAND.dark } };
+      const cell   = row.getCell(c);
+      const colFmt = ws.getColumn(c).style?.numFmt;
+      cell.fill = {
+        type: "pattern", pattern: "solid",
+        fgColor: { argb: isAlt ? BRAND.bg : BRAND.white },
+      };
       cell.border = {
         top:    { style: "hair", color: { argb: BRAND.border } },
         bottom: { style: "hair", color: { argb: BRAND.border } },
         left:   { style: "hair", color: { argb: BRAND.border } },
         right:  { style: "hair", color: { argb: BRAND.border } },
       };
-      if (!cell.font) {
-        cell.font = { color: { argb: BRAND.cream }, size: 10 };
-      } else {
-        cell.font = { ...cell.font, color: cell.font.color ?? { argb: BRAND.cream }, size: 10 };
-      }
+      cell.font = { ...(cell.font ?? {}), color: { argb: BRAND.cream }, size: 10, name: "Calibri" };
+      if (colFmt && !cell.numFmt) cell.numFmt = colFmt;
     }
   }
 }
@@ -116,18 +158,26 @@ function applyRowStyles(ws, firstDataRow = 2, lastRow = null, numCols = null) {
 function addTotalsRow(ws, totalsCols, label = "TOTALES") {
   const lastData = Math.max(ws.lastRow?.number ?? 1, 2);
   const totRow   = ws.addRow([]);
-  totRow.height  = 22;
+  totRow.height  = 24;
+  const fillTot  = { type: "pattern", pattern: "solid", fgColor: { argb: BRAND.ink } };
   totRow.getCell(1).value = label;
-  totRow.getCell(1).font  = { bold: true, color: { argb: BRAND.orange }, size: 11 };
-  totRow.getCell(1).fill  = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A0F2E" } };
+  totRow.getCell(1).font  = { bold: true, color: { argb: BRAND.orange }, size: 11, name: "Calibri" };
+  totRow.getCell(1).fill  = fillTot;
   for (const [col, formula] of Object.entries(totalsCols)) {
     const colNum = parseInt(col);
-    const cell = totRow.getCell(colNum);
-    cell.value  = { formula: `${formula}(${ws.getColumn(colNum).letter}2:${ws.getColumn(colNum).letter}${lastData})` };
-    cell.numFmt = '"$"#,##0.00';
-    cell.font   = { bold: true, color: { argb: BRAND.greenNum }, size: 11 };
-    cell.fill   = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A0F2E" } };
-    cell.border = { top: { style: "medium", color: { argb: BRAND.orange } } };
+    const cell   = totRow.getCell(colNum);
+    cell.value   = { formula: `${formula}(${ws.getColumn(colNum).letter}2:${ws.getColumn(colNum).letter}${lastData})` };
+    cell.numFmt  = '"$"#,##0.00';
+    cell.font    = { bold: true, color: { argb: BRAND.greenNum }, size: 11, name: "Calibri" };
+    cell.fill    = fillTot;
+    cell.border  = { top: { style: "medium", color: { argb: BRAND.orange } } };
+    cell.alignment = { horizontal: "right" };
+  }
+  // Rellenar el resto de celdas de la fila de totales con el mismo fondo oscuro
+  const totalCols = ws.columns?.length || 10;
+  for (let c = 1; c <= totalCols; c++) {
+    const cell = totRow.getCell(c);
+    if (!cell.fill || cell.fill.fgColor?.argb !== BRAND.ink) cell.fill = fillTot;
   }
 }
 
@@ -138,6 +188,7 @@ function configSheet(ws) {
 }
 
 async function sendXlsx(wb, res, filename) {
+  wb.calcProperties.fullCalcOnLoad = true;
   res.setHeader("Content-Type", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
   res.setHeader("Content-Disposition", `attachment; filename="${filename}"`);
   await wb.xlsx.write(res);
@@ -150,12 +201,18 @@ async function sendXlsx(wb, res, filename) {
 export const getKPIs = async (req, res) => {
   try {
     const db = pools[req.user.rol] || pool;
+    const { desde, hasta } = req.query;
+    const params = [];
+    let df = "";
+    if (desde) { params.push(desde); df += ` AND fecha_venta >= $${params.length}`; }
+    if (hasta) { params.push(hasta); df += ` AND fecha_venta <= $${params.length}`; }
+
     const [ingresos, vendidas, ticket, comPend, artActivos, obrasActivas] =
       await Promise.all([
-        db.query(`SELECT COALESCE(SUM(total),0)::numeric AS valor FROM ventas WHERE estado != 'cancelado'`),
-        db.query(`SELECT COUNT(*)::int AS valor FROM ventas WHERE estado != 'cancelado'`),
-        db.query(`SELECT COALESCE(AVG(total),0)::numeric AS valor FROM ventas WHERE estado != 'cancelado'`),
-        db.query(`SELECT COALESCE(SUM(monto_comision),0)::numeric AS valor FROM comisiones WHERE estado = 'pendiente'`),
+        db.query(`SELECT COALESCE(SUM(total),0)::numeric AS valor FROM ventas WHERE estado != 'cancelado'${df}`, params),
+        db.query(`SELECT COUNT(*)::int AS valor FROM ventas WHERE estado != 'cancelado'${df}`, params),
+        db.query(`SELECT COALESCE(AVG(total),0)::numeric AS valor FROM ventas WHERE estado != 'cancelado'${df}`, params),
+        db.query(`SELECT COALESCE(SUM(monto_artista),0)::numeric AS valor FROM ventas WHERE id_liquidacion IS NULL AND estado = 'entregado'`),
         db.query(`SELECT COUNT(*)::int AS valor FROM artistas WHERE activo = TRUE AND eliminado IS NOT TRUE`),
         db.query(`SELECT COUNT(*)::int AS valor FROM obras WHERE estado = 'publicada' AND activa = TRUE AND eliminada IS NOT TRUE`),
       ]);
@@ -207,51 +264,26 @@ export const getVentasPorMes = async (req, res) => {
 export const getIngresosVsComisiones = async (req, res) => {
   try {
     const db = pools[req.user.rol] || pool;
-    const [ventas, comisiones] = await Promise.all([
-      db.query(`
-        SELECT
-          TO_CHAR(fecha_venta, 'Mon')                    AS mes,
-          EXTRACT(MONTH FROM fecha_venta)                AS mes_num,
-          COALESCE(SUM(total), 0)::numeric               AS ingresos,
-          COALESCE(SUM(comision_plataforma), 0)::numeric AS comision_plataforma,
-          COALESCE(SUM(total_artista), 0)::numeric       AS neto_artistas
-        FROM ventas
-        WHERE EXTRACT(YEAR FROM fecha_venta) = EXTRACT(YEAR FROM CURRENT_DATE)
-          AND estado != 'cancelado'
-        GROUP BY mes, mes_num ORDER BY mes_num ASC
-      `),
-      db.query(`
-        SELECT
-          TO_CHAR(fecha_calculo, 'Mon')                     AS mes,
-          EXTRACT(MONTH FROM fecha_calculo)                 AS mes_num,
-          COALESCE(SUM(monto_comision), 0)::numeric         AS monto_comision,
-          COALESCE(SUM(monto_neto_artista), 0)::numeric     AS monto_neto_artista
-        FROM comisiones
-        WHERE EXTRACT(YEAR FROM fecha_calculo) = EXTRACT(YEAR FROM CURRENT_DATE)
-          AND estado != 'cancelada'
-        GROUP BY mes, mes_num ORDER BY mes_num ASC
-      `),
-    ]);
-    const map = {};
-    ventas.rows.forEach(r => {
-      map[r.mes_num] = {
-        mes: r.mes, ingresos: parseFloat(r.ingresos),
-        comision_plataforma: parseFloat(r.comision_plataforma),
-        neto_artistas: parseFloat(r.neto_artistas), monto_comision: 0,
-      };
-    });
-    comisiones.rows.forEach(r => {
-      if (map[r.mes_num]) {
-        map[r.mes_num].monto_comision = parseFloat(r.monto_comision);
-      } else {
-        map[r.mes_num] = {
-          mes: r.mes, ingresos: 0, comision_plataforma: 0,
-          neto_artistas: parseFloat(r.monto_neto_artista),
-          monto_comision: parseFloat(r.monto_comision),
-        };
-      }
-    });
-    const data = Object.entries(map).sort(([a], [b]) => Number(a) - Number(b)).map(([, v]) => v);
+    const result = await db.query(`
+      SELECT
+        TO_CHAR(fecha_venta, 'Mon')                    AS mes,
+        EXTRACT(MONTH FROM fecha_venta)                AS mes_num,
+        COALESCE(SUM(total), 0)::numeric               AS ingresos,
+        COALESCE(SUM(monto_artista), 0)::numeric       AS neto_artistas,
+        COALESCE(SUM(total) - SUM(COALESCE(monto_artista,0)), 0)::numeric AS comision_plataforma
+      FROM ventas
+      WHERE EXTRACT(YEAR FROM fecha_venta) = EXTRACT(YEAR FROM CURRENT_DATE)
+        AND estado != 'cancelado'
+      GROUP BY mes, mes_num
+      ORDER BY mes_num ASC
+    `);
+    const data = result.rows.map(r => ({
+      mes:                r.mes,
+      ingresos:           parseFloat(r.ingresos),
+      neto_artistas:      parseFloat(r.neto_artistas),
+      comision_plataforma: parseFloat(r.comision_plataforma),
+      monto_comision:     parseFloat(r.comision_plataforma),
+    }));
     res.json({ success: true, data });
   } catch (error) {
     logger.error(`Error en getIngresosVsComisiones: ${error.message}`);
@@ -265,19 +297,24 @@ export const getIngresosVsComisiones = async (req, res) => {
 export const getTopObras = async (req, res) => {
   try {
     const db = pools[req.user.rol] || pool;
+    const { desde, hasta } = req.query;
+    const params = [];
+    let df = "";
+    if (desde) { params.push(desde); df += ` AND v.fecha_venta >= $${params.length}`; }
+    if (hasta) { params.push(hasta); df += ` AND v.fecha_venta <= $${params.length}`; }
     const result = await db.query(`
       SELECT
         o.id_obra, o.titulo, o.imagen_principal,
-        a.nombre_artistico                 AS artista,
+        COALESCE(a.nombre_artistico, a.nombre_completo) AS artista,
         COUNT(v.id_venta)::int             AS total_ventas,
         COALESCE(SUM(v.total), 0)::numeric AS ingresos
       FROM ventas v
       INNER JOIN obras    o ON v.id_obra    = o.id_obra
       INNER JOIN artistas a ON v.id_artista = a.id_artista
-      WHERE v.estado != 'cancelado'
-      GROUP BY o.id_obra, o.titulo, o.imagen_principal, a.nombre_artistico
+      WHERE v.estado != 'cancelado'${df}
+      GROUP BY o.id_obra, o.titulo, o.imagen_principal, a.nombre_artistico, a.nombre_completo
       ORDER BY ingresos DESC LIMIT 10
-    `);
+    `, params);
     res.json({ success: true, data: result.rows });
   } catch (error) {
     logger.error(`Error en getTopObras: ${error.message}`);
@@ -291,21 +328,27 @@ export const getTopObras = async (req, res) => {
 export const getTopArtistas = async (req, res) => {
   try {
     const db = pools[req.user.rol] || pool;
+    const { desde, hasta } = req.query;
+    const params = [];
+    let df = "";
+    if (desde) { params.push(desde); df += ` AND v.fecha_venta >= $${params.length}`; }
+    if (hasta) { params.push(hasta); df += ` AND v.fecha_venta <= $${params.length}`; }
     const result = await db.query(`
       SELECT
         a.id_artista, a.nombre_completo, a.nombre_artistico, a.foto_perfil,
         a.porcentaje_comision,
-        COUNT(DISTINCT c.id_venta)::int                                                              AS ventas_totales,
-        COALESCE(SUM(c.monto_comision), 0)::numeric                                                  AS comisiones_generadas,
-        COALESCE(SUM(c.monto_neto_artista), 0)::numeric                                              AS neto_artista,
-        COALESCE(SUM(CASE WHEN c.estado = 'pagada'    THEN c.monto_comision ELSE 0 END), 0)::numeric AS comisiones_pagadas,
-        COALESCE(SUM(CASE WHEN c.estado = 'pendiente' THEN c.monto_comision ELSE 0 END), 0)::numeric AS comisiones_pendientes
-      FROM comisiones c
-      INNER JOIN artistas a ON c.id_artista = a.id_artista
-      WHERE c.estado != 'cancelada'
+        COUNT(DISTINCT v.id_venta)::int                                                                                AS ventas_totales,
+        COALESCE(SUM(v.monto_artista), 0)::numeric                                                                     AS comisiones_generadas,
+        COALESCE(SUM(v.monto_artista), 0)::numeric                                                                     AS neto_artista,
+        COALESCE(SUM(CASE WHEN v.id_liquidacion IS NOT NULL THEN v.monto_artista ELSE 0 END), 0)::numeric              AS comisiones_pagadas,
+        COALESCE(SUM(CASE WHEN v.id_liquidacion IS NULL AND v.estado = 'entregado' THEN v.monto_artista ELSE 0 END), 0)::numeric AS comisiones_pendientes
+      FROM ventas v
+      INNER JOIN artistas a ON v.id_artista = a.id_artista
+      WHERE v.estado != 'cancelado'
+        AND v.monto_artista IS NOT NULL${df}
       GROUP BY a.id_artista, a.nombre_completo, a.nombre_artistico, a.foto_perfil, a.porcentaje_comision
       ORDER BY comisiones_generadas DESC LIMIT 10
-    `);
+    `, params);
     res.json({ success: true, data: result.rows });
   } catch (error) {
     logger.error(`Error en getTopArtistas: ${error.message}`);
@@ -394,9 +437,9 @@ export const exportarFinanciero = async (req, res) => {
         COALESCE(SUM(subtotal), 0)::numeric            AS subtotal,
         COALESCE(SUM(iva), 0)::numeric                 AS iva,
         COALESCE(SUM(costo_envio), 0)::numeric         AS envio,
-        COALESCE(SUM(total), 0)::numeric               AS ingresos_brutos,
-        COALESCE(SUM(comision_plataforma), 0)::numeric AS comision_plataforma,
-        COALESCE(SUM(total_artista), 0)::numeric       AS neto_artistas
+        COALESCE(SUM(total), 0)::numeric                                        AS ingresos_brutos,
+        COALESCE(SUM(total) - SUM(COALESCE(monto_artista,0)), 0)::numeric       AS comision_plataforma,
+        COALESCE(SUM(monto_artista), 0)::numeric                                AS neto_artistas
       FROM ventas
       WHERE estado != 'cancelado'
       GROUP BY periodo, anio, mes_num
@@ -441,17 +484,16 @@ export const exportarArtistas = async (req, res) => {
       SELECT
         a.nombre_completo, a.nombre_artistico, a.correo, a.ciudad,
         a.porcentaje_comision, a.estado,
-        TO_CHAR(a.fecha_registro, 'DD/MM/YYYY')                                                       AS fecha_registro,
-        COUNT(DISTINCT o.id_obra) FILTER (WHERE o.activa = TRUE AND o.estado = 'publicada')::int       AS obras_activas,
-        COUNT(DISTINCT v.id_venta)::int                                                                AS ventas_totales,
-        COALESCE(SUM(c.monto_comision), 0)::numeric                                                    AS comisiones_totales,
-        COALESCE(SUM(CASE WHEN c.estado = 'pagada'    THEN c.monto_comision ELSE 0 END), 0)::numeric   AS comisiones_pagadas,
-        COALESCE(SUM(CASE WHEN c.estado = 'pendiente' THEN c.monto_comision ELSE 0 END), 0)::numeric   AS comisiones_pendientes,
-        COALESCE(SUM(c.monto_neto_artista), 0)::numeric                                                AS neto_acumulado
+        TO_CHAR(a.fecha_registro, 'DD/MM/YYYY')                                                                    AS fecha_registro,
+        COUNT(DISTINCT o.id_obra) FILTER (WHERE o.activa = TRUE AND o.estado = 'publicada')::int                   AS obras_activas,
+        COUNT(DISTINCT v.id_venta) FILTER (WHERE v.estado != 'cancelado')::int                                     AS ventas_totales,
+        COALESCE(SUM(v.monto_artista) FILTER (WHERE v.estado != 'cancelado'), 0)::numeric                          AS comisiones_totales,
+        COALESCE(SUM(v.monto_artista) FILTER (WHERE v.estado != 'cancelado' AND v.id_liquidacion IS NOT NULL), 0)::numeric AS comisiones_pagadas,
+        COALESCE(SUM(v.monto_artista) FILTER (WHERE v.estado = 'entregado' AND v.id_liquidacion IS NULL), 0)::numeric     AS comisiones_pendientes,
+        COALESCE(SUM(v.monto_artista) FILTER (WHERE v.estado != 'cancelado'), 0)::numeric                          AS neto_acumulado
       FROM artistas a
-      LEFT JOIN obras      o ON a.id_artista = o.id_artista AND o.eliminada IS NOT TRUE
-      LEFT JOIN ventas     v ON a.id_artista = v.id_artista AND v.estado != 'cancelado'
-      LEFT JOIN comisiones c ON a.id_artista = c.id_artista AND c.estado != 'cancelada'
+      LEFT JOIN obras   o ON a.id_artista = o.id_artista AND o.eliminada IS NOT TRUE
+      LEFT JOIN ventas  v ON a.id_artista = v.id_artista
       WHERE a.eliminado IS NOT TRUE
       GROUP BY a.nombre_completo, a.nombre_artistico, a.correo, a.ciudad,
                a.porcentaje_comision, a.estado, a.fecha_registro
@@ -502,7 +544,7 @@ export const exportarCatalogoObras = async (req, res) => {
         o.id_obra, o.titulo,
         a.nombre_artistico                                    AS artista,
         cat.nombre                                            AS categoria,
-        COALESCE(tec.nombre, o.tecnica)                      AS tecnica,
+        tec.nombre                                           AS tecnica,
         o.anio_creacion, o.precio_base::numeric,
         o.dimensiones_alto                                    AS alto_cm,
         o.dimensiones_ancho                                   AS ancho_cm,
@@ -577,7 +619,7 @@ export const exportarCatalogoObras = async (req, res) => {
         COUNT(*) FILTER (WHERE o.estado = 'pendiente')::int AS pendientes,
         MIN(o.precio_base)::numeric AS precio_min,
         MAX(o.precio_base)::numeric AS precio_max,
-        AVG(o.precio_base)::numeric AS precio_prom
+        ROUND(AVG(o.precio_base), 2)::numeric AS precio_prom
       FROM obras o
       INNER JOIN artistas a ON o.id_artista = a.id_artista
       WHERE o.eliminada IS NOT TRUE
@@ -611,7 +653,7 @@ export const exportarObrasPlantilla = async (req, res) => {
           o.id_obra, o.titulo,
           a.nombre_artistico                                     AS artista,
           c.nombre                                               AS categoria,
-          COALESCE(t.nombre, o.tecnica)                         AS tecnica,
+          t.nombre                                              AS tecnica,
           o.anio_creacion, o.descripcion, o.precio_base,
           o.dimensiones_alto                                     AS alto_cm,
           o.dimensiones_ancho                                    AS ancho_cm,
@@ -671,7 +713,7 @@ export const exportarObrasPlantilla = async (req, res) => {
       row.height = 18;
       for (let c = 1; c <= wsObras.columns.length; c++) {
         const cell = row.getCell(c);
-        cell.fill   = { type: "pattern", pattern: "solid", fgColor: { argb: (r - 2) % 2 === 0 ? BRAND.dark : BRAND.rowAlt } };
+        cell.fill   = { type: "pattern", pattern: "solid", fgColor: { argb: (r - 2) % 2 === 0 ? BRAND.white : BRAND.bg } };
         cell.font   = { color: { argb: BRAND.cream }, size: 10 };
         cell.border = {
           top:    { style: "hair", color: { argb: BRAND.border } },
@@ -713,7 +755,7 @@ export const exportarObrasPlantilla = async (req, res) => {
     const hdr = wsCat.getRow(1);
     hdr.height = 22;
     hdr.eachCell(cell => {
-      cell.fill      = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A0F2E" } };
+      cell.fill      = { type: "pattern", pattern: "solid", fgColor: { argb: BRAND.ink } };
       cell.font      = { bold: true, color: { argb: BRAND.orange }, size: 11 };
       cell.alignment = { vertical: "middle", horizontal: "center" };
     });
@@ -725,7 +767,7 @@ export const exportarObrasPlantilla = async (req, res) => {
         tecnica:   tecnicas.rows[i]?.nombre  || "",
       });
       row.eachCell(cell => {
-        cell.fill   = { type: "pattern", pattern: "solid", fgColor: { argb: i % 2 === 0 ? BRAND.dark : BRAND.rowAlt } };
+        cell.fill   = { type: "pattern", pattern: "solid", fgColor: { argb: i % 2 === 0 ? BRAND.white : BRAND.bg } };
         cell.font   = { color: { argb: BRAND.cream }, size: 10 };
         cell.border = { bottom: { style: "hair", color: { argb: BRAND.border } } };
       });
@@ -943,7 +985,7 @@ export const exportarArtistasPlantilla = async (req, res) => {
     const refHdr = wsRef.getRow(1);
     refHdr.height = 22;
     refHdr.eachCell(cell => {
-      cell.fill      = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A0F2E" } };
+      cell.fill      = { type: "pattern", pattern: "solid", fgColor: { argb: BRAND.ink } };
       cell.font      = { bold: true, color: { argb: BRAND.pink }, size: 11 };
       cell.alignment = { vertical: "middle", horizontal: "center" };
     });
@@ -957,7 +999,7 @@ export const exportarArtistasPlantilla = async (req, res) => {
     refRows.forEach((r, i) => {
       const row = wsRef.addRow(r);
       row.eachCell(cell => {
-        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: i % 2 === 0 ? BRAND.dark : BRAND.rowAlt } };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: i % 2 === 0 ? BRAND.white : BRAND.bg } };
         cell.font = { color: { argb: BRAND.cream }, size: 10 };
       });
     });
@@ -1168,7 +1210,7 @@ export const exportarObrasPlantillaVacia = async (req, res) => {
     hint.font   = { italic: true, color: { argb: BRAND.gray }, size: 9 };
     hint.height = 16;
     hint.eachCell(cell => {
-      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A1530" } };
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: BRAND.ink } };
     });
 
     // Filas vacías pre-formateadas (200 filas listas para escribir)
@@ -1178,7 +1220,7 @@ export const exportarObrasPlantillaVacia = async (req, res) => {
       for (let c = 1; c <= wsObras.columns.length; c++) {
         const cell = row.getCell(c);
         const isAlt = (r - 3) % 2 === 1;
-        cell.fill   = { type: "pattern", pattern: "solid", fgColor: { argb: isAlt ? BRAND.rowAlt : BRAND.dark } };
+        cell.fill   = { type: "pattern", pattern: "solid", fgColor: { argb: isAlt ? BRAND.bg : BRAND.white } };
         cell.font   = { color: { argb: BRAND.cream }, size: 10 };
         cell.border = {
           top:    { style: "hair", color: { argb: BRAND.border } },
@@ -1243,7 +1285,7 @@ export const exportarObrasPlantillaVacia = async (req, res) => {
     const hdr = wsCat.getRow(1);
     hdr.height = 22;
     hdr.eachCell(cell => {
-      cell.fill      = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A0F2E" } };
+      cell.fill      = { type: "pattern", pattern: "solid", fgColor: { argb: BRAND.ink } };
       cell.font      = { bold: true, color: { argb: BRAND.orange }, size: 11 };
       cell.alignment = { vertical: "middle", horizontal: "center" };
     });
@@ -1255,7 +1297,7 @@ export const exportarObrasPlantillaVacia = async (req, res) => {
         tecnica:   tecnicas.rows[i]?.nombre  || "",
       });
       row.eachCell(cell => {
-        cell.fill   = { type: "pattern", pattern: "solid", fgColor: { argb: i % 2 === 0 ? BRAND.dark : BRAND.rowAlt } };
+        cell.fill   = { type: "pattern", pattern: "solid", fgColor: { argb: i % 2 === 0 ? BRAND.white : BRAND.bg } };
         cell.font   = { color: { argb: BRAND.cream }, size: 10 };
         cell.border = { bottom: { style: "hair", color: { argb: BRAND.border } } };
       });
@@ -1317,7 +1359,7 @@ export const exportarArtistasPlantillaVacia = async (req, res) => {
     hint.font   = { italic: true, color: { argb: BRAND.gray }, size: 9 };
     hint.height = 16;
     hint.eachCell(cell => {
-      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A1530" } };
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: BRAND.ink } };
     });
 
     // Filas vacías pre-formateadas (200)
@@ -1327,7 +1369,7 @@ export const exportarArtistasPlantillaVacia = async (req, res) => {
       for (let c = 1; c <= wsA.columns.length; c++) {
         const cell = row.getCell(c);
         const isAlt = (r - 3) % 2 === 1;
-        cell.fill   = { type: "pattern", pattern: "solid", fgColor: { argb: isAlt ? BRAND.rowAlt : BRAND.dark } };
+        cell.fill   = { type: "pattern", pattern: "solid", fgColor: { argb: isAlt ? BRAND.bg : BRAND.white } };
         cell.font   = { color: { argb: BRAND.cream }, size: 10 };
         cell.border = {
           top:    { style: "hair", color: { argb: BRAND.border } },
@@ -1366,7 +1408,7 @@ export const exportarArtistasPlantillaVacia = async (req, res) => {
     const refHdr = wsRef.getRow(1);
     refHdr.height = 22;
     refHdr.eachCell(cell => {
-      cell.fill      = { type: "pattern", pattern: "solid", fgColor: { argb: "FF1A0F2E" } };
+      cell.fill      = { type: "pattern", pattern: "solid", fgColor: { argb: BRAND.ink } };
       cell.font      = { bold: true, color: { argb: BRAND.pink }, size: 11 };
       cell.alignment = { vertical: "middle", horizontal: "center" };
     });
@@ -1385,7 +1427,7 @@ export const exportarArtistasPlantillaVacia = async (req, res) => {
     refRows.forEach((r, i) => {
       const row = wsRef.addRow(r);
       row.eachCell(cell => {
-        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: i % 2 === 0 ? BRAND.dark : BRAND.rowAlt } };
+        cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: i % 2 === 0 ? BRAND.white : BRAND.bg } };
         cell.font = { color: { argb: BRAND.cream }, size: 10 };
         cell.border = { bottom: { style: "hair", color: { argb: BRAND.border } } };
       });

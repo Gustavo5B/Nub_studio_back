@@ -107,10 +107,11 @@ export const obtenerColeccionPorSlug = async (req, res) => {
     const obrasResult = await db.query(`
       SELECT
         o.id_obra, o.titulo, o.slug, o.imagen_principal,
-        o.precio_base, o.estado, o.activa, o.tecnica,
+        o.precio_base, o.estado, o.activa, t.nombre AS tecnica,
         MIN(ot.precio_base) AS precio_minimo,
         GREATEST(COALESCE(i.stock_actual, 0) - COALESCE(i.stock_reservado, 0), 0) AS stock_disponible
       FROM obras o
+      LEFT JOIN tecnicas t ON o.id_tecnica = t.id_tecnica
       LEFT JOIN obras_tamaños ot ON ot.id_obra = o.id_obra AND ot.activo = TRUE
       LEFT JOIN inventario i ON i.id_obra = o.id_obra
       WHERE o.id_coleccion = $1 AND o.activa = TRUE AND o.eliminada = FALSE

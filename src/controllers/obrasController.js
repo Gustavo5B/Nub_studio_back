@@ -66,7 +66,7 @@ export const listarObras = async (req, res) => {
     const query = `
       SELECT
         o.id_obra, o.titulo, o.descripcion, o.slug, o.imagen_principal,
-        o.anio_creacion, o.tecnica, o.destacada, o.vistas, o.fecha_creacion,
+        o.anio_creacion, t.nombre AS tecnica, o.destacada, o.vistas, o.fecha_creacion,
         o.precio_base, o.precio_descuento, o.descuento_expira, o.estado, o.activa,
         a.id_artista, a.nombre_completo AS artista_nombre, a.nombre_artistico AS artista_alias,
         c.id_categoria, c.nombre AS categoria_nombre, c.slug AS categoria_slug,
@@ -82,11 +82,12 @@ export const listarObras = async (req, res) => {
       FROM obras o
       INNER JOIN artistas a ON o.id_artista = a.id_artista
       INNER JOIN categorias c ON o.id_categoria = c.id_categoria
+      LEFT JOIN tecnicas t ON o.id_tecnica = t.id_tecnica
       LEFT JOIN obras_tamaños ot ON o.id_obra = ot.id_obra AND ot.activo = TRUE
       WHERE ${whereClause}
       GROUP BY
         o.id_obra, o.titulo, o.descripcion, o.slug, o.imagen_principal,
-        o.anio_creacion, o.tecnica, o.destacada, o.vistas, o.fecha_creacion,
+        o.anio_creacion, t.nombre, o.destacada, o.vistas, o.fecha_creacion,
         o.precio_base, o.precio_descuento, o.descuento_expira, o.estado, o.activa,
         a.id_artista, a.nombre_completo, a.nombre_artistico,
         c.id_categoria, c.nombre, c.slug
@@ -189,7 +190,8 @@ export const obtenerObraPorId = async (req, res) => {
       FROM obras o
       INNER JOIN artistas a ON o.id_artista = a.id_artista
       LEFT JOIN obras_tamaños ot ON o.id_obra = ot.id_obra AND ot.activo = TRUE
-      WHERE o.activa = TRUE AND o.id_obra != $1 AND (o.id_categoria = $2 OR o.id_artista = $3)
+      WHERE o.activa = TRUE AND o.estado = 'publicada' AND o.eliminada IS NOT TRUE
+        AND o.id_obra != $1 AND (o.id_categoria = $2 OR o.id_artista = $3)
       GROUP BY o.id_obra, a.nombre_artistico ORDER BY RANDOM() LIMIT 4
     `, [id, obra.id_categoria, obra.id_artista]);
 
