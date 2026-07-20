@@ -3,6 +3,21 @@ import logger from '../config/logger.js';
 import { preference, payment } from '../config/mercadopagoConfig.js';
 import { sendConfirmacionPedidoEmail, sendEnvioEmail, sendListoRecogerEmail } from '../services/emailService.js';
 
+// Reentrena el recomendador del carrito en el microservicio de ML cuando se
+// confirma una compra (fire-and-forget: no bloquea el webhook; si falla, solo
+// se registra). Mismo patrón que el recálculo de posts relacionados del blog.
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+const dispararReentrenoRecomendaciones = () => {
+  fetch(`${ML_SERVICE_URL}/recalcular-recomendaciones`, {
+    method: 'POST',
+    signal: AbortSignal.timeout(30000),
+  })
+    .then((r) => r.ok
+      ? logger.info('Recomendador de carrito reentrenado tras compra confirmada')
+      : logger.warn(`Reentreno de recomendaciones respondió ${r.status}`))
+    .catch((e) => logger.warn(`No se pudo reentrenar recomendaciones: ${e.message}`));
+};
+
 // =========================================================
 // GET /api/ventas/mis-pedidos
 // Historial de compras del cliente autenticado
@@ -424,6 +439,11 @@ export const webhookPago = async (req, res) => {
         // No detener el flujo si el email falla
         logger.error(`Error enviando email confirmacion pedido #${id_pedido}: ${emailErr.message}`);
       }
+    }
+
+    // Compra confirmada → el modelo de recomendaciones aprende de ella
+    if (status === 'approved') {
+      dispararReentrenoRecomendaciones();
     }
 
     logger.info(`Webhook MP: pago ${paymentId} → ${nuevoEstado} (pedido #${id_pedido})`);

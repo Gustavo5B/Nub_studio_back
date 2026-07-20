@@ -5,6 +5,7 @@ import {
   actualizarCantidad,
   eliminarDelCarrito,
   agregarColeccionAlCarrito,
+  getRecomendacionesCarrito,
 } from '../controllers/carritoController.js';
 import { resolveUsuario, requireRole } from '../middlewares/authMiddleware.js';
 
@@ -15,6 +16,7 @@ router.use(resolveUsuario);
 router.use(requireRole('cliente'));
 
 router.get('/', getCarrito);
+router.get('/recomendaciones', getRecomendacionesCarrito);
 router.post('/', agregarAlCarrito);
 router.post('/coleccion', agregarColeccionAlCarrito);
 router.put('/:id_carrito', actualizarCantidad);

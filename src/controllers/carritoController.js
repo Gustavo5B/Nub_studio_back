@@ -452,3 +452,89 @@ export const agregarColeccionAlCarrito = async (req, res) => {
     res.status(500).json({ success: false, message: 'Error al agregar la colección al carrito' });
   }
 };
+
+// =========================================================
+// GET /api/carrito/recomendaciones
+// Obras recomendadas según el carrito y el historial del cliente.
+// El modelo (SVD colaborativo) corre en el microservicio de ML;
+// aquí se enriquece con datos frescos y se filtra disponibilidad.
+// =========================================================
+const ML_SERVICE_URL = process.env.ML_SERVICE_URL || 'http://localhost:8000';
+
+export const getRecomendacionesCarrito = async (req, res) => {
+  try {
+    const db = pools[req.user.rol] || pool;
+    const id_usuario = req.user.id_usuario;
+
+    const carritoRes = await db.query(
+      `SELECT c.id_obra
+       FROM carritos c
+       JOIN obras o ON o.id_obra = c.id_obra
+       WHERE c.id_usuario = $1 AND c.activo = TRUE AND o.eliminada IS NOT TRUE`,
+      [id_usuario]
+    );
+    const ids_carrito = carritoRes.rows.map((r) => r.id_obra);
+
+    // Pedimos bastantes candidatas (40): muchas obras recomendadas pueden estar
+    // agotadas (el modelo aprende de compras) y el filtro de disponibilidad
+    // de abajo las descarta; así siempre quedan suficientes para mostrar.
+    let recomendadas = [];
+    let nivel = null;
+    try {
+      const resp = await fetch(`${ML_SERVICE_URL}/recomendaciones-carrito`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id_usuario, ids_carrito, n: 40 }),
+        signal: AbortSignal.timeout(8000),
+      });
+      if (!resp.ok) throw new Error(`ML service respondió ${resp.status}`);
+      const data = await resp.json();
+      recomendadas = data.recomendaciones || [];
+      nivel = data.nivel || null;
+    } catch (mlErr) {
+      // Si el microservicio no está, el carrito sigue funcionando sin la sección
+      logger.warn(`Recomendador de carrito no disponible: ${mlErr.message}`);
+      return res.json({ success: true, data: [], nivel: null });
+    }
+
+    if (recomendadas.length === 0) {
+      return res.json({ success: true, data: [], nivel });
+    }
+
+    const ids = recomendadas.map((r) => r.id_obra);
+    const obrasRes = await db.query(
+      `SELECT o.id_obra, o.titulo, o.slug, o.imagen_principal,
+              CASE
+                WHEN o.precio_descuento IS NOT NULL
+                  AND (o.descuento_expira IS NULL OR o.descuento_expira > NOW())
+                THEN o.precio_descuento
+                ELSE o.precio_base
+              END AS precio_efectivo,
+              cat.nombre AS categoria,
+              COALESCE(a.nombre_artistico, a.nombre_completo) AS artista_alias
+       FROM obras o
+       JOIN artistas a ON a.id_artista = o.id_artista
+       LEFT JOIN categorias cat ON cat.id_categoria = o.id_categoria
+       LEFT JOIN inventario inv ON inv.id_obra = o.id_obra
+       WHERE o.id_obra = ANY($1::int[])
+         AND o.activa = TRUE
+         AND o.eliminada IS NOT TRUE
+         AND COALESCE(o.visible, TRUE) = TRUE
+         AND COALESCE(inv.stock_actual - inv.stock_reservado, 1) > 0`,
+      [ids]
+    );
+
+    // Conservar el orden que dio el modelo y limitar a 6
+    const porId = new Map(obrasRes.rows.map((r) => [r.id_obra, r]));
+    const scorePorId = new Map(recomendadas.map((r) => [r.id_obra, r.score]));
+    const data = ids
+      .filter((id) => porId.has(id))
+      .slice(0, 6)
+      .map((id) => ({ ...porId.get(id), score: scorePorId.get(id) }));
+
+    res.json({ success: true, data, nivel });
+  } catch (error) {
+    logger.error(`Error en getRecomendacionesCarrito: ${error.message}`);
+    res.status(500).json({ success: false, message: 'Error al obtener recomendaciones' });
+  }
+};
