@@ -91,7 +91,8 @@ export const obtenerColeccionPorSlug = async (req, res) => {
         c.id_coleccion, c.nombre, c.slug, c.historia,
         c.imagen_portada, c.destacada, c.estado, c.fecha_creacion,
         a.id_artista, a.nombre_completo AS artista_nombre,
-        a.nombre_artistico AS artista_alias, a.foto_perfil AS artista_foto
+        a.nombre_artistico AS artista_alias, a.foto_perfil AS artista_foto,
+        a.matricula AS artista_matricula
       FROM colecciones c
       INNER JOIN artistas a ON c.id_artista = a.id_artista
       WHERE c.slug = $1 AND c.activa = TRUE AND c.eliminada = FALSE
@@ -108,15 +109,23 @@ export const obtenerColeccionPorSlug = async (req, res) => {
       SELECT
         o.id_obra, o.titulo, o.slug, o.imagen_principal,
         o.precio_base, o.estado, o.activa, t.nombre AS tecnica,
-        MIN(ot.precio_base) AS precio_minimo,
-        GREATEST(COALESCE(i.stock_actual, 0) - COALESCE(i.stock_reservado, 0), 0) AS stock_disponible
+        ot_agg.precio_minimo,
+        COALESCE(inv.stock_disponible, 0) AS stock_disponible
       FROM obras o
-      LEFT JOIN tecnicas t ON o.id_tecnica = t.id_tecnica
-      LEFT JOIN obras_tamaños ot ON ot.id_obra = o.id_obra AND ot.activo = TRUE
-      LEFT JOIN inventario i ON i.id_obra = o.id_obra
+      LEFT JOIN tecnicas t ON t.id_tecnica = o.id_tecnica
+      LEFT JOIN (
+        SELECT id_obra, MIN(precio_base) AS precio_minimo
+        FROM obras_tamaños WHERE activo = TRUE
+        GROUP BY id_obra
+      ) ot_agg ON ot_agg.id_obra = o.id_obra
+      LEFT JOIN (
+        SELECT id_obra,
+          GREATEST(COALESCE(MAX(stock_actual), 0) - COALESCE(MAX(stock_reservado), 0), 0) AS stock_disponible
+        FROM inventario
+        GROUP BY id_obra
+      ) inv ON inv.id_obra = o.id_obra
       WHERE o.id_coleccion = $1 AND o.activa = TRUE AND o.eliminada = FALSE
         AND o.estado = 'publicada'
-      GROUP BY o.id_obra, i.stock_actual, i.stock_reservado
       ORDER BY o.fecha_creacion DESC
     `, [coleccion.id_coleccion]);
 
