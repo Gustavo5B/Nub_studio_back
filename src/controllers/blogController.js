@@ -1069,6 +1069,10 @@ export const obtenerPostPorSlug = async (req, res) => {
           WHEN 'artista' THEN a.id_artista
           ELSE NULL
         END AS autor_artista_id,
+        CASE bp.autor_rol
+          WHEN 'artista' THEN a.matricula
+          ELSE NULL
+        END AS autor_matricula,
         COALESCE(
           (SELECT json_agg(json_build_object(
              'id_blog_etiqueta', be.id_blog_etiqueta, 'nombre', be.nombre, 'slug', be.slug)
