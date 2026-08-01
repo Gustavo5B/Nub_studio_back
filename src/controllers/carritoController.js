@@ -478,6 +478,13 @@ export const getRecomendacionesCarrito = async (req, res) => {
     // Pedimos bastantes candidatas (40): muchas obras recomendadas pueden estar
     // agotadas (el modelo aprende de compras) y el filtro de disponibilidad
     // de abajo las descarta; así siempre quedan suficientes para mostrar.
+    // Espera larga a propósito: el microservicio de ML corre en un plan que
+    // suspende el proceso tras un rato sin tráfico, y despertarlo toma ~50 s.
+    // Con el timeout corto de antes la sección salía SIEMPRE vacía en la
+    // primera visita del día. Se puede permitir porque esta petición no bloquea
+    // el carrito: el frontend la resuelve por separado y solo retrasa la
+    // aparición de la sección de recomendaciones, nunca los totales ni el pago.
+    const TIMEOUT_ML_MS = Number(process.env.ML_TIMEOUT_MS) || 45000;
     let recomendadas = [];
     let nivel = null;
     try {
@@ -485,7 +492,7 @@ export const getRecomendacionesCarrito = async (req, res) => {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ id_usuario, ids_carrito, n: 40 }),
-        signal: AbortSignal.timeout(8000),
+        signal: AbortSignal.timeout(TIMEOUT_ML_MS),
       });
       if (!resp.ok) throw new Error(`ML service respondió ${resp.status}`);
       const data = await resp.json();

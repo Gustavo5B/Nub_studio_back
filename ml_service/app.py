@@ -48,8 +48,12 @@ MODEL_PATH = os.environ.get(
 CARRITO_MODEL_PATH = os.environ.get(
     "ML_CARRITO_MODEL_PATH",
     os.path.join(BASE_DIR, "..", "notebooks", "modelo_recomendacion_carrito.joblib"))
-CSV_PATH = os.path.join(BASE_DIR, "..", "notebooks", "blog_posts_dataset.csv")
-ENV_PATH = os.path.join(BASE_DIR, "..", ".env")
+CSV_PATH = os.environ.get(
+    "ML_CSV_PATH", os.path.join(BASE_DIR, "..", "notebooks", "blog_posts_dataset.csv"))
+# En despliegue las credenciales suelen venir del entorno del contenedor y no de
+# un archivo. Si ENV_PATH no existe, load_dotenv simplemente no hace nada y se
+# usan las variables ya presentes en el entorno.
+ENV_PATH = os.environ.get("ML_ENV_PATH", os.path.join(BASE_DIR, "..", ".env"))
 
 # Estado global cargado al arrancar (modelo + corpus vectorizado en memoria)
 STATE: dict = {}
@@ -167,6 +171,38 @@ class TextoIn(BaseModel):
 # --------------------------------------------------------------------------- #
 # Endpoints
 # --------------------------------------------------------------------------- #
+@app.get("/")
+def raiz():
+    """Portada del servicio. Evita el 404 de quien abre la URL en el navegador
+    (o de la sonda por defecto del proveedor de hosting) y sirve de índice."""
+    return {
+        "servicio": "NU★B Studio — Microservicio de ML",
+        "estado": "activo",
+        "modelos": {
+            "recomendador_carrito": {
+                "tecnica": "SVD colaborativo + similitud coseno + popularidad (cascada)",
+                "cargado": "car_svd" in STATE,
+                "k": STATE.get("car_k"),
+            },
+            "clasificador_etiquetas": {
+                "tecnica": "Regresión Logística sobre TF-IDF",
+                "cargado": "modelo" in STATE,
+                "etiquetas": len(STATE.get("clases", [])),
+            },
+        },
+        "endpoints": {
+            "POST /recomendaciones-carrito": "obras recomendadas para un usuario y su carrito",
+            "POST /recalcular-recomendaciones": "reentrena el recomendador con los datos actuales",
+            "POST /predecir-etiquetas": "etiquetas sugeridas para el texto de un post",
+            "GET  /relacionados/{id_post}": "posts parecidos a uno existente",
+            "POST /relacionados-texto": "posts parecidos a un borrador sin guardar",
+            "POST /recalcular-relacionados": "reescribe la tabla de posts relacionados",
+            "GET  /health": "estado detallado del servicio",
+            "GET  /docs": "documentación interactiva de la API",
+        },
+    }
+
+
 @app.get("/health")
 def health():
     return {
