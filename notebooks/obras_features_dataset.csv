@@ -1,486 +1,1977 @@
 id_obra,titulo,id_categoria,categoria,id_tecnica,tecnica,id_material,precio_base,dimensiones_alto,dimensiones_ancho
-1340,Río Moctezuma al Amanecer,1,Fotografía,3.0,HDR,1,1050.0,21.94,18.73
-1438,Papel Amate Pintado,4,Artesanía,58.0,Pintado en amate,18,3450.0,43.03,44.18
-50,Expiatorio en Guadalajara,1,Fotografía,1.0,Fotografía digital,1,2700.0,80.3,61.07
-1345,Tejedora de Xilitla,1,Fotografía,2.0,Fotografía analógica,1,3350.0,28.72,21.51
-1364,Milpa Sagrada,2,Pintura,9.0,Temple,11,8800.0,60.0,45.0
-56,libro 3,2,Pintura,,,7,5150.0,61.12,62.27
-54,libro 1,2,Pintura,,,7,4950.0,58.9,43.25
-55,libro 2,2,Pintura,,,7,9550.0,107.85,76.51
-1373,Caña de Azúcar,2,Pintura,7.0,Acuarela,5,7000.0,40.0,30.0
-1393,Niño Maíz,3,Escultura,40.0,Modelado en barro,2,7300.0,30.0,15.0
-979,Curandero 11,7,Grabado,54.0,Serigrafía,3,3200.0,31.3,29.86
-991,Niebla en Molango 11,1,Fotografía,3.0,HDR,1,1850.0,58.38,32.94
-1433,Bolsa de Palma Huasteca,4,Artesanía,11.0,Tejido,4,3900.0,15.87,12.64
-1015,Milpa en Agosto 11,5,Ilustración,44.0,Ilustración digital,8,3150.0,26.73,17.24
-1076,Cántaro de la Sierra 12,3,Escultura,43.0,Fundición en metal,14,9750.0,200.0,150.0
-1094,Ritmo de Tambor 6,5,Ilustración,45.0,Tinta sobre papel,13,1500.0,42.43,37.19
-1095,Vendedora de Naranjas 7,5,Ilustración,45.0,Tinta sobre papel,13,1350.0,40.22,33.62
-985,Palma Tejida 5,3,Escultura,43.0,Fundición en metal,14,4300.0,40.0,30.0
-1035,Jaguar Mítico 7,7,Grabado,54.0,Serigrafía,3,2050.0,26.2,24.97
-1418,Abuela y Estrella,5,Ilustración,60.0,Tinta china,13,1600.0,30.0,24.0
-1395,Voz del Caracol,3,Escultura,43.0,Fundición en metal,14,4550.0,15.0,12.0
-1324,Vasija Escultórica 8,3,Escultura,43.0,Fundición en metal,14,6600.0,200.0,150.0
-1391,Colibrí en Vuelo,3,Escultura,43.0,Fundición en metal,14,5900.0,20.0,30.0
-1149,Barro Ritual 1,3,Escultura,43.0,Fundición en metal,14,4550.0,80.0,60.0
-1014,Paisaje Huasteco 10,5,Ilustración,45.0,Tinta sobre papel,13,1400.0,41.51,27.91
-1092,Milpa en Agosto 4,5,Ilustración,45.0,Tinta sobre papel,13,1950.0,61.2,54.17
-1229,Obsidiana y Jade 9,3,Escultura,43.0,Fundición en metal,14,8350.0,80.0,60.0
-1328,Monolito Verde 12,3,Escultura,43.0,Fundición en metal,14,8800.0,200.0,150.0
-1332,Figura Ritual 16,3,Escultura,43.0,Fundición en metal,14,9250.0,200.0,150.0
-1414,Calendario Xipeico,5,Ilustración,60.0,Tinta china,13,1900.0,35.0,35.0
-1457,Tazón Raku Humo,6,Cerámica,51.0,Raku,16,6350.0,12.0,18.0
-1059,Ritmo de Tambor 7,2,Pintura,9.0,Temple,11,3950.0,40.0,30.0
-1061,Horizonte Tropical 9,2,Pintura,7.0,Acuarela,5,8850.0,120.0,100.0
-1063,Paisaje Huasteco 11,2,Pintura,6.0,Óleo sobre lienzo,7,8050.0,40.0,30.0
-1458,Figura de Colibrí,6,Cerámica,61.0,Modelado a mano,15,4300.0,15.0,12.0
-1339,Mercado Huasteco,1,Fotografía,1.0,Fotografía digital,1,1300.0,25.89,18.87
-1346,Niebla en la Sierra,1,Fotografía,1.0,Fotografía digital,1,1950.0,83.73,63.44
-1347,Danza del Xantolo,1,Fotografía,1.0,Fotografía digital,1,1750.0,22.59,24.49
-1348,Reflejo en el Río,1,Fotografía,3.0,HDR,1,3750.0,55.35,30.05
-1349,Milpas bajo Tormenta,1,Fotografía,2.0,Fotografía analógica,1,1000.0,21.64,18.1
-1355,Mariposa Monarca en Paso,1,Fotografía,1.0,Fotografía digital,1,1500.0,46.21,42.52
-1361,Último Jacal,1,Fotografía,2.0,Fotografía analógica,1,1150.0,24.44,17.86
-1371,Danzante de Quetzales,2,Pintura,57.0,Técnica mixta,6,5450.0,85.0,65.0
-1377,Cascada Íntima,2,Pintura,7.0,Acuarela,5,3400.0,35.0,25.0
-957,Sierra Verde 1,1,Fotografía,1.0,Fotografía digital,1,2000.0,47.44,35.97
-958,Río Moctezuma al Atardecer 2,1,Fotografía,3.0,HDR,1,2050.0,55.49,49.21
-47,Tlahui,1,Fotografía,1.0,Fotografía digital,1,3950.0,180.0,100.0
-51,Espíritu Navideño,1,Fotografía,1.0,Fotografía digital,1,2150.0,57.83,33.91
-36,Pencas,1,Fotografía,1.0,Fotografía digital,1,2400.0,120.0,80.0
-1126,Río Moctezuma al Atardecer 2,1,Fotografía,2.0,Fotografía analógica,1,1950.0,28.4,21.64
-1151,Obsidiana y Jade 3,3,Escultura,41.0,Talla en madera,9,8350.0,200.0,150.0
-1388,Curandero Nahua,3,Escultura,40.0,Modelado en barro,2,5300.0,40.0,22.0
-1389,Espiral Cósmica,3,Escultura,42.0,Talla en piedra,10,4000.0,30.0,30.0
-1390,Madre Tierra,3,Escultura,40.0,Modelado en barro,2,6600.0,50.0,35.0
-959,Niebla en Molango 3,1,Fotografía,2.0,Fotografía analógica,1,1800.0,79.41,50.13
-1072,Cerámica Negra 8,3,Escultura,43.0,Fundición en metal,14,8050.0,200.0,150.0
-1140,Paisaje Huasteco 4,2,Pintura,8.0,Acrílico,6,6350.0,80.0,60.0
-1147,Paisaje Huasteco 11,2,Pintura,6.0,Óleo sobre lienzo,7,17950.0,200.0,150.0
-967,Niebla en Molango 11,1,Fotografía,3.0,HDR,1,2950.0,24.67,16.86
-1400,Tenek I,7,Grabado,54.0,Serigrafía,3,2250.0,55.0,42.0
-1401,Río Pánuco,7,Grabado,53.0,Xilografía,3,3550.0,45.0,35.0
-1001,Textura de Henequén 9,4,Artesanía,11.0,Tejido,4,2600.0,20.4,27.43
-1007,Niebla en Molango 3,1,Fotografía,4.0,Blanco y negro,1,3050.0,24.37,21.29
-1406,Barcos en Laguna,7,Grabado,55.0,Litografía,3,2050.0,45.0,35.0
-1407,Madre e Hijo,7,Grabado,54.0,Serigrafía,3,3750.0,55.0,42.0
-1016,Cascada de Tamul 12,1,Fotografía,2.0,Fotografía analógica,1,2100.0,53.26,33.98
-1022,Cántaro de la Sierra 6,6,Cerámica,48.0,Torno alfarero,2,5900.0,40.54,31.82
-1215,Niebla en Molango 7,1,Fotografía,4.0,Blanco y negro,1,3400.0,86.8,54.09
-1031,El Torito de Petate 3,7,Grabado,56.0,Linografía,13,3900.0,64.55,53.0
-1046,Río Moctezuma al Atardecer 6,1,Fotografía,4.0,Blanco y negro,1,2200.0,41.25,32.64
-1049,Montes Azules 9,1,Fotografía,4.0,Blanco y negro,1,2050.0,20.71,17.94
-1110,Máscara del Xantolo 10,7,Grabado,56.0,Linografía,13,1800.0,61.04,55.06
-1135,Niebla en Molango 11,1,Fotografía,4.0,Blanco y negro,1,2300.0,87.61,67.47
-1207,Curandero 11,7,Grabado,56.0,Linografía,13,4050.0,53.78,40.53
-1214,Río Moctezuma al Atardecer 6,1,Fotografía,4.0,Blanco y negro,1,3200.0,72.88,63.99
-1246,Danza del Gavilán 2,7,Grabado,56.0,Linografía,13,4350.0,63.67,49.06
-997,Curandero 5,7,Grabado,56.0,Linografía,13,1900.0,62.67,47.9
-1080,Maíz y Copal 4,6,Cerámica,50.0,Talavera,2,2750.0,33.14,35.06
-1202,Nahual 6,7,Grabado,56.0,Linografía,13,1500.0,27.86,22.85
-43,Sierra Alta,1,Fotografía,1.0,Fotografía digital,1,2000.0,120.0,80.0
-1359,Fiesta de San Juan,1,Fotografía,2.0,Fotografía analógica,1,1250.0,46.29,45.79
-35,Atardecer en la Sierra Alta,1,Fotografía,1.0,Fotografía digital,1,5750.0,120.0,80.0
-37,Puesto de comida en noche de huapangos.,1,Fotografía,1.0,Fotografía digital,1,2100.0,120.0,80.0
-40,Montañas de Tolantongo,1,Fotografía,1.0,Fotografía digital,1,2350.0,120.0,80.0
-48,Capital de Pueblo,1,Fotografía,1.0,Fotografía digital,1,4500.0,90.0,60.0
-41,Amigos tomando el sol.,1,Fotografía,1.0,Fotografía digital,1,3400.0,120.0,80.0
-44,De camino a mi departamento en Chapul,1,Fotografía,1.0,Fotografía digital,1,1600.0,120.0,80.0
-49,Portal de Colores,1,Fotografía,1.0,Fotografía digital,1,4650.0,120.0,80.0
-45,Calle de Chapulhuacán.,1,Fotografía,1.0,Fotografía digital,1,2150.0,58.05,36.72
-1128,Cascada de Tamul 4,1,Fotografía,3.0,HDR,1,950.0,21.03,24.86
-42,Valle de Sombras,1,Fotografía,1.0,Fotografía digital,1,4400.0,120.0,80.0
-1052,Cañaveal del Pantepec 12,1,Fotografía,5.0,Fotografía macro,1,3550.0,27.15,20.31
-1064,Cascada de Tamul 12,1,Fotografía,2.0,Fotografía analógica,1,3150.0,28.32,16.56
-1131,Ceiba Sagrada 7,1,Fotografía,2.0,Fotografía analógica,1,1250.0,46.91,49.57
-1461,Bowl de Gres,6,Cerámica,48.0,Torno alfarero,20,4250.0,8.0,22.0
-1134,Río Moctezuma al Atardecer 10,1,Fotografía,1.0,Fotografía digital,1,2050.0,28.27,20.06
-1195,Ceiba Sagrada 11,1,Fotografía,5.0,Fotografía macro,1,1200.0,41.77,38.72
-1203,Ceiba Sagrada 7,1,Fotografía,5.0,Fotografía macro,1,1800.0,43.29,36.14
-1216,Cascada de Tamul 8,1,Fotografía,3.0,HDR,1,2900.0,54.39,49.12
-1211,Ceiba Sagrada 3,1,Fotografía,2.0,Fotografía analógica,1,4000.0,82.93,51.04
-1213,Sierra Verde 5,1,Fotografía,5.0,Fotografía macro,1,2000.0,21.2,21.5
-1219,Ceiba Sagrada 11,1,Fotografía,1.0,Fotografía digital,1,2100.0,42.42,46.44
-1220,Cañaveal del Pantepec 12,1,Fotografía,2.0,Fotografía analógica,1,1850.0,48.67,49.12
-1228,Cañaveal del Pantepec 8,1,Fotografía,1.0,Fotografía digital,1,3150.0,72.77,58.52
-961,Montes Azules 5,1,Fotografía,3.0,HDR,1,2050.0,56.75,47.14
-965,Sierra Verde 9,1,Fotografía,2.0,Fotografía analógica,1,1350.0,44.89,40.21
-1133,Sierra Verde 9,1,Fotografía,2.0,Fotografía analógica,1,2300.0,44.85,45.06
-1041,Montes Azules 1,1,Fotografía,3.0,HDR,1,3550.0,29.47,20.78
-1048,Cascada de Tamul 8,1,Fotografía,5.0,Fotografía macro,1,1550.0,71.11,54.36
-1130,Serranía en Lluvia 6,1,Fotografía,2.0,Fotografía analógica,1,1250.0,46.09,44.66
-1065,Montes Azules 1,1,Fotografía,3.0,HDR,1,3750.0,29.1,20.79
-1200,Cascada de Tamul 4,1,Fotografía,1.0,Fotografía digital,1,2800.0,25.92,20.59
-1357,Camino de Piedra,1,Fotografía,1.0,Fotografía digital,1,4200.0,56.77,34.09
-1066,Serranía en Lluvia 2,1,Fotografía,3.0,HDR,1,2000.0,43.91,40.57
-1358,Cara de Lluvia,1,Fotografía,3.0,HDR,1,2550.0,63.38,68.72
-1217,Montes Azules 9,1,Fotografía,1.0,Fotografía digital,1,2000.0,57.75,40.2
-963,Ceiba Sagrada 7,1,Fotografía,1.0,Fotografía digital,1,1950.0,27.67,17.53
-966,Río Moctezuma al Atardecer 10,1,Fotografía,1.0,Fotografía digital,1,1100.0,23.59,18.75
-1021,Sierra Verde 5,1,Fotografía,2.0,Fotografía analógica,1,2200.0,28.82,23.67
-1042,Serranía en Lluvia 2,1,Fotografía,2.0,Fotografía analógica,1,1750.0,43.11,37.3
-1047,Niebla en Molango 7,1,Fotografía,2.0,Fotografía analógica,1,2800.0,26.35,15.7
-1137,Barro Ritual 1,6,Cerámica,49.0,Barro negro,2,5350.0,41.46,27.33
-1344,Río Moctezuma al Amanecer,1,Fotografía,3.0,HDR,1,1300.0,43.91,44.42
-1186,Cerámica Negra 2,6,Cerámica,51.0,Raku,2,1500.0,33.61,28.7
-1196,Cántaro de la Sierra 12,6,Cerámica,48.0,Torno alfarero,2,3650.0,22.22,26.32
-1350,Pulquería de Huejutla,1,Fotografía,1.0,Fotografía digital,1,3400.0,29.6,18.5
-1352,Árbol Ceiba Milenaria,1,Fotografía,2.0,Fotografía analógica,1,2750.0,86.26,67.75
-1353,Eclipse sobre Huasteca,1,Fotografía,1.0,Fotografía digital,1,1900.0,77.01,69.51
-1354,Copal al Viento,1,Fotografía,3.0,HDR,1,2550.0,46.64,40.4
-1356,Pescadores del Amanecer,1,Fotografía,2.0,Fotografía analógica,1,1700.0,51.1,34.25
-1360,Zopilotes al Vuelo,1,Fotografía,1.0,Fotografía digital,1,2400.0,69.49,58.45
-1045,Sierra Verde 5,1,Fotografía,1.0,Fotografía digital,1,4500.0,82.89,65.27
-1183,Palma Tejida 11,6,Cerámica,51.0,Raku,2,3400.0,11.11,8.89
-1338,Milpa en Flor,1,Fotografía,2.0,Fotografía analógica,1,1600.0,49.53,42.56
-1342,Milpa en Flor,1,Fotografía,2.0,Fotografía analógica,1,2450.0,82.77,55.71
-1343,Mercado Huasteco,1,Fotografía,1.0,Fotografía digital,1,3800.0,28.84,16.29
-1351,Cascada Tamul,1,Fotografía,3.0,HDR,1,1300.0,47.34,32.69
-1190,Cántaro de la Sierra 6,6,Cerámica,51.0,Raku,2,3600.0,19.72,23.34
-1104,Maíz y Copal 4,6,Cerámica,50.0,Talavera,2,2250.0,23.91,24.71
-1111,Palma Tejida 11,6,Cerámica,51.0,Raku,2,4900.0,44.78,32.1
-1208,Cántaro de la Sierra 12,6,Cerámica,51.0,Raku,2,3800.0,11.6,8.82
-1247,Obsidiana y Jade 3,3,Escultura,40.0,Modelado en barro,2,7000.0,120.0,100.0
-1107,Barro Ritual 7,6,Cerámica,49.0,Barro negro,2,3100.0,19.99,19.69
-1185,Barro Ritual 1,6,Cerámica,51.0,Raku,2,4800.0,26.54,19.57
-1237,Palma Tejida 5,3,Escultura,40.0,Modelado en barro,2,6900.0,200.0,150.0
-1105,Palma Tejida 5,6,Cerámica,49.0,Barro negro,2,5200.0,27.24,21.58
-1018,Cerámica Negra 2,6,Cerámica,51.0,Raku,2,1600.0,9.88,11.45
-1238,Cántaro de la Sierra 6,3,Escultura,40.0,Modelado en barro,2,6250.0,40.0,30.0
-1240,Cerámica Negra 8,3,Escultura,40.0,Modelado en barro,2,9250.0,120.0,100.0
-1321,Máscara Ceremonial 5,3,Escultura,40.0,Modelado en barro,2,5200.0,40.0,30.0
-1325,Guerrero Huasteco 9,3,Escultura,40.0,Modelado en barro,2,5350.0,40.0,30.0
-1329,Espiral del Tiempo 13,3,Escultura,40.0,Modelado en barro,2,6500.0,40.0,30.0
-1037,El Torito de Petate 9,7,Grabado,55.0,Litografía,3,2750.0,68.73,47.47
-1383,Mujer Serpiente,3,Escultura,40.0,Modelado en barro,2,4900.0,35.0,20.0
-1019,Obsidiana y Jade 3,6,Cerámica,48.0,Torno alfarero,2,3000.0,8.33,11.82
-1020,Máscara del Xantolo 4,7,Grabado,53.0,Xilografía,3,5500.0,67.28,57.96
-1152,Maíz y Copal 4,3,Escultura,40.0,Modelado en barro,2,5600.0,40.0,30.0
-1333,Tótem Tenek 17,3,Escultura,40.0,Modelado en barro,2,4800.0,40.0,30.0
-1116,Máscara del Xantolo 4,7,Grabado,53.0,Xilografía,3,1800.0,47.8,36.25
-1160,Cántaro de la Sierra 12,3,Escultura,40.0,Modelado en barro,2,11150.0,200.0,150.0
-1209,Barro Ritual 1,3,Escultura,40.0,Modelado en barro,2,5250.0,80.0,60.0
-1120,Danza del Gavilán 8,7,Grabado,53.0,Xilografía,3,3650.0,30.13,20.99
-1233,Barro Ritual 1,3,Escultura,40.0,Modelado en barro,2,4650.0,40.0,30.0
-1241,Obsidiana y Jade 9,3,Escultura,40.0,Modelado en barro,2,10450.0,200.0,150.0
-1317,Figura Ritual 1,3,Escultura,40.0,Modelado en barro,2,8650.0,40.0,30.0
-1386,Semilla Germinando,3,Escultura,40.0,Modelado en barro,2,7350.0,25.0,18.0
-1411,Pueblo Mágico,7,Grabado,54.0,Serigrafía,3,1350.0,65.0,50.0
-1100,Cántaro de la Sierra 12,6,Cerámica,50.0,Talavera,2,5600.0,44.7,31.8
-1115,El Torito de Petate 3,7,Grabado,54.0,Serigrafía,3,2600.0,62.54,47.12
-1121,El Torito de Petate 9,7,Grabado,55.0,Litografía,3,2900.0,68.07,53.07
-1118,Nahual 6,7,Grabado,54.0,Serigrafía,3,3050.0,66.3,46.22
-1122,Máscara del Xantolo 10,7,Grabado,55.0,Litografía,3,2050.0,60.85,45.99
-1123,Curandero 11,7,Grabado,55.0,Litografía,3,2200.0,30.65,24.02
-1198,Río Moctezuma al Atardecer 2,1,Fotografía,5.0,Fotografía macro,1,1950.0,23.07,16.82
-1199,El Torito de Petate 3,7,Grabado,52.0,Aguafuerte,3,2750.0,33.16,25.18
-1038,Máscara del Xantolo 10,7,Grabado,54.0,Serigrafía,3,3550.0,46.14,31.94
-1223,El Torito de Petate 3,7,Grabado,55.0,Litografía,3,1350.0,25.87,24.79
-1067,El Torito de Petate 3,7,Grabado,54.0,Serigrafía,3,1650.0,45.97,36.66
-1256,Nahual 12,7,Grabado,54.0,Serigrafía,3,2850.0,53.95,39.3
-1119,Jaguar Mítico 7,7,Grabado,55.0,Litografía,3,2450.0,64.83,57.4
-1132,Cañaveal del Pantepec 8,1,Fotografía,2.0,Fotografía analógica,1,1900.0,74.31,60.79
-1029,Jaguar Mítico 1,7,Grabado,53.0,Xilografía,3,2650.0,46.43,43.26
-1071,Jaguar Mítico 7,7,Grabado,53.0,Xilografía,3,3550.0,58.76,59.75
-1410,Frontera de Milpa,7,Grabado,55.0,Litografía,3,5200.0,50.0,40.0
-1405,Cosmovisión Nahua,7,Grabado,53.0,Xilografía,3,3700.0,50.0,50.0
-1397,Milpa desde Arriba,7,Grabado,54.0,Serigrafía,3,1550.0,60.0,45.0
-1398,Xantolo I,7,Grabado,55.0,Litografía,3,2250.0,50.0,40.0
-1034,Nahual 6,7,Grabado,54.0,Serigrafía,3,2900.0,64.62,47.85
-1187,Obsidiana y Jade 3,6,Cerámica,49.0,Barro negro,2,4100.0,10.19,12.32
-1446,Figura de Palma,4,Artesanía,11.0,Tejido,4,2450.0,12.37,16.65
-1408,Serpiente Emplumada,7,Grabado,52.0,Aguafuerte,3,2550.0,40.0,30.0
-1402,Ceiba Sagrada,7,Grabado,55.0,Litografía,3,4250.0,50.0,40.0
-1403,Quetzal,7,Grabado,54.0,Serigrafía,3,1350.0,60.0,45.0
-1404,Mercado I,7,Grabado,52.0,Aguafuerte,3,2000.0,35.0,28.0
-986,Nahual 6,7,Grabado,55.0,Litografía,3,1900.0,44.59,42.72
-1399,Danza del Volador,7,Grabado,52.0,Aguafuerte,3,1850.0,40.0,30.0
-1409,Huracán,7,Grabado,53.0,Xilografía,3,2350.0,48.0,38.0
-1449,Collar de Cuentas,4,Artesanía,59.0,Artesanía tradicional,4,2950.0,22.53,24.67
-1002,Hilos de la Milpa 10,4,Artesanía,11.0,Tejido,4,4000.0,26.86,19.03
-1077,Bordado Nahua 1,4,Artesanía,10.0,Bordado tradicional,4,3100.0,26.57,30.64
-1435,Faja Nahua Bordada,4,Artesanía,10.0,Bordado tradicional,4,4800.0,34.05,24.22
-1172,Telar Ancestral 12,4,Artesanía,11.0,Tejido,4,4300.0,28.88,22.55
-1253,Textura de Henequén 9,4,Artesanía,11.0,Tejido,4,2900.0,20.25,29.85
-1432,Quechquémitl Ceremonial,4,Artesanía,10.0,Bordado tradicional,4,4700.0,31.77,22.58
-1434,Sombrero de Palma,4,Artesanía,11.0,Tejido,4,4100.0,19.62,16.76
-1436,Petate Ceremonial,4,Artesanía,11.0,Tejido,4,3600.0,17.63,16.18
-1439,Canasta de Bejuco,4,Artesanía,11.0,Tejido,4,5600.0,19.43,18.98
-1443,Morral de Palma,4,Artesanía,11.0,Tejido,4,3350.0,15.86,19.35
-1441,Tapete de Palma,4,Artesanía,11.0,Tejido,4,2150.0,10.35,14.35
-1442,Bordado de Mariposas,4,Artesanía,10.0,Bordado tradicional,4,3650.0,14.1,16.5
-1447,Abanico de Palma,4,Artesanía,11.0,Tejido,4,4050.0,28.2,18.95
-1445,Mantel Tenek,4,Artesanía,10.0,Bordado tradicional,4,2450.0,23.13,28.47
-1450,Frutero de Bejuco,4,Artesanía,11.0,Tejido,4,3500.0,27.34,26.68
-1451,Cinturón Bordado,4,Artesanía,10.0,Bordado tradicional,4,3550.0,26.32,19.18
-996,Hilos de la Milpa 4,4,Artesanía,10.0,Bordado tradicional,4,5200.0,54.4,28.21
-1036,Tejido de Luz 8,4,Artesanía,11.0,Tejido,4,2900.0,38.05,42.73
-1000,Tejido de Luz 8,4,Artesanía,10.0,Bordado tradicional,4,3050.0,43.9,43.25
-995,Textura de Henequén 3,4,Artesanía,11.0,Tejido,4,2950.0,41.32,43.86
-1009,Mercado de Huejutla 5,5,Ilustración,47.0,Acuarela ilustrada,5,1250.0,22.54,18.45
-1054,Horizonte Tropical 2,2,Pintura,7.0,Acuarela,5,4700.0,40.0,30.0
-1166,Telar Ancestral 6,4,Artesanía,11.0,Tejido,4,3050.0,11.84,18.91
-1102,Cerámica Negra 2,6,Cerámica,51.0,Raku,2,6150.0,44.01,34.84
-1144,Vendedora de Naranjas 8,5,Ilustración,47.0,Acuarela ilustrada,5,2450.0,57.79,48.72
-976,Vendedora de Naranjas 8,2,Pintura,7.0,Acuarela,5,3150.0,40.0,30.0
-1251,Bordado Nahua 7,4,Artesanía,10.0,Bordado tradicional,4,3250.0,24.37,26.85
-1427,Retrato de Río,5,Ilustración,7.0,Acuarela,5,1900.0,35.0,25.0
-1148,Milpa en Agosto 12,2,Pintura,7.0,Acuarela,5,5550.0,40.0,30.0
-1431,Dios del Viento,5,Ilustración,7.0,Acuarela,5,2400.0,40.0,30.0
-1013,Amanecer en la Huasteca 9,5,Ilustración,47.0,Acuarela ilustrada,5,2200.0,49.01,39.06
-994,Tejido de Luz 2,4,Artesanía,10.0,Bordado tradicional,4,4500.0,50.09,33.91
-1081,Mujer Tenek 5,4,Artesanía,10.0,Bordado tradicional,4,5100.0,32.3,25.57
-1164,Hilos de la Milpa 4,4,Artesanía,10.0,Bordado tradicional,4,4150.0,16.98,17.84
-1231,Paisaje Huasteco 11,2,Pintura,7.0,Acuarela,5,12850.0,200.0,150.0
-1415,Herbario Nahua,5,Ilustración,7.0,Acuarela,5,3500.0,45.0,30.0
-1419,Catálogo de Maíces,5,Ilustración,7.0,Acuarela,5,900.0,50.0,35.0
-1070,Nahual 6,7,Grabado,55.0,Litografía,3,3300.0,68.06,46.71
-1423,Jardín de Colibrís,5,Ilustración,7.0,Acuarela,5,1350.0,40.0,30.0
-1093,Mercado de Huejutla 5,2,Pintura,7.0,Acuarela,5,8700.0,80.0,60.0
-1003,Ritmo de Tambor 11,2,Pintura,7.0,Acuarela,5,4650.0,80.0,60.0
-1023,Mercado de Huejutla 7,2,Pintura,7.0,Acuarela,5,9550.0,120.0,100.0
-1033,Horizonte Tropical 5,5,Ilustración,47.0,Acuarela ilustrada,5,2900.0,26.08,21.15
-1124,Nahual 12,7,Grabado,53.0,Xilografía,3,2400.0,31.57,20.75
-1176,Máscara del Xantolo 4,7,Grabado,54.0,Serigrafía,3,1800.0,62.75,48.85
-1227,Ritmo de Tambor 7,2,Pintura,7.0,Acuarela,5,3900.0,40.0,30.0
-1298,Bodegón Huasteco 2,2,Pintura,7.0,Acuarela,5,7150.0,80.0,60.0
-1006,Amanecer en la Huasteca 2,5,Ilustración,47.0,Acuarela ilustrada,5,1300.0,20.9,22.96
-1159,Palma Tejida 11,3,Escultura,40.0,Modelado en barro,2,6800.0,120.0,100.0
-1302,Calle de Molango 6,2,Pintura,7.0,Acuarela,5,6950.0,80.0,60.0
-1306,Cañada al Amanecer 10,2,Pintura,7.0,Acuarela,5,4650.0,80.0,60.0
-1168,Paisaje Huasteco 8,2,Pintura,7.0,Acuarela,5,3700.0,80.0,60.0
-1011,Vendedora de Naranjas 7,5,Ilustración,47.0,Acuarela ilustrada,5,3100.0,63.59,51.6
-1184,Nahual 12,7,Grabado,52.0,Aguafuerte,3,1800.0,30.92,20.97
-1210,Serranía en Lluvia 2,1,Fotografía,2.0,Fotografía analógica,1,2000.0,53.81,43.51
-1101,Barro Ritual 1,6,Cerámica,48.0,Torno alfarero,2,4450.0,26.21,25.43
-1310,Ventana al Pantepec 14,2,Pintura,7.0,Acuarela,5,5250.0,80.0,60.0
-1314,Paisaje Huasteco 18,2,Pintura,7.0,Acuarela,5,6400.0,80.0,60.0
-1138,Horizonte Tropical 2,2,Pintura,8.0,Acrílico,6,13650.0,200.0,150.0
-1139,Amanecer en la Huasteca 3,2,Pintura,7.0,Acuarela,5,4750.0,40.0,30.0
-1167,Amanecer en la Huasteca 7,2,Pintura,8.0,Acrílico,6,4300.0,40.0,30.0
-1142,Mercado de Huejutla 6,2,Pintura,8.0,Acrílico,6,15200.0,200.0,150.0
-1363,Barranca Dorada,2,Pintura,8.0,Acrílico,6,4350.0,70.0,50.0
-1366,Retrato de Abuela Tenek,2,Pintura,8.0,Acrílico,6,6800.0,55.0,45.0
-1154,Paisaje Huasteco 6,2,Pintura,8.0,Acrílico,6,5900.0,80.0,60.0
-1165,Mujer Tenek 5,4,Artesanía,11.0,Tejido,4,4800.0,19.89,14.89
-1230,Amanecer en la Huasteca 10,2,Pintura,8.0,Acrílico,6,10350.0,120.0,100.0
-1236,Maíz y Copal 4,6,Cerámica,48.0,Torno alfarero,2,2400.0,25.08,22.52
-1369,Ceiba Cósmica,2,Pintura,8.0,Acrílico,6,6700.0,120.0,90.0
-1375,Atardecer Tamazunchale,2,Pintura,8.0,Acrílico,6,4750.0,60.0,50.0
-1380,Nopal al Mediodía,2,Pintura,8.0,Acrílico,6,3600.0,45.0,35.0
-1056,Paisaje Huasteco 4,2,Pintura,6.0,Óleo sobre lienzo,7,4350.0,120.0,100.0
-1146,Amanecer en la Huasteca 10,2,Pintura,6.0,Óleo sobre lienzo,7,11050.0,120.0,100.0
-1222,Horizonte Tropical 2,2,Pintura,6.0,Óleo sobre lienzo,7,4200.0,40.0,30.0
-1058,Mercado de Huejutla 6,2,Pintura,8.0,Acrílico,6,16050.0,200.0,150.0
-1205,Mercado de Huejutla 9,2,Pintura,8.0,Acrílico,6,6850.0,40.0,30.0
-1225,Milpa en Agosto 5,2,Pintura,8.0,Acrílico,6,7300.0,120.0,100.0
-1051,Mercado de Huejutla 11,2,Pintura,7.0,Acuarela,5,11450.0,120.0,100.0
-1145,Horizonte Tropical 9,2,Pintura,8.0,Acrílico,6,8300.0,80.0,60.0
-1221,Vendedora de Naranjas 1,2,Pintura,8.0,Acrílico,6,15650.0,200.0,150.0
-1299,Paisaje Huasteco 3,2,Pintura,8.0,Acrílico,6,7750.0,120.0,100.0
-1303,Río del Pantepec 7,2,Pintura,8.0,Acrílico,6,8600.0,120.0,100.0
-1307,Frutos de la Milpa 11,2,Pintura,8.0,Acrílico,6,8750.0,120.0,100.0
-1311,Luz de Octubre 15,2,Pintura,8.0,Acrílico,6,12000.0,120.0,100.0
-1315,Mujer con Rebozo 19,2,Pintura,8.0,Acrílico,6,11000.0,120.0,100.0
-1367,Espíritu del Río,2,Pintura,6.0,Óleo sobre lienzo,7,7000.0,90.0,70.0
-1379,Bordado Viviente,2,Pintura,57.0,Técnica mixta,6,5250.0,50.0,50.0
-1143,Ritmo de Tambor 7,2,Pintura,8.0,Acrílico,6,8200.0,40.0,30.0
-975,Ritmo de Tambor 7,2,Pintura,6.0,Óleo sobre lienzo,7,13850.0,200.0,150.0
-1232,Nahual 12,7,Grabado,52.0,Aguafuerte,3,1400.0,44.0,33.0
-1242,Maíz y Copal 10,6,Cerámica,49.0,Barro negro,2,5600.0,15.76,17.61
-1040,Telar Ancestral 12,4,Artesanía,10.0,Bordado tradicional,4,3050.0,21.41,29.75
-1062,Amanecer en la Huasteca 10,2,Pintura,6.0,Óleo sobre lienzo,7,16150.0,200.0,150.0
-1305,Danza en Color 9,2,Pintura,6.0,Óleo sobre lienzo,7,4150.0,40.0,30.0
-1103,Obsidiana y Jade 3,6,Cerámica,48.0,Torno alfarero,2,4350.0,22.61,18.87
-1108,Cerámica Negra 8,6,Cerámica,48.0,Torno alfarero,2,2900.0,11.44,14.63
-1309,Sombras de la Huasteca 13,2,Pintura,6.0,Óleo sobre lienzo,7,4550.0,40.0,30.0
-1313,Bodegón Huasteco 17,2,Pintura,6.0,Óleo sobre lienzo,7,6550.0,40.0,30.0
-974,Mercado de Huejutla 6,2,Pintura,6.0,Óleo sobre lienzo,7,11250.0,120.0,100.0
-1044,Cañaveal del Pantepec 4,1,Fotografía,1.0,Fotografía digital,1,1850.0,23.2,24.86
-1301,Flores de Cempasúchil 5,2,Pintura,6.0,Óleo sobre lienzo,7,4150.0,40.0,30.0
-1370,Maíz Azul,2,Pintura,6.0,Óleo sobre lienzo,7,2550.0,65.0,50.0
-1193,Obsidiana y Jade 9,6,Cerámica,48.0,Torno alfarero,2,3150.0,33.4,31.78
-1376,Mujer del Mercado,2,Pintura,6.0,Óleo sobre lienzo,7,3700.0,80.0,65.0
-1194,Horizonte Tropical 10,5,Ilustración,47.0,Acuarela ilustrada,5,1800.0,37.05,32.24
-1378,El Guardián del Maíz,2,Pintura,6.0,Óleo sobre lienzo,7,10300.0,95.0,75.0
-970,Horizonte Tropical 2,2,Pintura,6.0,Óleo sobre lienzo,7,15750.0,200.0,150.0
-1234,Ritmo de Tambor 2,2,Pintura,6.0,Óleo sobre lienzo,7,6150.0,80.0,60.0
-1297,Retrato de la Sierra 1,2,Pintura,6.0,Óleo sobre lienzo,7,4200.0,40.0,30.0
-1173,Horizonte Tropical 1,5,Ilustración,44.0,Ilustración digital,8,2050.0,41.35,28.32
-1096,Horizonte Tropical 8,5,Ilustración,44.0,Ilustración digital,8,1900.0,36.85,36.88
-1372,Huachichil en el Monte,2,Pintura,6.0,Óleo sobre lienzo,7,9400.0,75.0,60.0
-1177,Mercado de Huejutla 5,5,Ilustración,44.0,Ilustración digital,8,1850.0,59.82,59.57
-1099,Milpa en Agosto 11,5,Ilustración,44.0,Ilustración digital,8,2750.0,58.59,53.39
-1109,Obsidiana y Jade 9,6,Cerámica,50.0,Talavera,2,4800.0,26.85,16.02
-1179,Vendedora de Naranjas 7,5,Ilustración,44.0,Ilustración digital,8,1650.0,29.06,17.89
-1189,Palma Tejida 5,6,Cerámica,48.0,Torno alfarero,2,2550.0,30.91,34.69
-1245,Barro Ritual 1,6,Cerámica,50.0,Talavera,2,3450.0,21.48,23.88
-1362,Xochicueitl en Fiesta,2,Pintura,6.0,Óleo sobre lienzo,7,8100.0,80.0,60.0
-968,Cascada de Tamul 12,1,Fotografía,4.0,Blanco y negro,1,3100.0,26.58,18.96
-1089,Horizonte Tropical 1,5,Ilustración,44.0,Ilustración digital,8,1750.0,64.65,56.55
-1365,Lluvia de Copal,2,Pintura,6.0,Óleo sobre lienzo,7,3000.0,100.0,80.0
-1129,Ritmo de Tambor 5,5,Ilustración,44.0,Ilustración digital,8,2250.0,53.64,42.94
-1381,Procesión Nocturna,2,Pintura,6.0,Óleo sobre lienzo,7,8600.0,110.0,85.0
-1430,Atlas de la Huasteca,5,Ilustración,44.0,Ilustración digital,8,1100.0,60.0,45.0
-1182,Paisaje Huasteco 10,5,Ilustración,44.0,Ilustración digital,8,2800.0,43.58,36.53
-1424,Amate Cósmico,5,Ilustración,44.0,Ilustración digital,8,2400.0,45.0,35.0
-990,Maíz y Copal 10,3,Escultura,41.0,Talla en madera,9,10750.0,200.0,150.0
-1412,Bestiary Huasteco I,5,Ilustración,44.0,Ilustración digital,8,2100.0,40.0,30.0
-1091,Paisaje Huasteco 3,5,Ilustración,44.0,Ilustración digital,8,2050.0,49.45,32.12
-1175,Paisaje Huasteco 3,5,Ilustración,44.0,Ilustración digital,8,3700.0,45.2,39.75
-1426,Ferias de Pueblo,5,Ilustración,44.0,Ilustración digital,8,1550.0,55.0,45.0
-1417,Tianguis Cósmico,5,Ilustración,44.0,Ilustración digital,8,2150.0,45.0,35.0
-1420,El Último Chamán,5,Ilustración,44.0,Ilustración digital,8,1850.0,40.0,30.0
-1248,Cascada de Tamul 4,1,Fotografía,2.0,Fotografía analógica,1,1550.0,74.13,66.92
-1413,Mapa del Inframundo,5,Ilustración,44.0,Ilustración digital,8,1350.0,50.0,35.0
-960,Cascada de Tamul 4,1,Fotografía,1.0,Fotografía digital,1,1650.0,50.91,32.64
-1416,Leyenda de la Llorona,5,Ilustración,44.0,Ilustración digital,8,2700.0,55.0,40.0
-1422,Mensajero Huasteco,5,Ilustración,44.0,Ilustración digital,8,1800.0,50.0,40.0
-1428,Vuelo de Teporingo,5,Ilustración,44.0,Ilustración digital,8,1300.0,40.0,30.0
-1068,Maíz y Copal 4,3,Escultura,41.0,Talla en madera,9,4350.0,80.0,60.0
-1073,Obsidiana y Jade 9,3,Escultura,41.0,Talla en madera,9,5250.0,40.0,30.0
-984,Maíz y Copal 4,3,Escultura,41.0,Talla en madera,9,8950.0,200.0,150.0
-982,Cerámica Negra 2,3,Escultura,41.0,Talla en madera,9,5300.0,80.0,60.0
-1150,Cerámica Negra 2,3,Escultura,41.0,Talla en madera,9,8550.0,120.0,100.0
-1156,Cerámica Negra 8,3,Escultura,40.0,Modelado en barro,2,7800.0,200.0,150.0
-988,Cerámica Negra 8,3,Escultura,41.0,Talla en madera,9,5500.0,120.0,100.0
-992,Cántaro de la Sierra 12,3,Escultura,41.0,Talla en madera,9,7300.0,40.0,30.0
-1055,Amanecer en la Huasteca 3,2,Pintura,7.0,Acuarela,5,8600.0,80.0,60.0
-1082,Telar Ancestral 6,4,Artesanía,10.0,Bordado tradicional,4,4150.0,50.07,43.76
-1125,Barro Ritual 1,6,Cerámica,51.0,Raku,2,4000.0,24.62,23.32
-1206,Máscara del Xantolo 10,7,Grabado,56.0,Linografía,13,3500.0,33.46,20.96
-1218,Maíz y Copal 10,3,Escultura,41.0,Talla en madera,9,5850.0,120.0,100.0
-1318,Tótem Tenek 2,3,Escultura,41.0,Talla en madera,9,4850.0,80.0,60.0
-1322,Nahual de la Sierra 6,3,Escultura,41.0,Talla en madera,9,5500.0,80.0,60.0
-983,Obsidiana y Jade 3,3,Escultura,41.0,Talla en madera,9,6050.0,120.0,100.0
-1028,Cántaro de la Sierra 12,6,Cerámica,48.0,Torno alfarero,2,4350.0,22.2,22.07
-1326,Ave Sagrada 10,3,Escultura,41.0,Talla en madera,9,5000.0,80.0,60.0
-1074,Maíz y Copal 10,3,Escultura,41.0,Talla en madera,9,6350.0,80.0,60.0
-1330,Danzante Eterno 14,3,Escultura,41.0,Talla en madera,9,3950.0,80.0,60.0
-1153,Mujer Tenek 5,4,Artesanía,10.0,Bordado tradicional,4,5000.0,49.98,44.66
-1394,Jaguar Dormido,3,Escultura,41.0,Talla en madera,9,4850.0,35.0,55.0
-1050,Hilos de la Milpa 10,4,Artesanía,11.0,Tejido,4,2950.0,41.18,39.79
-1192,Cerámica Negra 8,6,Cerámica,50.0,Talavera,2,2900.0,19.63,21.04
-1197,Jaguar Mítico 1,7,Grabado,56.0,Linografía,13,2300.0,28.62,26.74
-1396,Raíz Humana,3,Escultura,41.0,Talla en madera,9,7750.0,80.0,20.0
-1384,Árbol de la Vida,3,Escultura,41.0,Talla en madera,9,4150.0,60.0,25.0
-1114,Cerámica Negra 2,3,Escultura,42.0,Talla en piedra,10,6850.0,120.0,100.0
-1083,Barro Ritual 7,3,Escultura,42.0,Talla en piedra,10,4600.0,40.0,30.0
-1331,Deidad del Maíz 15,3,Escultura,42.0,Talla en piedra,10,6600.0,120.0,100.0
-962,Cántaro de la Sierra 6,3,Escultura,42.0,Talla en piedra,10,5650.0,80.0,60.0
-1043,Obsidiana y Jade 3,3,Escultura,42.0,Talla en piedra,10,7100.0,80.0,60.0
-1069,Palma Tejida 5,3,Escultura,42.0,Talla en piedra,10,5150.0,120.0,100.0
-1075,Palma Tejida 11,3,Escultura,42.0,Talla en piedra,10,6550.0,120.0,100.0
-1088,Telar Ancestral 12,4,Artesanía,11.0,Tejido,4,2900.0,24.92,21.86
-1157,Obsidiana y Jade 9,3,Escultura,42.0,Talla en piedra,10,6250.0,40.0,30.0
-1239,Barro Ritual 7,3,Escultura,42.0,Talla en piedra,10,7750.0,80.0,60.0
-1250,Cántaro de la Sierra 6,3,Escultura,42.0,Talla en piedra,10,10750.0,200.0,150.0
-1319,Torso Ancestral 3,3,Escultura,42.0,Talla en piedra,10,4950.0,120.0,100.0
-1327,Manos que Crean 11,3,Escultura,42.0,Talla en piedra,10,5600.0,120.0,100.0
-1334,Torso Ancestral 18,3,Escultura,41.0,Talla en madera,9,5450.0,80.0,60.0
-1387,Torso del Viento,3,Escultura,41.0,Talla en madera,9,7600.0,70.0,30.0
-1335,Ofrenda Ceremonial 19,3,Escultura,42.0,Talla en piedra,10,9400.0,120.0,100.0
-1323,Ídolo de la Sierra 7,3,Escultura,42.0,Talla en piedra,10,6250.0,120.0,100.0
-1012,Horizonte Tropical 8,5,Ilustración,47.0,Acuarela ilustrada,5,1550.0,28.06,22.0
-1141,Milpa en Agosto 5,2,Pintura,9.0,Temple,11,8950.0,120.0,100.0
-1243,Palma Tejida 11,3,Escultura,42.0,Talla en piedra,10,4350.0,40.0,30.0
-972,Paisaje Huasteco 4,2,Pintura,9.0,Temple,11,5300.0,40.0,30.0
-973,Milpa en Agosto 5,2,Pintura,9.0,Temple,11,9850.0,80.0,60.0
-977,Horizonte Tropical 9,2,Pintura,9.0,Temple,11,5350.0,80.0,60.0
-1024,Cerámica Negra 8,6,Cerámica,49.0,Barro negro,2,3050.0,11.46,17.25
-1039,Vendedora de Naranjas 11,2,Pintura,9.0,Temple,11,4300.0,40.0,30.0
-1316,Flores de Cempasúchil 20,2,Pintura,9.0,Temple,11,15750.0,200.0,150.0
-1382,Tláloc Moderno,3,Escultura,42.0,Talla en piedra,10,7650.0,45.0,30.0
-1385,Guerrero Jaguar,3,Escultura,42.0,Talla en piedra,10,3700.0,50.0,35.0
-1392,Caracol del Tiempo,3,Escultura,42.0,Talla en piedra,10,5150.0,40.0,40.0
-1304,Naturaleza Viva 8,2,Pintura,9.0,Temple,11,15500.0,200.0,150.0
-1090,Amanecer en la Huasteca 2,5,Ilustración,44.0,Ilustración digital,8,1250.0,38.71,31.78
-1308,Rostro Ancestral 12,2,Pintura,9.0,Temple,11,16900.0,200.0,150.0
-1312,Retrato de la Sierra 16,2,Pintura,9.0,Temple,11,10950.0,200.0,150.0
-1032,Maíz y Copal 4,3,Escultura,42.0,Talla en piedra,10,7200.0,200.0,150.0
-1112,Cántaro de la Sierra 12,6,Cerámica,49.0,Barro negro,2,6450.0,43.15,36.6
-1117,Sierra Verde 5,1,Fotografía,3.0,HDR,1,4550.0,88.15,52.05
-1136,Cascada de Tamul 12,1,Fotografía,3.0,HDR,1,1850.0,51.42,40.7
-1201,Curandero 5,7,Grabado,54.0,Serigrafía,3,2000.0,46.73,39.0
-1300,Mujer con Rebozo 4,2,Pintura,9.0,Temple,11,14900.0,200.0,150.0
-1025,Obsidiana y Jade 9,6,Cerámica,48.0,Torno alfarero,2,5450.0,41.37,39.78
-969,Vendedora de Naranjas 1,2,Pintura,9.0,Temple,11,7200.0,120.0,100.0
-1178,Ritmo de Tambor 6,2,Pintura,9.0,Temple,11,8200.0,120.0,100.0
-978,Amanecer en la Huasteca 10,2,Pintura,8.0,Acrílico,6,9350.0,120.0,100.0
-1255,Mujer Tenek 11,4,Artesanía,10.0,Bordado tradicional,4,4950.0,32.33,29.75
-1204,Milpa en Agosto 8,2,Pintura,9.0,Temple,11,11250.0,200.0,150.0
-980,Milpa en Agosto 12,2,Pintura,9.0,Temple,11,14950.0,200.0,150.0
-993,Bordado Nahua 1,4,Artesanía,10.0,Bordado tradicional,4,4750.0,30.53,23.93
-1224,Paisaje Huasteco 4,2,Pintura,9.0,Temple,11,5650.0,80.0,60.0
-1226,Mercado de Huejutla 6,2,Pintura,9.0,Temple,11,19300.0,200.0,150.0
-1368,Cosecha bajo Luna,2,Pintura,9.0,Temple,11,6550.0,50.0,40.0
-1374,Tláloc en la Milpa,2,Pintura,9.0,Temple,11,8650.0,70.0,55.0
-1030,Danza del Gavilán 2,7,Grabado,54.0,Serigrafía,3,3400.0,63.94,48.41
-1163,Textura de Henequén 3,4,Artesanía,12.0,Talabartería,12,2150.0,28.51,29.9
-987,Barro Ritual 7,3,Escultura,40.0,Modelado en barro,2,4350.0,80.0,60.0
-1169,Textura de Henequén 9,4,Artesanía,12.0,Talabartería,12,3150.0,13.53,14.46
-1252,Tejido de Luz 8,4,Artesanía,12.0,Talabartería,12,5000.0,52.58,44.29
-1078,Tejido de Luz 2,4,Artesanía,12.0,Talabartería,12,3500.0,49.24,33.11
-1084,Tejido de Luz 8,4,Artesanía,12.0,Talabartería,12,5050.0,52.73,34.99
-1085,Textura de Henequén 9,4,Artesanía,12.0,Talabartería,12,1700.0,12.34,14.67
-1437,Talabartería Floral,4,Artesanía,12.0,Talabartería,12,2050.0,14.8,15.52
-1440,Huaraches de Cuero,4,Artesanía,12.0,Talabartería,12,4400.0,19.83,18.97
-1444,Cartera de Cuero Floral,4,Artesanía,12.0,Talabartería,12,1900.0,20.2,23.39
-981,Barro Ritual 1,3,Escultura,42.0,Talla en piedra,10,5050.0,40.0,30.0
-998,Telar Ancestral 6,4,Artesanía,12.0,Talabartería,12,3850.0,28.0,23.63
-999,Bordado Nahua 7,4,Artesanía,12.0,Talabartería,12,2800.0,10.94,17.69
-1004,Telar Ancestral 12,4,Artesanía,12.0,Talabartería,12,5100.0,33.55,18.01
-1060,Vendedora de Naranjas 8,2,Pintura,7.0,Acuarela,5,4850.0,80.0,60.0
-1086,Hilos de la Milpa 10,4,Artesanía,12.0,Talabartería,12,2300.0,10.55,14.15
-1171,Mujer Tenek 11,4,Artesanía,12.0,Talabartería,12,1600.0,38.97,36.57
-1010,Ritmo de Tambor 6,5,Ilustración,47.0,Acuarela ilustrada,5,3050.0,46.5,36.28
-1106,Cántaro de la Sierra 6,6,Cerámica,48.0,Torno alfarero,2,4400.0,25.36,25.51
-1017,Barro Ritual 1,6,Cerámica,51.0,Raku,2,4700.0,27.78,27.27
-1174,Amanecer en la Huasteca 2,5,Ilustración,45.0,Tinta sobre papel,13,2250.0,58.92,43.93
-1005,Horizonte Tropical 1,5,Ilustración,45.0,Tinta sobre papel,13,3450.0,47.91,28.12
-1027,Mujer Tenek 11,4,Artesanía,12.0,Talabartería,12,2500.0,47.83,30.02
-1057,Milpa en Agosto 5,5,Ilustración,45.0,Tinta sobre papel,13,3450.0,27.96,23.32
-1170,Serranía en Lluvia 10,1,Fotografía,4.0,Blanco y negro,1,1900.0,22.08,17.41
-1008,Milpa en Agosto 4,5,Ilustración,44.0,Ilustración digital,8,3500.0,48.76,34.67
-1181,Amanecer en la Huasteca 9,5,Ilustración,46.0,Lápiz y grafito,13,3050.0,45.05,37.39
-1191,Barro Ritual 7,6,Cerámica,48.0,Torno alfarero,2,5250.0,41.28,32.87
-1249,Vendedora de Naranjas 5,5,Ilustración,45.0,Tinta sobre papel,13,2400.0,43.19,35.72
-971,Textura de Henequén 3,4,Artesanía,12.0,Talabartería,12,3200.0,41.56,32.05
-1026,Maíz y Copal 10,6,Cerámica,50.0,Talavera,2,3850.0,14.85,10.22
-1053,Vendedora de Naranjas 1,2,Pintura,7.0,Acuarela,5,15100.0,200.0,150.0
-964,Tejido de Luz 8,4,Artesanía,12.0,Talabartería,12,4200.0,28.85,27.33
-1079,Textura de Henequén 3,4,Artesanía,12.0,Talabartería,12,3700.0,29.71,24.6
-1161,Bordado Nahua 1,4,Artesanía,11.0,Tejido,4,2900.0,41.68,37.49
-1180,Horizonte Tropical 8,5,Ilustración,46.0,Lápiz y grafito,13,1350.0,40.21,37.56
-1188,Cañaveal del Pantepec 4,1,Fotografía,5.0,Fotografía macro,1,1600.0,67.02,65.82
-1421,Serpientes del Cielo,5,Ilustración,60.0,Tinta china,13,1350.0,35.0,28.0
-1098,Paisaje Huasteco 10,5,Ilustración,45.0,Tinta sobre papel,13,1900.0,28.71,22.29
-1212,Cañaveal del Pantepec 4,1,Fotografía,4.0,Blanco y negro,1,850.0,20.23,18.66
-1254,Hilos de la Milpa 10,4,Artesanía,10.0,Bordado tradicional,4,5100.0,52.29,42.27
-1113,Jaguar Mítico 1,7,Grabado,52.0,Aguafuerte,3,3800.0,34.44,25.63
-989,Ritmo de Tambor 9,5,Ilustración,46.0,Lápiz y grafito,13,1950.0,61.05,53.0
-1087,Mujer Tenek 11,4,Artesanía,12.0,Talabartería,12,4650.0,33.71,20.84
-1127,Milpa en Agosto 3,5,Ilustración,46.0,Lápiz y grafito,13,2250.0,37.07,35.8
-1425,Historia de una Semilla,5,Ilustración,60.0,Tinta china,13,1500.0,60.0,20.0
-1429,Luna Llena en Milpa,5,Ilustración,60.0,Tinta china,13,1200.0,28.0,21.0
-1162,Tejido de Luz 2,4,Artesanía,12.0,Talabartería,12,1550.0,22.91,19.19
-1097,Amanecer en la Huasteca 9,5,Ilustración,45.0,Tinta sobre papel,13,2000.0,47.36,30.08
-1336,Máscara Ceremonial 20,3,Escultura,43.0,Fundición en metal,14,6650.0,200.0,150.0
-1452,Olla de Barro Negro,6,Cerámica,48.0,Torno alfarero,17,4750.0,25.0,20.0
-1466,Platón Barro Negro,6,Cerámica,48.0,Torno alfarero,17,2250.0,6.0,35.0
-1465,Vasija de Porcelana,6,Cerámica,48.0,Torno alfarero,19,2350.0,22.0,16.0
-1454,Taza de Raku,6,Cerámica,51.0,Raku,16,4050.0,10.0,10.0
-1456,Cántaro Ceremonial,6,Cerámica,61.0,Modelado a mano,15,5400.0,40.0,25.0
-1463,Plato Ritual,6,Cerámica,61.0,Modelado a mano,15,3600.0,4.0,30.0
-1462,Jarrón Craquelado,6,Cerámica,48.0,Torno alfarero,16,3900.0,30.0,15.0
-1155,Barro Ritual 7,3,Escultura,43.0,Fundición en metal,14,7000.0,120.0,100.0
-1158,Maíz y Copal 10,3,Escultura,43.0,Fundición en metal,14,7100.0,80.0,60.0
-1235,Obsidiana y Jade 3,3,Escultura,43.0,Fundición en metal,14,6600.0,120.0,100.0
-1244,Cántaro de la Sierra 12,3,Escultura,43.0,Fundición en metal,14,7100.0,80.0,60.0
-1320,Ofrenda Ceremonial 4,3,Escultura,43.0,Fundición en metal,14,10450.0,200.0,150.0
-1448,Cuadro en Papel Amate,4,Artesanía,58.0,Pintado en amate,18,3100.0,14.52,10.76
-1453,Vasija Tláloc,6,Cerámica,61.0,Modelado a mano,15,3600.0,30.0,22.0
-1455,Plato Huasteco,6,Cerámica,48.0,Torno alfarero,16,4350.0,5.0,28.0
-1459,Maceta Tenek,6,Cerámica,48.0,Torno alfarero,17,4450.0,20.0,18.0
-1460,Incensario Prehispánico,6,Cerámica,61.0,Modelado a mano,15,2250.0,35.0,20.0
-1464,Alcancía Armadillo,6,Cerámica,61.0,Modelado a mano,15,3900.0,18.0,14.0
+1340,Río Moctezuma al Amanecer,1,Fotografía,3,HDR,1,1050.0,21.94,18.73
+2961,Alba en Tlanchinol,1,Fotografía,1,Fotografía digital,1,2350.0,29.8,32.7
+2962,Danza de las Varitas,1,Fotografía,5,Fotografía macro,8,2050.0,38.0,40.3
+1438,Papel Amate Pintado,4,Artesanía,58,Pintado en amate,18,3450.0,43.03,44.18
+50,Expiatorio en Guadalajara,1,Fotografía,1,Fotografía digital,1,2700.0,80.3,61.07
+1345,Tejedora de Xilitla,1,Fotografía,2,Fotografía analógica,1,3350.0,28.72,21.51
+2963,Canoa del Pescador,1,Fotografía,3,HDR,8,2450.0,52.3,65.1
+2964,Regata en el Río,1,Fotografía,2,Fotografía analógica,8,3400.0,54.2,72.7
+2965,Milpero Nahua,1,Fotografía,5,Fotografía macro,1,3000.0,38.5,39.8
+1364,Milpa Sagrada,2,Pintura,9,Temple,11,8800.0,60.0,45.0
+2966,Atardecer en Tamazunchale,1,Fotografía,5,Fotografía macro,8,3000.0,46.2,46.8
+54,libro 1,2,Pintura,7,Acuarela,7,4950.0,58.9,43.25
+2967,Hilo de Palma,1,Fotografía,4,Blanco y negro,1,2900.0,54.4,33.4
+1373,Caña de Azúcar,2,Pintura,7,Acuarela,5,7000.0,40.0,30.0
+2968,Violín de Cuerdas,1,Fotografía,5,Fotografía macro,8,2100.0,24.5,48.9
+2969,Feria de San Cristóbal,1,Fotografía,2,Fotografía analógica,1,3800.0,50.5,54.7
+2970,Artesana de Xilitla,1,Fotografía,1,Fotografía digital,8,2800.0,59.1,54.3
+2971,Mujer de Xilitla,1,Fotografía,3,HDR,8,2750.0,37.5,53.5
+2972,Charca de Tlanchinol,1,Fotografía,5,Fotografía macro,1,2550.0,46.8,36.8
+2973,El Canasto,1,Fotografía,4,Blanco y negro,8,2700.0,54.6,28.0
+2974,Nopalera Serrana,1,Fotografía,4,Blanco y negro,1,3300.0,37.7,72.4
+2975,Comunidad Nahua,1,Fotografía,1,Fotografía digital,1,2050.0,20.1,46.5
+2976,Huapanguero Serrano,1,Fotografía,2,Fotografía analógica,1,2850.0,49.9,28.1
+2977,Tambores de Xantolo,1,Fotografía,1,Fotografía digital,1,2650.0,44.8,48.1
+2978,Faro del Tamiahua,1,Fotografía,1,Fotografía digital,1,2600.0,44.8,56.0
+2979,Vaquero de la Huasteca,1,Fotografía,3,HDR,1,2700.0,57.3,30.7
+2980,Bohío en la Lluvia,1,Fotografía,5,Fotografía macro,8,3550.0,56.2,71.5
+2981,Pastizal en Agosto,1,Fotografía,1,Fotografía digital,1,3350.0,41.8,70.9
+2982,Fogata Serrana,1,Fotografía,3,HDR,8,1900.0,57.0,38.0
+3684,Artesanía Serie 141,4,Artesanía,59,Artesanía tradicional,15,3450.0,38.2,113.2
+2983,Bote en el Amanecer,1,Fotografía,3,HDR,1,2850.0,35.3,27.1
+2984,Ordeña Mañanera,1,Fotografía,3,HDR,8,3150.0,47.2,71.4
+2985,Faenas del Campo,1,Fotografía,5,Fotografía macro,1,3300.0,56.0,35.5
+1393,Niño Maíz,3,Escultura,40,Modelado en barro,2,7300.0,30.0,15.0
+979,Curandero 11,7,Grabado,54,Serigrafía,3,3200.0,31.3,29.86
+991,Niebla en Molango 11,1,Fotografía,3,HDR,1,1850.0,58.38,32.94
+2986,Maíz Azul,1,Fotografía,5,Fotografía macro,8,2800.0,48.8,41.5
+2987,Milpa de Agosto,1,Fotografía,1,Fotografía digital,8,2650.0,28.4,68.2
+2988,Cielo de Veracruz,1,Fotografía,5,Fotografía macro,8,3400.0,52.7,66.3
+2989,La Cantora Nahua,1,Fotografía,2,Fotografía analógica,8,2350.0,36.0,33.1
+2990,Dunas de Arena,1,Fotografía,4,Blanco y negro,1,2750.0,46.7,79.3
+2991,Playa del Golfo,1,Fotografía,4,Blanco y negro,8,2900.0,53.6,40.3
+2992,Danza de los Negritos,1,Fotografía,2,Fotografía analógica,1,3350.0,36.6,43.2
+2993,Balcón Colonial,1,Fotografía,4,Blanco y negro,1,2850.0,28.8,49.0
+2994,El Pochote,1,Fotografía,4,Blanco y negro,1,3300.0,27.3,39.3
+2995,Copalero en la Sierra,1,Fotografía,3,HDR,1,2250.0,51.2,60.8
+2996,Cosecha Bajo el Sol,1,Fotografía,3,HDR,1,2750.0,51.1,34.0
+2997,Ataraya al Vuelo,1,Fotografía,2,Fotografía analógica,1,2750.0,54.0,58.0
+2998,Cardón en Flor,1,Fotografía,4,Blanco y negro,1,3100.0,58.4,60.0
+2999,Comunidad de Huehutla,1,Fotografía,5,Fotografía macro,8,2650.0,54.1,70.7
+3000,Mercader de Papayas,1,Fotografía,2,Fotografía analógica,8,3450.0,33.6,73.4
+3001,Hamaca al Mediodía,1,Fotografía,4,Blanco y negro,1,3400.0,31.8,47.2
+3002,Llanura Bajo la Lluvia,1,Fotografía,2,Fotografía analógica,1,3500.0,32.6,65.9
+3003,Patio de Laja,1,Fotografía,3,HDR,1,1900.0,20.6,54.4
+3004,Huasteca Verde,1,Fotografía,4,Blanco y negro,8,2250.0,33.6,78.1
+3005,Son Huasteco,1,Fotografía,1,Fotografía digital,1,2650.0,42.3,47.9
+3006,Corriente del Vinazco,1,Fotografía,1,Fotografía digital,1,2800.0,30.6,29.5
+3007,Tarde en la Charca,1,Fotografía,2,Fotografía analógica,8,2200.0,37.0,55.0
+3008,Río Tempoal en Silencio,1,Fotografía,4,Blanco y negro,8,2850.0,37.5,57.9
+3009,El Guaje Huasteco,1,Fotografía,1,Fotografía digital,1,2400.0,40.8,49.3
+3010,Tamales al Vapor,1,Fotografía,3,HDR,8,2950.0,31.5,77.0
+3011,Noche en Huejutla,1,Fotografía,4,Blanco y negro,8,2850.0,27.5,44.9
+3012,El Ranchero,1,Fotografía,2,Fotografía analógica,1,2400.0,42.0,55.4
+3013,Pesca de Mojarra,1,Fotografía,4,Blanco y negro,8,2250.0,29.7,55.3
+3014,Troza en el Río,1,Fotografía,3,HDR,1,3050.0,49.0,71.1
+3015,Vendedora de Naranja,1,Fotografía,2,Fotografía analógica,8,3200.0,54.2,47.6
+1433,Bolsa de Palma Huasteca,4,Artesanía,11,Tejido,4,3900.0,15.87,12.64
+3016,Tejido al Sol,1,Fotografía,3,HDR,1,2950.0,24.0,75.1
+3017,Fronda de Liquidámbar,1,Fotografía,5,Fotografía macro,8,3000.0,45.1,73.8
+3018,Columna Olvidada,1,Fotografía,1,Fotografía digital,8,2000.0,47.8,74.7
+1015,Milpa en Agosto 11,5,Ilustración,44,Ilustración digital,8,3150.0,26.73,17.24
+3019,Portón de Hacienda,1,Fotografía,1,Fotografía digital,8,2550.0,39.9,57.1
+3020,Manglar al Amanecer,1,Fotografía,3,HDR,8,1850.0,38.3,41.6
+3021,Pescadores del Pánuco,1,Fotografía,3,HDR,1,2700.0,56.4,66.0
+3022,Arco de Piedra,1,Fotografía,2,Fotografía analógica,1,3200.0,32.4,49.2
+3023,Crepúsculo en Chapulhuacán,1,Fotografía,4,Blanco y negro,8,2350.0,52.2,50.8
+3024,Mediodía en Huautla,1,Fotografía,3,HDR,1,2900.0,34.7,66.2
+3025,Tarde de Caracoles,1,Fotografía,4,Blanco y negro,8,1900.0,24.7,27.5
+3026,Retrato Totonaca,1,Fotografía,5,Fotografía macro,1,2550.0,46.2,70.9
+3027,Amanecer Tenek,1,Fotografía,5,Fotografía macro,8,2200.0,35.9,35.4
+3028,Palmas en la Bruma,1,Fotografía,5,Fotografía macro,1,2800.0,53.2,55.5
+3029,Bordadora Tenek,1,Fotografía,2,Fotografía analógica,1,3250.0,25.3,44.7
+3030,El Papalotero,1,Fotografía,1,Fotografía digital,8,2100.0,57.8,27.4
+3031,Guitarrista del Monte,1,Fotografía,4,Blanco y negro,1,2850.0,32.9,33.2
+1076,Cántaro de la Sierra 12,3,Escultura,43,Fundición en metal,14,9750.0,200.0,150.0
+1094,Ritmo de Tambor 6,5,Ilustración,45,Tinta sobre papel,13,1500.0,42.43,37.19
+1095,Vendedora de Naranjas 7,5,Ilustración,45,Tinta sobre papel,13,1350.0,40.22,33.62
+1324,Vasija Escultórica 8,3,Escultura,43,Fundición en metal,14,6600.0,200.0,150.0
+985,Palma Tejida 5,3,Escultura,43,Fundición en metal,14,4300.0,40.0,30.0
+1035,Jaguar Mítico 7,7,Grabado,54,Serigrafía,3,2050.0,26.2,24.97
+1418,Abuela y Estrella,5,Ilustración,60,Tinta china,13,1600.0,30.0,24.0
+1395,Voz del Caracol,3,Escultura,43,Fundición en metal,14,4550.0,15.0,12.0
+1328,Monolito Verde 12,3,Escultura,43,Fundición en metal,14,8800.0,200.0,150.0
+1391,Colibrí en Vuelo,3,Escultura,43,Fundición en metal,14,5900.0,20.0,30.0
+1149,Barro Ritual 1,3,Escultura,43,Fundición en metal,14,4550.0,80.0,60.0
+1014,Paisaje Huasteco 10,5,Ilustración,45,Tinta sobre papel,13,1400.0,41.51,27.91
+1092,Milpa en Agosto 4,5,Ilustración,45,Tinta sobre papel,13,1950.0,61.2,54.17
+1229,Obsidiana y Jade 9,3,Escultura,43,Fundición en metal,14,8350.0,80.0,60.0
+3032,Huertos de Jalapa,1,Fotografía,1,Fotografía digital,1,2750.0,38.1,37.6
+1332,Figura Ritual 16,3,Escultura,43,Fundición en metal,14,9250.0,200.0,150.0
+1414,Calendario Xipeico,5,Ilustración,60,Tinta china,13,1900.0,35.0,35.0
+3033,Manos en la Arcilla,1,Fotografía,1,Fotografía digital,8,2500.0,49.8,45.5
+3034,Tarde en Molango,1,Fotografía,3,HDR,8,2950.0,43.1,36.7
+3035,Barranca Azul,1,Fotografía,5,Fotografía macro,1,2050.0,21.2,40.0
+1059,Ritmo de Tambor 7,2,Pintura,9,Temple,11,3950.0,40.0,30.0
+1061,Horizonte Tropical 9,2,Pintura,7,Acuarela,5,8850.0,120.0,100.0
+1063,Paisaje Huasteco 11,2,Pintura,6,Óleo sobre lienzo,7,8050.0,40.0,30.0
+3036,Tlapexco Brumoso,1,Fotografía,5,Fotografía macro,1,2750.0,36.8,43.7
+3037,Polvorienta,1,Fotografía,5,Fotografía macro,8,3200.0,30.9,66.5
+3038,Siembra en la Sierra,1,Fotografía,2,Fotografía analógica,8,3200.0,33.1,25.4
+3039,Fronda de Plátanos,1,Fotografía,1,Fotografía digital,8,2650.0,54.5,56.7
+3040,Niños del Ejido,1,Fotografía,4,Blanco y negro,1,2450.0,37.4,47.0
+3041,Nado en la Laguna,1,Fotografía,2,Fotografía analógica,1,2500.0,25.9,35.8
+3042,Mercado de Huejutla,1,Fotografía,5,Fotografía macro,8,2800.0,26.0,28.8
+3043,Danza del Xantolo,1,Fotografía,1,Fotografía digital,8,2850.0,43.2,77.5
+1458,Figura de Colibrí,6,Cerámica,61,Modelado a mano,15,4300.0,15.0,12.0
+3044,Techo de Guano,1,Fotografía,1,Fotografía digital,1,2850.0,29.9,49.1
+3045,Laguna Turbia,1,Fotografía,1,Fotografía digital,8,1700.0,42.3,46.3
+1457,Tazón Raku Humo,6,Cerámica,51,Raku,16,6350.0,12.0,18.0
+3046,Fuente del Pueblo,1,Fotografía,2,Fotografía analógica,1,3500.0,42.4,60.4
+55,libro 2,2,Pintura,6,Óleo sobre lienzo,7,9550.0,107.85,76.51
+3047,Horizonte de Hidalgo,1,Fotografía,2,Fotografía analógica,8,3150.0,27.7,80.0
+1346,Niebla en la Sierra,1,Fotografía,1,Fotografía digital,1,1950.0,83.73,63.44
+3048,El Borreguero,1,Fotografía,4,Blanco y negro,1,2200.0,27.2,63.1
+1348,Reflejo en el Río,1,Fotografía,3,HDR,1,3750.0,55.35,30.05
+1349,Milpas bajo Tormenta,1,Fotografía,2,Fotografía analógica,1,1000.0,21.64,18.1
+3049,Baile Huapango,1,Fotografía,2,Fotografía analógica,1,3700.0,58.6,68.1
+3050,Noche de Xantolo,1,Fotografía,5,Fotografía macro,1,2100.0,22.1,51.4
+3051,Atardecer en Matlapa,1,Fotografía,1,Fotografía digital,1,3250.0,55.4,76.2
+3052,Palma Huasteca,1,Fotografía,2,Fotografía analógica,1,2950.0,56.7,51.0
+3053,Niebla en la Sierra Alta,1,Fotografía,1,Fotografía digital,8,1900.0,32.0,27.6
+1339,Mercado Huasteco,1,Fotografía,1,Fotografía digital,1,1300.0,25.89,18.87
+1347,Danza del Xantolo,1,Fotografía,1,Fotografía digital,1,1750.0,22.59,24.49
+3054,Tarde Lluvia en la Cuenca,1,Fotografía,2,Fotografía analógica,8,3000.0,20.1,44.4
+3055,Cerro de la Máscara,1,Fotografía,1,Fotografía digital,8,2400.0,30.1,25.9
+3056,Laguna de Tamiahua,1,Fotografía,2,Fotografía analógica,8,2300.0,45.3,69.6
+3057,Agua del Río Grande,1,Fotografía,4,Blanco y negro,8,1900.0,50.1,35.5
+3058,Cosecha de Vainilla,1,Fotografía,2,Fotografía analógica,8,2850.0,34.7,68.9
+3059,Cascada Tamul,1,Fotografía,4,Blanco y negro,8,2050.0,47.6,44.3
+1355,Mariposa Monarca en Paso,1,Fotografía,1,Fotografía digital,1,1500.0,46.21,42.52
+1361,Último Jacal,1,Fotografía,2,Fotografía analógica,1,1150.0,24.44,17.86
+3060,Fogón Familiar,1,Fotografía,5,Fotografía macro,1,3200.0,25.7,58.4
+3061,Madrugada en el Tlapexco,1,Fotografía,4,Blanco y negro,1,3150.0,41.2,46.9
+3062,Presa del Moralillo,1,Fotografía,5,Fotografía macro,8,2900.0,28.0,32.5
+3063,El Tenek y el Maíz,1,Fotografía,3,HDR,1,3300.0,51.7,53.0
+3064,Copalillo al Amanecer,1,Fotografía,3,HDR,8,2850.0,41.0,67.3
+3065,Silueta al Contraluz,1,Fotografía,1,Fotografía digital,1,2450.0,26.6,42.7
+3066,Temporal en la Sierra,1,Fotografía,5,Fotografía macro,1,2900.0,43.7,56.9
+3067,Brisa del Golfo,1,Fotografía,2,Fotografía analógica,8,2500.0,39.9,59.5
+3068,Puente de Troncos,1,Fotografía,4,Blanco y negro,8,2700.0,33.6,32.9
+3069,Jarana Huasteca,1,Fotografía,4,Blanco y negro,1,2950.0,23.9,41.0
+3070,Petate y Luna,1,Fotografía,4,Blanco y negro,8,2750.0,39.9,30.0
+3071,Sombra del Pochote,1,Fotografía,4,Blanco y negro,1,2950.0,49.1,67.0
+3072,Fotografía Serie 112,1,Fotografía,2,Fotografía analógica,1,3350.0,34.9,79.3
+3073,Fotografía Serie 113,1,Fotografía,5,Fotografía macro,1,3150.0,57.3,42.5
+3074,Fotografía Serie 114,1,Fotografía,3,HDR,8,3150.0,59.2,57.1
+1371,Danzante de Quetzales,2,Pintura,57,Técnica mixta,6,5450.0,85.0,65.0
+1377,Cascada Íntima,2,Pintura,7,Acuarela,5,3400.0,35.0,25.0
+3075,Fotografía Serie 115,1,Fotografía,1,Fotografía digital,8,2750.0,41.0,64.7
+3076,Fotografía Serie 116,1,Fotografía,2,Fotografía analógica,8,3550.0,54.9,65.5
+3077,Fotografía Serie 117,1,Fotografía,5,Fotografía macro,8,2950.0,44.4,35.6
+3078,Fotografía Serie 118,1,Fotografía,5,Fotografía macro,8,2300.0,24.9,62.2
+957,Sierra Verde 1,1,Fotografía,1,Fotografía digital,1,2000.0,47.44,35.97
+958,Río Moctezuma al Atardecer 2,1,Fotografía,3,HDR,1,2050.0,55.49,49.21
+3079,Fotografía Serie 119,1,Fotografía,3,HDR,8,2700.0,28.1,54.6
+3080,Fotografía Serie 120,1,Fotografía,1,Fotografía digital,8,2650.0,48.7,30.5
+3081,Fotografía Serie 121,1,Fotografía,3,HDR,8,2400.0,56.3,29.9
+51,Espíritu Navideño,1,Fotografía,1,Fotografía digital,1,2150.0,57.83,33.91
+3082,Fotografía Serie 122,1,Fotografía,2,Fotografía analógica,8,2200.0,20.4,56.2
+3083,Fotografía Serie 123,1,Fotografía,2,Fotografía analógica,1,3200.0,26.5,50.2
+1126,Río Moctezuma al Atardecer 2,1,Fotografía,2,Fotografía analógica,1,1950.0,28.4,21.64
+36,Pencas,1,Fotografía,1,Fotografía digital,1,2400.0,120.0,80.0
+3084,Fotografía Serie 124,1,Fotografía,4,Blanco y negro,1,3350.0,59.3,51.3
+3085,Fotografía Serie 125,1,Fotografía,2,Fotografía analógica,1,2550.0,38.6,33.8
+47,Tlahui,1,Fotografía,1,Fotografía digital,1,3950.0,180.0,100.0
+3086,Fotografía Serie 126,1,Fotografía,2,Fotografía analógica,8,3300.0,38.2,79.4
+3087,Fotografía Serie 127,1,Fotografía,5,Fotografía macro,8,2650.0,23.1,56.0
+3088,Fotografía Serie 128,1,Fotografía,4,Blanco y negro,1,3450.0,52.3,49.9
+3089,Fotografía Serie 129,1,Fotografía,1,Fotografía digital,1,1700.0,33.8,28.5
+1151,Obsidiana y Jade 3,3,Escultura,41,Talla en madera,9,8350.0,200.0,150.0
+3090,Fotografía Serie 130,1,Fotografía,4,Blanco y negro,8,3100.0,37.9,75.4
+3091,Fotografía Serie 131,1,Fotografía,1,Fotografía digital,8,1900.0,46.9,54.9
+3092,Fotografía Serie 132,1,Fotografía,4,Blanco y negro,1,2700.0,28.2,30.5
+1389,Espiral Cósmica,3,Escultura,42,Talla en piedra,10,4000.0,30.0,30.0
+1390,Madre Tierra,3,Escultura,40,Modelado en barro,2,6600.0,50.0,35.0
+959,Niebla en Molango 3,1,Fotografía,2,Fotografía analógica,1,1800.0,79.41,50.13
+3093,Fotografía Serie 133,1,Fotografía,2,Fotografía analógica,8,3050.0,52.6,65.2
+1072,Cerámica Negra 8,3,Escultura,43,Fundición en metal,14,8050.0,200.0,150.0
+3094,Fotografía Serie 134,1,Fotografía,5,Fotografía macro,1,3150.0,42.2,27.6
+3095,Fotografía Serie 135,1,Fotografía,2,Fotografía analógica,8,2550.0,52.2,75.3
+1388,Curandero Nahua,3,Escultura,40,Modelado en barro,2,5300.0,40.0,22.0
+1140,Paisaje Huasteco 4,2,Pintura,8,Acrílico,6,6350.0,80.0,60.0
+3096,Fotografía Serie 136,1,Fotografía,1,Fotografía digital,1,2250.0,30.7,62.1
+1147,Paisaje Huasteco 11,2,Pintura,6,Óleo sobre lienzo,7,17950.0,200.0,150.0
+3097,Fotografía Serie 137,1,Fotografía,1,Fotografía digital,1,3200.0,58.5,31.5
+3098,Fotografía Serie 138,1,Fotografía,3,HDR,8,2000.0,34.4,73.6
+967,Niebla en Molango 11,1,Fotografía,3,HDR,1,2950.0,24.67,16.86
+3099,Fotografía Serie 139,1,Fotografía,2,Fotografía analógica,1,3400.0,42.1,57.1
+3100,Fotografía Serie 140,1,Fotografía,4,Blanco y negro,8,3300.0,49.3,44.4
+3101,Fotografía Serie 141,1,Fotografía,1,Fotografía digital,1,3000.0,25.5,59.7
+3102,Fotografía Serie 142,1,Fotografía,5,Fotografía macro,8,2950.0,20.7,64.7
+3103,Fotografía Serie 143,1,Fotografía,5,Fotografía macro,8,2850.0,30.7,46.8
+3104,Fotografía Serie 144,1,Fotografía,1,Fotografía digital,8,2650.0,35.1,51.2
+3105,Fotografía Serie 145,1,Fotografía,2,Fotografía analógica,8,2300.0,21.9,29.1
+3106,Fotografía Serie 146,1,Fotografía,4,Blanco y negro,1,2600.0,26.5,38.2
+3107,Fotografía Serie 147,1,Fotografía,1,Fotografía digital,1,2600.0,29.3,29.2
+3108,Fotografía Serie 148,1,Fotografía,4,Blanco y negro,8,2700.0,47.2,61.3
+3109,Fotografía Serie 149,1,Fotografía,3,HDR,1,2950.0,20.2,42.0
+3110,Fotografía Serie 150,1,Fotografía,5,Fotografía macro,8,2700.0,20.5,47.8
+3111,Fotografía Serie 151,1,Fotografía,4,Blanco y negro,1,2300.0,26.7,40.2
+3112,Fotografía Serie 152,1,Fotografía,3,HDR,1,3350.0,33.3,59.1
+3113,Fotografía Serie 153,1,Fotografía,2,Fotografía analógica,8,3150.0,31.7,63.2
+56,libro 3,2,Pintura,8,Acrílico,7,5150.0,61.12,62.27
+3114,Fotografía Serie 154,1,Fotografía,5,Fotografía macro,1,2650.0,57.7,36.5
+3115,Fotografía Serie 155,1,Fotografía,2,Fotografía analógica,8,2950.0,23.0,79.5
+3116,Fotografía Serie 156,1,Fotografía,5,Fotografía macro,1,3500.0,50.8,61.2
+3117,Fotografía Serie 157,1,Fotografía,3,HDR,1,2600.0,37.8,46.5
+3118,Fotografía Serie 158,1,Fotografía,3,HDR,8,2400.0,38.2,36.4
+3119,Fotografía Serie 159,1,Fotografía,1,Fotografía digital,1,2600.0,40.6,55.4
+3120,Fotografía Serie 160,1,Fotografía,4,Blanco y negro,8,2550.0,20.2,36.8
+3121,Fotografía Serie 161,1,Fotografía,4,Blanco y negro,8,2350.0,44.5,57.3
+3122,Fotografía Serie 162,1,Fotografía,3,HDR,1,2550.0,32.2,35.1
+3123,Fotografía Serie 163,1,Fotografía,2,Fotografía analógica,8,3200.0,25.6,42.3
+3124,Fotografía Serie 164,1,Fotografía,4,Blanco y negro,8,2000.0,39.5,29.5
+3125,Fotografía Serie 165,1,Fotografía,5,Fotografía macro,1,2850.0,30.7,54.9
+3126,Fotografía Serie 166,1,Fotografía,3,HDR,1,2100.0,30.5,72.4
+3127,Fotografía Serie 167,1,Fotografía,4,Blanco y negro,1,3500.0,51.4,69.7
+3128,Fotografía Serie 168,1,Fotografía,1,Fotografía digital,1,3400.0,56.8,79.6
+3129,Fotografía Serie 169,1,Fotografía,3,HDR,8,2600.0,38.1,59.8
+3130,Fotografía Serie 170,1,Fotografía,1,Fotografía digital,8,2150.0,54.0,68.8
+3131,Fotografía Serie 171,1,Fotografía,3,HDR,1,3050.0,24.0,68.1
+1400,Tenek I,7,Grabado,54,Serigrafía,3,2250.0,55.0,42.0
+1401,Río Pánuco,7,Grabado,53,Xilografía,3,3550.0,45.0,35.0
+1001,Textura de Henequén 9,4,Artesanía,11,Tejido,4,2600.0,20.4,27.43
+3132,Fotografía Serie 172,1,Fotografía,2,Fotografía analógica,8,2200.0,46.2,38.8
+3133,Fotografía Serie 173,1,Fotografía,1,Fotografía digital,1,3150.0,39.1,32.3
+3134,Fotografía Serie 174,1,Fotografía,1,Fotografía digital,1,2450.0,32.5,73.5
+3135,Fotografía Serie 175,1,Fotografía,2,Fotografía analógica,1,2700.0,44.6,49.3
+3136,Fotografía Serie 176,1,Fotografía,3,HDR,1,2400.0,42.1,58.0
+3137,Fotografía Serie 177,1,Fotografía,4,Blanco y negro,8,3500.0,51.4,68.7
+1007,Niebla en Molango 3,1,Fotografía,4,Blanco y negro,1,3050.0,24.37,21.29
+3138,Fotografía Serie 178,1,Fotografía,4,Blanco y negro,8,3150.0,50.5,77.5
+3139,Fotografía Serie 179,1,Fotografía,4,Blanco y negro,8,3050.0,23.3,54.5
+3140,Fotografía Serie 180,1,Fotografía,1,Fotografía digital,8,2700.0,49.2,71.6
+3141,Fotografía Serie 181,1,Fotografía,2,Fotografía analógica,1,2650.0,39.9,44.1
+3142,Fotografía Serie 182,1,Fotografía,4,Blanco y negro,8,2650.0,30.5,78.6
+3143,Fotografía Serie 183,1,Fotografía,5,Fotografía macro,1,2700.0,54.3,25.7
+1406,Barcos en Laguna,7,Grabado,55,Litografía,3,2050.0,45.0,35.0
+1407,Madre e Hijo,7,Grabado,54,Serigrafía,3,3750.0,55.0,42.0
+3144,Fotografía Serie 184,1,Fotografía,3,HDR,1,3050.0,56.6,42.6
+3145,Fotografía Serie 185,1,Fotografía,3,HDR,8,2750.0,42.1,25.4
+3146,Fotografía Serie 186,1,Fotografía,2,Fotografía analógica,1,3250.0,57.3,26.3
+3147,Fotografía Serie 187,1,Fotografía,5,Fotografía macro,1,3200.0,39.7,28.3
+3148,Nopalera Roja,2,Pintura,6,Óleo sobre lienzo,6,7300.0,39.0,98.1
+3149,Rojo Sangre de Toro,2,Pintura,8,Acrílico,6,9600.0,143.2,46.3
+3150,El Cempoalxóchitl,2,Pintura,6,Óleo sobre lienzo,5,11250.0,126.9,66.5
+3151,La Milpa Sagrada,2,Pintura,7,Acuarela,5,9150.0,132.6,96.7
+3152,Mujer Tenek III,2,Pintura,6,Óleo sobre lienzo,7,10750.0,32.6,37.7
+1016,Cascada de Tamul 12,1,Fotografía,2,Fotografía analógica,1,2100.0,53.26,33.98
+3153,Telar de Palma,2,Pintura,9,Temple,11,6550.0,75.9,81.2
+1022,Cántaro de la Sierra 6,6,Cerámica,48,Torno alfarero,2,5900.0,40.54,31.82
+1215,Niebla en Molango 7,1,Fotografía,4,Blanco y negro,1,3400.0,86.8,54.09
+3154,Vendimia en la Sierra,2,Pintura,57,Técnica mixta,11,9700.0,40.5,76.0
+3155,Bodegón con Guayaba,2,Pintura,8,Acrílico,7,9450.0,62.5,33.1
+3156,La Feria del Pueblo,2,Pintura,7,Acuarela,7,9600.0,121.7,143.7
+3157,Ceiba Sagrada,2,Pintura,57,Técnica mixta,5,10000.0,143.7,97.6
+3158,Verde de la Milpa,2,Pintura,57,Técnica mixta,11,10300.0,69.8,103.7
+3159,Verde Copal,2,Pintura,8,Acrílico,11,9150.0,70.4,68.7
+3160,Mujer Tenek I,2,Pintura,57,Técnica mixta,6,10750.0,66.8,112.6
+3161,Frutos del Monte,2,Pintura,7,Acuarela,5,5250.0,46.9,119.4
+1031,El Torito de Petate 3,7,Grabado,56,Linografía,13,3900.0,64.55,53.0
+1046,Río Moctezuma al Atardecer 6,1,Fotografía,4,Blanco y negro,1,2200.0,41.25,32.64
+3162,Ramos del Campo,2,Pintura,7,Acuarela,6,8750.0,72.1,124.4
+3163,Barro Rojo en Óleo,2,Pintura,57,Técnica mixta,6,11850.0,84.2,125.9
+3164,Huasteca al Amanecer,2,Pintura,6,Óleo sobre lienzo,11,11500.0,102.9,82.1
+3165,Ladrillo y Maíz,2,Pintura,9,Temple,11,5800.0,36.5,30.5
+3166,Altar Florido,2,Pintura,8,Acrílico,11,10950.0,88.7,109.3
+3167,Camarones del Pánuco,2,Pintura,6,Óleo sobre lienzo,6,8100.0,40.3,71.3
+3168,Canasta de Tejidos,2,Pintura,57,Técnica mixta,6,10400.0,65.9,77.4
+3169,Cosecha de Vainilla II,2,Pintura,6,Óleo sobre lienzo,11,11950.0,148.6,82.2
+3170,La Vendedora de Maíz,2,Pintura,57,Técnica mixta,11,11450.0,124.4,104.8
+3171,Peces del Río,2,Pintura,57,Técnica mixta,7,11700.0,61.7,108.6
+3172,Flores Silvestres,2,Pintura,9,Temple,7,10050.0,32.4,128.1
+3173,El Maíz Sagrado II,2,Pintura,6,Óleo sobre lienzo,6,8100.0,55.4,128.9
+1049,Montes Azules 9,1,Fotografía,4,Blanco y negro,1,2050.0,20.71,17.94
+3174,Primeros Colores,2,Pintura,57,Técnica mixta,5,9000.0,53.1,130.0
+3175,Bodegón con Flor de Cacao,2,Pintura,6,Óleo sobre lienzo,6,9800.0,88.7,83.5
+3176,Ocotes en la Niebla,2,Pintura,57,Técnica mixta,6,10450.0,107.7,111.3
+3177,Tarde en Naranjos,2,Pintura,57,Técnica mixta,7,10250.0,80.9,75.2
+3178,El Taller del Artesano,2,Pintura,6,Óleo sobre lienzo,11,9650.0,70.4,63.2
+3179,Palma Real,2,Pintura,9,Temple,7,10900.0,116.6,108.6
+3180,Corriente del Tamuín,2,Pintura,57,Técnica mixta,11,8050.0,90.9,131.5
+3181,Cantera Vieja,2,Pintura,8,Acrílico,6,10200.0,80.5,136.4
+3182,El Rito del Maíz,2,Pintura,9,Temple,7,9400.0,36.5,132.5
+3183,Sombra de Aguacate,2,Pintura,7,Acuarela,7,8000.0,30.6,62.8
+3184,Mercado Dominical,2,Pintura,6,Óleo sobre lienzo,5,8100.0,117.7,144.0
+3185,Velación en el Panteón,2,Pintura,9,Temple,7,9350.0,37.8,35.5
+3186,Bodegón con Flores de Mayo,2,Pintura,6,Óleo sobre lienzo,6,10000.0,117.3,45.7
+3187,Mujeres de Xilitla,2,Pintura,6,Óleo sobre lienzo,5,10300.0,35.8,43.9
+3188,Horizonte Serrano,2,Pintura,7,Acuarela,11,7750.0,91.4,104.1
+3189,El Maíz y el Copal,2,Pintura,7,Acuarela,5,10450.0,139.2,112.6
+3190,La Barbacoa,2,Pintura,6,Óleo sobre lienzo,7,11400.0,84.8,147.3
+1110,Máscara del Xantolo 10,7,Grabado,56,Linografía,13,1800.0,61.04,55.06
+3191,Maíz Azul en Óleo,2,Pintura,6,Óleo sobre lienzo,5,10150.0,109.6,50.5
+3192,La Posada en Lienzo,2,Pintura,9,Temple,11,7200.0,43.6,113.5
+3193,Palma al Amanecer,2,Pintura,8,Acrílico,5,10700.0,88.0,88.6
+3194,El Venado en Bosque,2,Pintura,8,Acrílico,5,10750.0,109.4,59.8
+3195,Chile Ancho en Tela,2,Pintura,6,Óleo sobre lienzo,11,10700.0,58.9,146.4
+3196,Toro de la Feria,2,Pintura,6,Óleo sobre lienzo,11,10600.0,42.3,79.5
+3197,La Danza de los Quetzales,2,Pintura,8,Acrílico,5,8600.0,131.3,69.8
+3198,Vainilla en Flor,2,Pintura,57,Técnica mixta,7,9250.0,35.5,49.7
+3199,Huasteca Azul,2,Pintura,8,Acrílico,5,8600.0,35.6,106.0
+3200,El Lazo,2,Pintura,57,Técnica mixta,11,10700.0,113.0,50.8
+3201,El Patio de la Abuela,2,Pintura,8,Acrílico,7,8000.0,126.6,46.6
+3202,Monte en Azul,2,Pintura,57,Técnica mixta,7,8600.0,140.5,45.9
+3203,Barranca al Ocaso,2,Pintura,9,Temple,7,9800.0,127.0,92.7
+3204,Ceiba en Flor,2,Pintura,7,Acuarela,5,7600.0,127.7,42.3
+3205,Sierra con Lluvia,2,Pintura,9,Temple,11,8700.0,145.9,36.5
+3206,Rojo Totonaca,2,Pintura,57,Técnica mixta,6,10050.0,65.3,51.3
+3207,Cohetes al Cielo,2,Pintura,8,Acrílico,11,7050.0,34.8,141.4
+1135,Niebla en Molango 11,1,Fotografía,4,Blanco y negro,1,2300.0,87.61,67.47
+3208,Bodegón Tropical,2,Pintura,57,Técnica mixta,6,10700.0,92.5,124.4
+3209,Primavera Huasteca,2,Pintura,57,Técnica mixta,5,9400.0,110.3,83.5
+3210,El Pochote Sagrado,2,Pintura,6,Óleo sobre lienzo,7,12150.0,88.4,65.6
+3211,Mujer Tenek II,2,Pintura,7,Acuarela,11,9400.0,54.7,129.4
+3212,Niebla en Óleos,2,Pintura,57,Técnica mixta,5,9950.0,139.3,78.9
+3213,Puesta de Sol en Matlapa,2,Pintura,6,Óleo sobre lienzo,7,10100.0,64.8,112.3
+3214,Cardón en Óleo,2,Pintura,8,Acrílico,6,11550.0,111.3,139.7
+3215,Vena del Monte,2,Pintura,8,Acrílico,6,9700.0,55.4,138.7
+3216,Sombra de Palma,2,Pintura,57,Técnica mixta,5,8900.0,110.6,60.1
+3217,Lienzo de Bordado,2,Pintura,57,Técnica mixta,7,11900.0,97.9,73.7
+3218,Laguna en Verano,2,Pintura,9,Temple,11,11550.0,123.0,88.4
+3219,Loro Verde,2,Pintura,6,Óleo sobre lienzo,11,9050.0,138.8,96.2
+3220,Rebozo al Viento,2,Pintura,9,Temple,7,11100.0,109.5,131.8
+3221,Tarde de Mangos,2,Pintura,8,Acrílico,5,8850.0,121.4,57.8
+1214,Río Moctezuma al Atardecer 6,1,Fotografía,4,Blanco y negro,1,3200.0,72.88,63.99
+3222,Huipil Bordado,2,Pintura,57,Técnica mixta,7,10450.0,99.4,98.4
+3223,El Maguey y el Cielo,2,Pintura,9,Temple,11,8800.0,90.2,46.7
+3224,Manta de la Huasteca,2,Pintura,6,Óleo sobre lienzo,11,11000.0,87.5,100.9
+3225,Sembrando el Futuro,2,Pintura,57,Técnica mixta,11,9200.0,135.4,117.4
+3226,Colibrí de Pecho Rojo,2,Pintura,7,Acuarela,7,9950.0,116.9,71.1
+3227,Milpa en Óleo,2,Pintura,6,Óleo sobre lienzo,6,11850.0,138.2,102.0
+1207,Curandero 11,7,Grabado,56,Linografía,13,4050.0,53.78,40.53
+3228,El Charro y su Caballo,2,Pintura,9,Temple,7,10800.0,113.7,81.5
+1246,Danza del Gavilán 2,7,Grabado,56,Linografía,13,4350.0,63.67,49.06
+3229,Danza Circular,2,Pintura,7,Acuarela,5,8700.0,101.8,95.2
+3230,Tarde en el Cafetal,2,Pintura,6,Óleo sobre lienzo,6,11450.0,108.2,60.4
+3231,El Colibrí y la Flor,2,Pintura,9,Temple,7,11000.0,99.3,122.9
+3232,Garza Blanca,2,Pintura,57,Técnica mixta,5,6700.0,76.7,106.3
+3233,Celosía de Bambú,2,Pintura,9,Temple,7,11800.0,143.5,128.4
+3234,La Noche de Difuntos,2,Pintura,6,Óleo sobre lienzo,6,10900.0,149.6,123.6
+3235,El Mapache,2,Pintura,7,Acuarela,11,10350.0,99.0,61.3
+3703,Artesanía Serie 160,4,Artesanía,41,Talla en madera,4,4400.0,54.0,78.7
+3236,Lluvia Serrana,2,Pintura,7,Acuarela,7,10900.0,111.8,137.6
+3237,Guacamaya Roja,2,Pintura,57,Técnica mixta,5,6650.0,59.8,41.2
+3238,Pan de Muerto al Natural,2,Pintura,7,Acuarela,11,9050.0,58.2,59.0
+3239,El Tlacuache Dormido,2,Pintura,57,Técnica mixta,5,6500.0,74.5,67.9
+3240,Atardecer Serrano,2,Pintura,7,Acuarela,5,8800.0,87.4,94.9
+997,Curandero 5,7,Grabado,56,Linografía,13,1900.0,62.67,47.9
+1080,Maíz y Copal 4,6,Cerámica,50,Talavera,2,2750.0,33.14,35.06
+3241,Café Huasteco,2,Pintura,6,Óleo sobre lienzo,7,10800.0,103.5,61.2
+3242,Paisaje de la Sierra Alta,2,Pintura,7,Acuarela,6,10150.0,127.7,116.5
+3243,Plátanos al Mediodía,2,Pintura,57,Técnica mixta,7,10400.0,66.0,97.5
+3244,El Pescador y su Canoa,2,Pintura,57,Técnica mixta,7,7950.0,32.4,44.5
+3245,La Chachalaca,2,Pintura,9,Temple,5,6650.0,103.6,85.7
+3246,Cempasúchil al Óleo,2,Pintura,7,Acuarela,7,10600.0,108.4,115.3
+3247,Flores de Anturio,2,Pintura,7,Acuarela,6,10900.0,142.9,114.1
+3248,Fiesta de San Juan,2,Pintura,9,Temple,7,10000.0,59.7,64.1
+3249,Huasteca Profunda,2,Pintura,57,Técnica mixta,11,11500.0,146.3,113.7
+3250,Zacahuil en el Tianguis,2,Pintura,9,Temple,7,9450.0,79.5,48.7
+3251,Pintura Serie 104,2,Pintura,9,Temple,7,8750.0,125.6,95.8
+3252,Pintura Serie 105,2,Pintura,9,Temple,6,9350.0,64.2,119.2
+3253,Pintura Serie 106,2,Pintura,8,Acrílico,5,8950.0,36.0,94.2
+3254,Pintura Serie 107,2,Pintura,8,Acrílico,11,9500.0,69.6,131.2
+3255,Pintura Serie 108,2,Pintura,7,Acuarela,11,10000.0,59.7,149.3
+3256,Pintura Serie 109,2,Pintura,57,Técnica mixta,5,9150.0,87.7,65.9
+3257,Pintura Serie 110,2,Pintura,6,Óleo sobre lienzo,5,10450.0,112.6,48.6
+3258,Pintura Serie 111,2,Pintura,57,Técnica mixta,5,9300.0,88.5,68.0
+3259,Pintura Serie 112,2,Pintura,9,Temple,11,10700.0,95.1,88.8
+3260,Pintura Serie 113,2,Pintura,8,Acrílico,7,10850.0,84.5,123.1
+3261,Pintura Serie 114,2,Pintura,7,Acuarela,11,8400.0,103.6,68.7
+3262,Pintura Serie 115,2,Pintura,6,Óleo sobre lienzo,11,10500.0,93.1,114.2
+3263,Pintura Serie 116,2,Pintura,6,Óleo sobre lienzo,7,11350.0,128.6,125.3
+3264,Pintura Serie 117,2,Pintura,57,Técnica mixta,11,8350.0,53.2,108.8
+3265,Pintura Serie 118,2,Pintura,9,Temple,5,10050.0,125.1,96.0
+3266,Pintura Serie 119,2,Pintura,9,Temple,7,7400.0,97.6,55.7
+3267,Pintura Serie 120,2,Pintura,57,Técnica mixta,6,10200.0,30.8,148.1
+3268,Pintura Serie 121,2,Pintura,9,Temple,7,10050.0,46.6,74.0
+3269,Pintura Serie 122,2,Pintura,9,Temple,5,6900.0,34.5,127.0
+3270,Pintura Serie 123,2,Pintura,57,Técnica mixta,5,10150.0,36.5,92.9
+1202,Nahual 6,7,Grabado,56,Linografía,13,1500.0,27.86,22.85
+3271,Pintura Serie 124,2,Pintura,6,Óleo sobre lienzo,6,9150.0,64.8,77.3
+3272,Pintura Serie 125,2,Pintura,9,Temple,6,6600.0,77.4,98.6
+3273,Pintura Serie 126,2,Pintura,9,Temple,11,10900.0,71.8,68.5
+3274,Pintura Serie 127,2,Pintura,7,Acuarela,7,11200.0,120.9,132.3
+3275,Pintura Serie 128,2,Pintura,7,Acuarela,6,9050.0,95.6,120.0
+3276,Pintura Serie 129,2,Pintura,8,Acrílico,6,10550.0,36.4,108.6
+3277,Pintura Serie 130,2,Pintura,8,Acrílico,11,7450.0,52.4,90.1
+3278,Pintura Serie 131,2,Pintura,8,Acrílico,7,8950.0,58.3,147.4
+3279,Pintura Serie 132,2,Pintura,7,Acuarela,7,6450.0,108.8,40.5
+3280,Pintura Serie 133,2,Pintura,8,Acrílico,11,7450.0,54.8,46.6
+3281,Pintura Serie 134,2,Pintura,57,Técnica mixta,6,9000.0,38.1,94.0
+3282,Pintura Serie 135,2,Pintura,8,Acrílico,6,9200.0,42.8,52.2
+3283,Pintura Serie 136,2,Pintura,7,Acuarela,11,10300.0,52.1,76.5
+3284,Pintura Serie 137,2,Pintura,7,Acuarela,5,10850.0,141.3,148.3
+3285,Pintura Serie 138,2,Pintura,57,Técnica mixta,5,8250.0,84.2,129.2
+3286,Pintura Serie 139,2,Pintura,7,Acuarela,7,9200.0,77.8,66.5
+3287,Pintura Serie 140,2,Pintura,57,Técnica mixta,6,9300.0,79.6,84.1
+3288,Pintura Serie 141,2,Pintura,6,Óleo sobre lienzo,5,9850.0,114.7,106.1
+3289,Pintura Serie 142,2,Pintura,57,Técnica mixta,6,10900.0,134.3,51.5
+3290,Pintura Serie 143,2,Pintura,6,Óleo sobre lienzo,11,9150.0,132.6,95.2
+3291,Pintura Serie 144,2,Pintura,57,Técnica mixta,7,9450.0,35.9,47.8
+3292,Pintura Serie 145,2,Pintura,8,Acrílico,6,8100.0,119.9,73.2
+3293,Pintura Serie 146,2,Pintura,7,Acuarela,5,9050.0,69.5,79.7
+3294,Pintura Serie 147,2,Pintura,57,Técnica mixta,7,10450.0,103.7,89.6
+3295,Pintura Serie 148,2,Pintura,7,Acuarela,11,7650.0,35.5,72.0
+3296,Pintura Serie 149,2,Pintura,8,Acrílico,7,12500.0,116.9,103.9
+3297,Pintura Serie 150,2,Pintura,9,Temple,7,7750.0,124.1,79.7
+3298,Pintura Serie 151,2,Pintura,6,Óleo sobre lienzo,6,10650.0,130.9,70.7
+3299,Pintura Serie 152,2,Pintura,6,Óleo sobre lienzo,7,8000.0,40.4,135.2
+3300,Pintura Serie 153,2,Pintura,9,Temple,5,9100.0,138.6,48.5
+3301,Pintura Serie 154,2,Pintura,57,Técnica mixta,5,6000.0,67.3,35.3
+3302,Pintura Serie 155,2,Pintura,8,Acrílico,6,6200.0,54.1,64.4
+3303,Pintura Serie 156,2,Pintura,8,Acrílico,6,6200.0,98.9,50.6
+3304,Pintura Serie 157,2,Pintura,9,Temple,11,10050.0,114.6,137.0
+3305,Pintura Serie 158,2,Pintura,9,Temple,6,10000.0,127.5,140.4
+3306,Pintura Serie 159,2,Pintura,9,Temple,6,9750.0,124.7,135.9
+3307,Pintura Serie 160,2,Pintura,9,Temple,5,7600.0,96.7,38.5
+3308,Pintura Serie 161,2,Pintura,57,Técnica mixta,11,10750.0,98.1,71.1
+3309,Pintura Serie 162,2,Pintura,7,Acuarela,7,6900.0,38.4,43.0
+3310,Pintura Serie 163,2,Pintura,7,Acuarela,6,9450.0,93.8,76.8
+3311,Pintura Serie 164,2,Pintura,57,Técnica mixta,5,8800.0,131.7,132.3
+3312,Pintura Serie 165,2,Pintura,7,Acuarela,11,10700.0,105.0,115.4
+3313,Pintura Serie 166,2,Pintura,7,Acuarela,6,8150.0,38.6,31.9
+3314,Pintura Serie 167,2,Pintura,57,Técnica mixta,6,11550.0,91.1,96.2
+3315,Pintura Serie 168,2,Pintura,57,Técnica mixta,7,11950.0,147.4,98.2
+3316,Pintura Serie 169,2,Pintura,6,Óleo sobre lienzo,5,9400.0,86.7,119.0
+3317,Pintura Serie 170,2,Pintura,9,Temple,7,10800.0,72.3,147.3
+3318,Pintura Serie 171,2,Pintura,6,Óleo sobre lienzo,7,7800.0,64.4,39.9
+3319,Pintura Serie 172,2,Pintura,57,Técnica mixta,6,11150.0,74.4,51.0
+3320,Pintura Serie 173,2,Pintura,9,Temple,11,10750.0,109.3,117.1
+3321,Pintura Serie 174,2,Pintura,57,Técnica mixta,6,9800.0,112.0,76.8
+3322,Pintura Serie 175,2,Pintura,57,Técnica mixta,7,11000.0,103.3,108.2
+3323,Pintura Serie 176,2,Pintura,7,Acuarela,7,8500.0,67.6,31.3
+3324,Pintura Serie 177,2,Pintura,6,Óleo sobre lienzo,5,11600.0,144.1,106.6
+3325,Pintura Serie 178,2,Pintura,8,Acrílico,11,10250.0,106.7,140.7
+3326,Pintura Serie 179,2,Pintura,8,Acrílico,6,9100.0,38.3,147.5
+3327,Pintura Serie 180,2,Pintura,6,Óleo sobre lienzo,5,8300.0,98.6,60.1
+3328,Pintura Serie 181,2,Pintura,57,Técnica mixta,5,7100.0,87.4,78.5
+3329,Pintura Serie 182,2,Pintura,8,Acrílico,7,10250.0,78.1,105.9
+3330,Pintura Serie 183,2,Pintura,9,Temple,6,10450.0,113.5,137.6
+3331,Pintura Serie 184,2,Pintura,6,Óleo sobre lienzo,7,10050.0,94.1,130.1
+3332,Pintura Serie 185,2,Pintura,9,Temple,6,9100.0,141.0,34.4
+3333,Pintura Serie 186,2,Pintura,9,Temple,6,6600.0,128.1,42.8
+3334,Pintura Serie 187,2,Pintura,57,Técnica mixta,6,11750.0,130.4,125.2
+3335,Pintura Serie 188,2,Pintura,6,Óleo sobre lienzo,6,11750.0,124.9,105.9
+3336,Pintura Serie 189,2,Pintura,9,Temple,6,9800.0,47.2,62.5
+3337,Pintura Serie 190,2,Pintura,8,Acrílico,11,8300.0,96.9,53.0
+3338,Pintura Serie 191,2,Pintura,8,Acrílico,5,7050.0,43.5,47.9
+3339,Pintura Serie 192,2,Pintura,57,Técnica mixta,11,9850.0,42.5,36.3
+3340,Caracol Sagrado,3,Escultura,42,Talla en piedra,9,10450.0,42.8,19.9
+3341,El Dualismo,3,Escultura,42,Talla en piedra,9,10200.0,70.4,46.6
+3342,El Quinto Sol,3,Escultura,42,Talla en piedra,17,7500.0,75.3,46.9
+3343,Figura Tenek,3,Escultura,42,Talla en piedra,2,6450.0,71.5,27.3
+3344,El Maíz Primordial,3,Escultura,40,Modelado en barro,14,11050.0,53.5,54.9
+3345,El Pájaro Quetzal,3,Escultura,40,Modelado en barro,14,7150.0,31.3,38.0
+3346,El Chamán,3,Escultura,40,Modelado en barro,2,8850.0,82.5,31.6
+3347,El Pescador Nahua,3,Escultura,42,Talla en piedra,2,9500.0,46.8,38.3
+3348,Cabeza Olmeca Pequeña,3,Escultura,41,Talla en madera,9,10750.0,44.7,28.4
+3349,La Tormenta en Piedra,3,Escultura,40,Modelado en barro,9,8850.0,26.1,34.5
+3350,El Tronco,3,Escultura,41,Talla en madera,14,11500.0,49.4,51.9
+3351,El Señor del Maíz,3,Escultura,43,Fundición en metal,14,11500.0,59.7,59.9
+3352,Hombre de Barro,3,Escultura,42,Talla en piedra,9,11350.0,78.8,49.6
+43,Sierra Alta,1,Fotografía,1,Fotografía digital,1,2000.0,120.0,80.0
+1359,Fiesta de San Juan,1,Fotografía,2,Fotografía analógica,1,1250.0,46.29,45.79
+35,Atardecer en la Sierra Alta,1,Fotografía,1,Fotografía digital,1,5750.0,120.0,80.0
+3353,Hombre de Bronce,3,Escultura,42,Talla en piedra,10,7800.0,46.1,42.0
+40,Montañas de Tolantongo,1,Fotografía,1,Fotografía digital,1,2350.0,120.0,80.0
+45,Calle de Chapulhuacán.,1,Fotografía,1,Fotografía digital,1,2150.0,58.05,36.72
+49,Portal de Colores,1,Fotografía,1,Fotografía digital,1,4650.0,120.0,80.0
+44,De camino a mi departamento en Chapul,1,Fotografía,1,Fotografía digital,1,1600.0,120.0,80.0
+48,Capital de Pueblo,1,Fotografía,1,Fotografía digital,1,4500.0,90.0,60.0
+41,Amigos tomando el sol.,1,Fotografía,1,Fotografía digital,1,3400.0,120.0,80.0
+1128,Cascada de Tamul 4,1,Fotografía,3,HDR,1,950.0,21.03,24.86
+3354,Cabeza Totonaca,3,Escultura,42,Talla en piedra,10,11500.0,82.7,63.5
+42,Valle de Sombras,1,Fotografía,1,Fotografía digital,1,4400.0,120.0,80.0
+37,Puesto de comida en noche de huapangos.,1,Fotografía,1,Fotografía digital,1,2100.0,120.0,80.0
+1052,Cañaveal del Pantepec 12,1,Fotografía,5,Fotografía macro,1,3550.0,27.15,20.31
+1064,Cascada de Tamul 12,1,Fotografía,2,Fotografía analógica,1,3150.0,28.32,16.56
+1131,Ceiba Sagrada 7,1,Fotografía,2,Fotografía analógica,1,1250.0,46.91,49.57
+1461,Bowl de Gres,6,Cerámica,48,Torno alfarero,20,4250.0,8.0,22.0
+1134,Río Moctezuma al Atardecer 10,1,Fotografía,1,Fotografía digital,1,2050.0,28.27,20.06
+1195,Ceiba Sagrada 11,1,Fotografía,5,Fotografía macro,1,1200.0,41.77,38.72
+1203,Ceiba Sagrada 7,1,Fotografía,5,Fotografía macro,1,1800.0,43.29,36.14
+3355,Hombre Sembrador,3,Escultura,40,Modelado en barro,10,8650.0,48.1,57.0
+1211,Ceiba Sagrada 3,1,Fotografía,2,Fotografía analógica,1,4000.0,82.93,51.04
+1213,Sierra Verde 5,1,Fotografía,5,Fotografía macro,1,2000.0,21.2,21.5
+1219,Ceiba Sagrada 11,1,Fotografía,1,Fotografía digital,1,2100.0,42.42,46.44
+1220,Cañaveal del Pantepec 12,1,Fotografía,2,Fotografía analógica,1,1850.0,48.67,49.12
+1228,Cañaveal del Pantepec 8,1,Fotografía,1,Fotografía digital,1,3150.0,72.77,58.52
+1216,Cascada de Tamul 8,1,Fotografía,3,HDR,1,2900.0,54.39,49.12
+961,Montes Azules 5,1,Fotografía,3,HDR,1,2050.0,56.75,47.14
+965,Sierra Verde 9,1,Fotografía,2,Fotografía analógica,1,1350.0,44.89,40.21
+1133,Sierra Verde 9,1,Fotografía,2,Fotografía analógica,1,2300.0,44.85,45.06
+1041,Montes Azules 1,1,Fotografía,3,HDR,1,3550.0,29.47,20.78
+1048,Cascada de Tamul 8,1,Fotografía,5,Fotografía macro,1,1550.0,71.11,54.36
+1066,Serranía en Lluvia 2,1,Fotografía,3,HDR,1,2000.0,43.91,40.57
+1065,Montes Azules 1,1,Fotografía,3,HDR,1,3750.0,29.1,20.79
+1130,Serranía en Lluvia 6,1,Fotografía,2,Fotografía analógica,1,1250.0,46.09,44.66
+3356,El Renacimiento,3,Escultura,40,Modelado en barro,17,5300.0,33.6,30.9
+1200,Cascada de Tamul 4,1,Fotografía,1,Fotografía digital,1,2800.0,25.92,20.59
+1357,Camino de Piedra,1,Fotografía,1,Fotografía digital,1,4200.0,56.77,34.09
+3357,El Cerro Tutelar,3,Escultura,42,Talla en piedra,10,7250.0,81.2,19.4
+1358,Cara de Lluvia,1,Fotografía,3,HDR,1,2550.0,63.38,68.72
+1217,Montes Azules 9,1,Fotografía,1,Fotografía digital,1,2000.0,57.75,40.2
+963,Ceiba Sagrada 7,1,Fotografía,1,Fotografía digital,1,1950.0,27.67,17.53
+966,Río Moctezuma al Atardecer 10,1,Fotografía,1,Fotografía digital,1,1100.0,23.59,18.75
+1021,Sierra Verde 5,1,Fotografía,2,Fotografía analógica,1,2200.0,28.82,23.67
+1042,Serranía en Lluvia 2,1,Fotografía,2,Fotografía analógica,1,1750.0,43.11,37.3
+3358,El Monte Sagrado,3,Escultura,40,Modelado en barro,9,7200.0,41.2,64.4
+1047,Niebla en Molango 7,1,Fotografía,2,Fotografía analógica,1,2800.0,26.35,15.7
+1137,Barro Ritual 1,6,Cerámica,49,Barro negro,2,5350.0,41.46,27.33
+1344,Río Moctezuma al Amanecer,1,Fotografía,3,HDR,1,1300.0,43.91,44.42
+1186,Cerámica Negra 2,6,Cerámica,51,Raku,2,1500.0,33.61,28.7
+1196,Cántaro de la Sierra 12,6,Cerámica,48,Torno alfarero,2,3650.0,22.22,26.32
+1350,Pulquería de Huejutla,1,Fotografía,1,Fotografía digital,1,3400.0,29.6,18.5
+1352,Árbol Ceiba Milenaria,1,Fotografía,2,Fotografía analógica,1,2750.0,86.26,67.75
+3359,El Guardián,3,Escultura,41,Talla en madera,9,10750.0,78.3,29.5
+1354,Copal al Viento,1,Fotografía,3,HDR,1,2550.0,46.64,40.4
+1356,Pescadores del Amanecer,1,Fotografía,2,Fotografía analógica,1,1700.0,51.1,34.25
+1360,Zopilotes al Vuelo,1,Fotografía,1,Fotografía digital,1,2400.0,69.49,58.45
+1353,Eclipse sobre Huasteca,1,Fotografía,1,Fotografía digital,1,1900.0,77.01,69.51
+3360,Abstracción de Madera,3,Escultura,43,Fundición en metal,2,9950.0,49.2,39.6
+3361,Ciclo de Vida,3,Escultura,43,Fundición en metal,2,10300.0,55.9,43.8
+1045,Sierra Verde 5,1,Fotografía,1,Fotografía digital,1,4500.0,82.89,65.27
+1183,Palma Tejida 11,6,Cerámica,51,Raku,2,3400.0,11.11,8.89
+1338,Milpa en Flor,1,Fotografía,2,Fotografía analógica,1,1600.0,49.53,42.56
+1342,Milpa en Flor,1,Fotografía,2,Fotografía analógica,1,2450.0,82.77,55.71
+1343,Mercado Huasteco,1,Fotografía,1,Fotografía digital,1,3800.0,28.84,16.29
+1351,Cascada Tamul,1,Fotografía,3,HDR,1,1300.0,47.34,32.69
+1190,Cántaro de la Sierra 6,6,Cerámica,51,Raku,2,3600.0,19.72,23.34
+1104,Maíz y Copal 4,6,Cerámica,50,Talavera,2,2250.0,23.91,24.71
+1111,Palma Tejida 11,6,Cerámica,51,Raku,2,4900.0,44.78,32.1
+1208,Cántaro de la Sierra 12,6,Cerámica,51,Raku,2,3800.0,11.6,8.82
+1247,Obsidiana y Jade 3,3,Escultura,40,Modelado en barro,2,7000.0,120.0,100.0
+1107,Barro Ritual 7,6,Cerámica,49,Barro negro,2,3100.0,19.99,19.69
+1185,Barro Ritual 1,6,Cerámica,51,Raku,2,4800.0,26.54,19.57
+1237,Palma Tejida 5,3,Escultura,40,Modelado en barro,2,6900.0,200.0,150.0
+1105,Palma Tejida 5,6,Cerámica,49,Barro negro,2,5200.0,27.24,21.58
+1018,Cerámica Negra 2,6,Cerámica,51,Raku,2,1600.0,9.88,11.45
+1238,Cántaro de la Sierra 6,3,Escultura,40,Modelado en barro,2,6250.0,40.0,30.0
+1240,Cerámica Negra 8,3,Escultura,40,Modelado en barro,2,9250.0,120.0,100.0
+1321,Máscara Ceremonial 5,3,Escultura,40,Modelado en barro,2,5200.0,40.0,30.0
+1325,Guerrero Huasteco 9,3,Escultura,40,Modelado en barro,2,5350.0,40.0,30.0
+1329,Espiral del Tiempo 13,3,Escultura,40,Modelado en barro,2,6500.0,40.0,30.0
+3362,Figura de Fertilidad II,3,Escultura,42,Talla en piedra,10,8950.0,56.0,53.3
+3363,Mujer con Cántaro,3,Escultura,40,Modelado en barro,17,8200.0,77.6,15.6
+1037,El Torito de Petate 9,7,Grabado,55,Litografía,3,2750.0,68.73,47.47
+1383,Mujer Serpiente,3,Escultura,40,Modelado en barro,2,4900.0,35.0,20.0
+1019,Obsidiana y Jade 3,6,Cerámica,48,Torno alfarero,2,3000.0,8.33,11.82
+1020,Máscara del Xantolo 4,7,Grabado,53,Xilografía,3,5500.0,67.28,57.96
+1152,Maíz y Copal 4,3,Escultura,40,Modelado en barro,2,5600.0,40.0,30.0
+1333,Tótem Tenek 17,3,Escultura,40,Modelado en barro,2,4800.0,40.0,30.0
+1116,Máscara del Xantolo 4,7,Grabado,53,Xilografía,3,1800.0,47.8,36.25
+1160,Cántaro de la Sierra 12,3,Escultura,40,Modelado en barro,2,11150.0,200.0,150.0
+1209,Barro Ritual 1,3,Escultura,40,Modelado en barro,2,5250.0,80.0,60.0
+1120,Danza del Gavilán 8,7,Grabado,53,Xilografía,3,3650.0,30.13,20.99
+1233,Barro Ritual 1,3,Escultura,40,Modelado en barro,2,4650.0,40.0,30.0
+1241,Obsidiana y Jade 9,3,Escultura,40,Modelado en barro,2,10450.0,200.0,150.0
+1317,Figura Ritual 1,3,Escultura,40,Modelado en barro,2,8650.0,40.0,30.0
+3364,El Tlacuache,3,Escultura,40,Modelado en barro,14,10000.0,84.1,20.8
+1386,Semilla Germinando,3,Escultura,40,Modelado en barro,2,7350.0,25.0,18.0
+3365,El Fruto,3,Escultura,40,Modelado en barro,2,8200.0,29.0,49.7
+3366,Tótem del Monte,3,Escultura,40,Modelado en barro,17,10050.0,52.8,60.4
+3808,Los Cinco Soles,5,Ilustración,44,Ilustración digital,13,1300.0,22.0,30.5
+3367,Figura Meditante,3,Escultura,41,Talla en madera,10,11450.0,44.7,57.8
+1100,Cántaro de la Sierra 12,6,Cerámica,50,Talavera,2,5600.0,44.7,31.8
+1115,El Torito de Petate 3,7,Grabado,54,Serigrafía,3,2600.0,62.54,47.12
+1121,El Torito de Petate 9,7,Grabado,55,Litografía,3,2900.0,68.07,53.07
+1411,Pueblo Mágico,7,Grabado,54,Serigrafía,3,1350.0,65.0,50.0
+1118,Nahual 6,7,Grabado,54,Serigrafía,3,3050.0,66.3,46.22
+1122,Máscara del Xantolo 10,7,Grabado,55,Litografía,3,2050.0,60.85,45.99
+1123,Curandero 11,7,Grabado,55,Litografía,3,2200.0,30.65,24.02
+1198,Río Moctezuma al Atardecer 2,1,Fotografía,5,Fotografía macro,1,1950.0,23.07,16.82
+1199,El Torito de Petate 3,7,Grabado,52,Aguafuerte,3,2750.0,33.16,25.18
+1067,El Torito de Petate 3,7,Grabado,54,Serigrafía,3,1650.0,45.97,36.66
+1038,Máscara del Xantolo 10,7,Grabado,54,Serigrafía,3,3550.0,46.14,31.94
+1223,El Torito de Petate 3,7,Grabado,55,Litografía,3,1350.0,25.87,24.79
+3368,Figura en Reposo,3,Escultura,40,Modelado en barro,9,9500.0,45.7,44.5
+1256,Nahual 12,7,Grabado,54,Serigrafía,3,2850.0,53.95,39.3
+1119,Jaguar Mítico 7,7,Grabado,55,Litografía,3,2450.0,64.83,57.4
+1132,Cañaveal del Pantepec 8,1,Fotografía,2,Fotografía analógica,1,1900.0,74.31,60.79
+1029,Jaguar Mítico 1,7,Grabado,53,Xilografía,3,2650.0,46.43,43.26
+3369,Las Raíces,3,Escultura,41,Talla en madera,14,11500.0,69.3,42.9
+1410,Frontera de Milpa,7,Grabado,55,Litografía,3,5200.0,50.0,40.0
+1405,Cosmovisión Nahua,7,Grabado,53,Xilografía,3,3700.0,50.0,50.0
+1397,Milpa desde Arriba,7,Grabado,54,Serigrafía,3,1550.0,60.0,45.0
+1398,Xantolo I,7,Grabado,55,Litografía,3,2250.0,50.0,40.0
+3370,El Amanecer Esculpido,3,Escultura,41,Talla en madera,2,10700.0,85.7,33.4
+1034,Nahual 6,7,Grabado,54,Serigrafía,3,2900.0,64.62,47.85
+1187,Obsidiana y Jade 3,6,Cerámica,49,Barro negro,2,4100.0,10.19,12.32
+1446,Figura de Palma,4,Artesanía,11,Tejido,4,2450.0,12.37,16.65
+3371,El Cargador de Leña,3,Escultura,40,Modelado en barro,10,6350.0,43.7,44.7
+1402,Ceiba Sagrada,7,Grabado,55,Litografía,3,4250.0,50.0,40.0
+1403,Quetzal,7,Grabado,54,Serigrafía,3,1350.0,60.0,45.0
+1404,Mercado I,7,Grabado,52,Aguafuerte,3,2000.0,35.0,28.0
+1071,Jaguar Mítico 7,7,Grabado,53,Xilografía,3,3550.0,58.76,59.75
+986,Nahual 6,7,Grabado,55,Litografía,3,1900.0,44.59,42.72
+1399,Danza del Volador,7,Grabado,52,Aguafuerte,3,1850.0,40.0,30.0
+1409,Huracán,7,Grabado,53,Xilografía,3,2350.0,48.0,38.0
+1449,Collar de Cuentas,4,Artesanía,59,Artesanía tradicional,4,2950.0,22.53,24.67
+1408,Serpiente Emplumada,7,Grabado,52,Aguafuerte,3,2550.0,40.0,30.0
+1002,Hilos de la Milpa 10,4,Artesanía,11,Tejido,4,4000.0,26.86,19.03
+1077,Bordado Nahua 1,4,Artesanía,10,Bordado tradicional,4,3100.0,26.57,30.64
+1435,Faja Nahua Bordada,4,Artesanía,10,Bordado tradicional,4,4800.0,34.05,24.22
+1172,Telar Ancestral 12,4,Artesanía,11,Tejido,4,4300.0,28.88,22.55
+1253,Textura de Henequén 9,4,Artesanía,11,Tejido,4,2900.0,20.25,29.85
+1432,Quechquémitl Ceremonial,4,Artesanía,10,Bordado tradicional,4,4700.0,31.77,22.58
+1434,Sombrero de Palma,4,Artesanía,11,Tejido,4,4100.0,19.62,16.76
+1450,Frutero de Bejuco,4,Artesanía,11,Tejido,4,3500.0,27.34,26.68
+1439,Canasta de Bejuco,4,Artesanía,11,Tejido,4,5600.0,19.43,18.98
+1443,Morral de Palma,4,Artesanía,11,Tejido,4,3350.0,15.86,19.35
+1441,Tapete de Palma,4,Artesanía,11,Tejido,4,2150.0,10.35,14.35
+1442,Bordado de Mariposas,4,Artesanía,10,Bordado tradicional,4,3650.0,14.1,16.5
+1447,Abanico de Palma,4,Artesanía,11,Tejido,4,4050.0,28.2,18.95
+1445,Mantel Tenek,4,Artesanía,10,Bordado tradicional,4,2450.0,23.13,28.47
+3372,Figura Ancestral,3,Escultura,42,Talla en piedra,14,11500.0,89.1,40.6
+1436,Petate Ceremonial,4,Artesanía,11,Tejido,4,3600.0,17.63,16.18
+1451,Cinturón Bordado,4,Artesanía,10,Bordado tradicional,4,3550.0,26.32,19.18
+996,Hilos de la Milpa 4,4,Artesanía,10,Bordado tradicional,4,5200.0,54.4,28.21
+1036,Tejido de Luz 8,4,Artesanía,11,Tejido,4,2900.0,38.05,42.73
+3963,Ilustración Serie 204,5,Ilustración,60,Tinta china,5,2500.0,21.7,34.3
+1000,Tejido de Luz 8,4,Artesanía,10,Bordado tradicional,4,3050.0,43.9,43.25
+995,Textura de Henequén 3,4,Artesanía,11,Tejido,4,2950.0,41.32,43.86
+1009,Mercado de Huejutla 5,5,Ilustración,47,Acuarela ilustrada,5,1250.0,22.54,18.45
+3373,El Colibrí en Piedra,3,Escultura,42,Talla en piedra,9,7300.0,63.5,19.8
+1054,Horizonte Tropical 2,2,Pintura,7,Acuarela,5,4700.0,40.0,30.0
+1166,Telar Ancestral 6,4,Artesanía,11,Tejido,4,3050.0,11.84,18.91
+1102,Cerámica Negra 2,6,Cerámica,51,Raku,2,6150.0,44.01,34.84
+1144,Vendedora de Naranjas 8,5,Ilustración,47,Acuarela ilustrada,5,2450.0,57.79,48.72
+976,Vendedora de Naranjas 8,2,Pintura,7,Acuarela,5,3150.0,40.0,30.0
+1251,Bordado Nahua 7,4,Artesanía,10,Bordado tradicional,4,3250.0,24.37,26.85
+1427,Retrato de Río,5,Ilustración,7,Acuarela,5,1900.0,35.0,25.0
+1148,Milpa en Agosto 12,2,Pintura,7,Acuarela,5,5550.0,40.0,30.0
+1431,Dios del Viento,5,Ilustración,7,Acuarela,5,2400.0,40.0,30.0
+1013,Amanecer en la Huasteca 9,5,Ilustración,47,Acuarela ilustrada,5,2200.0,49.01,39.06
+994,Tejido de Luz 2,4,Artesanía,10,Bordado tradicional,4,4500.0,50.09,33.91
+1081,Mujer Tenek 5,4,Artesanía,10,Bordado tradicional,4,5100.0,32.3,25.57
+1164,Hilos de la Milpa 4,4,Artesanía,10,Bordado tradicional,4,4150.0,16.98,17.84
+3374,El Venado,3,Escultura,40,Modelado en barro,2,9050.0,81.6,21.0
+3375,Mano de Barro,3,Escultura,43,Fundición en metal,14,11400.0,59.8,39.5
+3376,Semilla de Vida,3,Escultura,40,Modelado en barro,2,5300.0,29.0,33.3
+3377,Figura Fetal,3,Escultura,41,Talla en madera,9,11500.0,61.5,60.5
+1419,Catálogo de Maíces,5,Ilustración,7,Acuarela,5,900.0,50.0,35.0
+1070,Nahual 6,7,Grabado,55,Litografía,3,3300.0,68.06,46.71
+3378,Anciana Sabia,3,Escultura,43,Fundición en metal,17,9000.0,89.0,33.9
+3379,El Caracol Cósmico,3,Escultura,42,Talla en piedra,10,7200.0,34.1,46.8
+1423,Jardín de Colibrís,5,Ilustración,7,Acuarela,5,1350.0,40.0,30.0
+1093,Mercado de Huejutla 5,2,Pintura,7,Acuarela,5,8700.0,80.0,60.0
+1231,Paisaje Huasteco 11,2,Pintura,7,Acuarela,5,12850.0,200.0,150.0
+1003,Ritmo de Tambor 11,2,Pintura,7,Acuarela,5,4650.0,80.0,60.0
+1023,Mercado de Huejutla 7,2,Pintura,7,Acuarela,5,9550.0,120.0,100.0
+1033,Horizonte Tropical 5,5,Ilustración,47,Acuarela ilustrada,5,2900.0,26.08,21.15
+1124,Nahual 12,7,Grabado,53,Xilografía,3,2400.0,31.57,20.75
+1176,Máscara del Xantolo 4,7,Grabado,54,Serigrafía,3,1800.0,62.75,48.85
+1227,Ritmo de Tambor 7,2,Pintura,7,Acuarela,5,3900.0,40.0,30.0
+1415,Herbario Nahua,5,Ilustración,7,Acuarela,5,3500.0,45.0,30.0
+3380,El Jaguar,3,Escultura,40,Modelado en barro,17,9700.0,61.4,28.7
+3381,Serpiente de Tierra II,3,Escultura,43,Fundición en metal,14,11500.0,63.7,37.7
+1006,Amanecer en la Huasteca 2,5,Ilustración,47,Acuarela ilustrada,5,1300.0,20.9,22.96
+1159,Palma Tejida 11,3,Escultura,40,Modelado en barro,2,6800.0,120.0,100.0
+1302,Calle de Molango 6,2,Pintura,7,Acuarela,5,6950.0,80.0,60.0
+1306,Cañada al Amanecer 10,2,Pintura,7,Acuarela,5,4650.0,80.0,60.0
+1168,Paisaje Huasteco 8,2,Pintura,7,Acuarela,5,3700.0,80.0,60.0
+1011,Vendedora de Naranjas 7,5,Ilustración,47,Acuarela ilustrada,5,3100.0,63.59,51.6
+1184,Nahual 12,7,Grabado,52,Aguafuerte,3,1800.0,30.92,20.97
+1298,Bodegón Huasteco 2,2,Pintura,7,Acuarela,5,7150.0,80.0,60.0
+1210,Serranía en Lluvia 2,1,Fotografía,2,Fotografía analógica,1,2000.0,53.81,43.51
+1101,Barro Ritual 1,6,Cerámica,48,Torno alfarero,2,4450.0,26.21,25.43
+1310,Ventana al Pantepec 14,2,Pintura,7,Acuarela,5,5250.0,80.0,60.0
+1314,Paisaje Huasteco 18,2,Pintura,7,Acuarela,5,6400.0,80.0,60.0
+3382,Toro Serrano,3,Escultura,43,Fundición en metal,17,10700.0,56.6,33.2
+3383,El Árbol de la Ceiba,3,Escultura,42,Talla en piedra,9,10100.0,68.1,26.8
+3384,El Árbol del Monte,3,Escultura,41,Talla en madera,2,8450.0,75.3,28.9
+3385,Chalchiuhtlicue,3,Escultura,42,Talla en piedra,2,10850.0,86.0,51.2
+1138,Horizonte Tropical 2,2,Pintura,8,Acrílico,6,13650.0,200.0,150.0
+3386,Figura Danzante,3,Escultura,40,Modelado en barro,10,7100.0,78.3,51.9
+1167,Amanecer en la Huasteca 7,2,Pintura,8,Acrílico,6,4300.0,40.0,30.0
+1142,Mercado de Huejutla 6,2,Pintura,8,Acrílico,6,15200.0,200.0,150.0
+1139,Amanecer en la Huasteca 3,2,Pintura,7,Acuarela,5,4750.0,40.0,30.0
+3387,Paloma de Piedra,3,Escultura,43,Fundición en metal,17,10150.0,69.0,20.6
+1366,Retrato de Abuela Tenek,2,Pintura,8,Acrílico,6,6800.0,55.0,45.0
+1154,Paisaje Huasteco 6,2,Pintura,8,Acrílico,6,5900.0,80.0,60.0
+1165,Mujer Tenek 5,4,Artesanía,11,Tejido,4,4800.0,19.89,14.89
+1230,Amanecer en la Huasteca 10,2,Pintura,8,Acrílico,6,10350.0,120.0,100.0
+1236,Maíz y Copal 4,6,Cerámica,48,Torno alfarero,2,2400.0,25.08,22.52
+1369,Ceiba Cósmica,2,Pintura,8,Acrílico,6,6700.0,120.0,90.0
+1375,Atardecer Tamazunchale,2,Pintura,8,Acrílico,6,4750.0,60.0,50.0
+1380,Nopal al Mediodía,2,Pintura,8,Acrílico,6,3600.0,45.0,35.0
+1363,Barranca Dorada,2,Pintura,8,Acrílico,6,4350.0,70.0,50.0
+3388,La Princesa Tenek,3,Escultura,40,Modelado en barro,2,5750.0,37.7,34.2
+3389,Guerrero Nahua,3,Escultura,42,Talla en piedra,2,9800.0,40.8,58.0
+3390,Hacha Votiva,3,Escultura,43,Fundición en metal,10,11500.0,81.4,56.0
+3981,Ilustración Serie 222,5,Ilustración,47,Acuarela ilustrada,13,3000.0,53.4,61.2
+1056,Paisaje Huasteco 4,2,Pintura,6,Óleo sobre lienzo,7,4350.0,120.0,100.0
+1146,Amanecer en la Huasteca 10,2,Pintura,6,Óleo sobre lienzo,7,11050.0,120.0,100.0
+1222,Horizonte Tropical 2,2,Pintura,6,Óleo sobre lienzo,7,4200.0,40.0,30.0
+1058,Mercado de Huejutla 6,2,Pintura,8,Acrílico,6,16050.0,200.0,150.0
+1205,Mercado de Huejutla 9,2,Pintura,8,Acrílico,6,6850.0,40.0,30.0
+1225,Milpa en Agosto 5,2,Pintura,8,Acrílico,6,7300.0,120.0,100.0
+1051,Mercado de Huejutla 11,2,Pintura,7,Acuarela,5,11450.0,120.0,100.0
+1145,Horizonte Tropical 9,2,Pintura,8,Acrílico,6,8300.0,80.0,60.0
+1221,Vendedora de Naranjas 1,2,Pintura,8,Acrílico,6,15650.0,200.0,150.0
+1299,Paisaje Huasteco 3,2,Pintura,8,Acrílico,6,7750.0,120.0,100.0
+1303,Río del Pantepec 7,2,Pintura,8,Acrílico,6,8600.0,120.0,100.0
+1307,Frutos de la Milpa 11,2,Pintura,8,Acrílico,6,8750.0,120.0,100.0
+1311,Luz de Octubre 15,2,Pintura,8,Acrílico,6,12000.0,120.0,100.0
+1315,Mujer con Rebozo 19,2,Pintura,8,Acrílico,6,11000.0,120.0,100.0
+1367,Espíritu del Río,2,Pintura,6,Óleo sobre lienzo,7,7000.0,90.0,70.0
+1379,Bordado Viviente,2,Pintura,57,Técnica mixta,6,5250.0,50.0,50.0
+3391,La Espiral,3,Escultura,41,Talla en madera,14,11500.0,20.2,25.0
+3392,Las Ramas,3,Escultura,43,Fundición en metal,14,11500.0,38.2,49.4
+1143,Ritmo de Tambor 7,2,Pintura,8,Acrílico,6,8200.0,40.0,30.0
+975,Ritmo de Tambor 7,2,Pintura,6,Óleo sobre lienzo,7,13850.0,200.0,150.0
+1232,Nahual 12,7,Grabado,52,Aguafuerte,3,1400.0,44.0,33.0
+1242,Maíz y Copal 10,6,Cerámica,49,Barro negro,2,5600.0,15.76,17.61
+1040,Telar Ancestral 12,4,Artesanía,10,Bordado tradicional,4,3050.0,21.41,29.75
+1062,Amanecer en la Huasteca 10,2,Pintura,6,Óleo sobre lienzo,7,16150.0,200.0,150.0
+1305,Danza en Color 9,2,Pintura,6,Óleo sobre lienzo,7,4150.0,40.0,30.0
+1103,Obsidiana y Jade 3,6,Cerámica,48,Torno alfarero,2,4350.0,22.61,18.87
+3393,Torso Huasteco,3,Escultura,41,Talla en madera,2,9600.0,33.9,50.1
+1108,Cerámica Negra 8,6,Cerámica,48,Torno alfarero,2,2900.0,11.44,14.63
+3394,Manos en Ofrenda,3,Escultura,43,Fundición en metal,14,11350.0,35.7,25.2
+1313,Bodegón Huasteco 17,2,Pintura,6,Óleo sobre lienzo,7,6550.0,40.0,30.0
+1309,Sombras de la Huasteca 13,2,Pintura,6,Óleo sobre lienzo,7,4550.0,40.0,30.0
+3395,Árbol de la Vida,3,Escultura,43,Fundición en metal,9,11500.0,75.5,16.4
+3396,Figura de Madera,3,Escultura,41,Talla en madera,14,11500.0,71.5,27.8
+3397,El Viento Esculpido,3,Escultura,42,Talla en piedra,17,9200.0,41.2,34.7
+3398,Figura Ceremonial,3,Escultura,43,Fundición en metal,9,8900.0,28.2,17.2
+974,Mercado de Huejutla 6,2,Pintura,6,Óleo sobre lienzo,7,11250.0,120.0,100.0
+1044,Cañaveal del Pantepec 4,1,Fotografía,1,Fotografía digital,1,1850.0,23.2,24.86
+1301,Flores de Cempasúchil 5,2,Pintura,6,Óleo sobre lienzo,7,4150.0,40.0,30.0
+1370,Maíz Azul,2,Pintura,6,Óleo sobre lienzo,7,2550.0,65.0,50.0
+1193,Obsidiana y Jade 9,6,Cerámica,48,Torno alfarero,2,3150.0,33.4,31.78
+1376,Mujer del Mercado,2,Pintura,6,Óleo sobre lienzo,7,3700.0,80.0,65.0
+1194,Horizonte Tropical 10,5,Ilustración,47,Acuarela ilustrada,5,1800.0,37.05,32.24
+1378,El Guardián del Maíz,2,Pintura,6,Óleo sobre lienzo,7,10300.0,95.0,75.0
+3399,Colibrí de Barro,3,Escultura,42,Talla en piedra,14,10150.0,42.1,64.7
+3400,El Sembrador II,3,Escultura,41,Talla en madera,14,9050.0,28.1,59.8
+970,Horizonte Tropical 2,2,Pintura,6,Óleo sobre lienzo,7,15750.0,200.0,150.0
+1234,Ritmo de Tambor 2,2,Pintura,6,Óleo sobre lienzo,7,6150.0,80.0,60.0
+3401,Figura Abstracta Nahua,3,Escultura,41,Talla en madera,17,10650.0,59.4,48.2
+3402,Niño con Maíz,3,Escultura,42,Talla en piedra,2,9500.0,46.1,61.5
+3403,Tláloc en Barro,3,Escultura,43,Fundición en metal,10,10550.0,34.8,17.4
+1297,Retrato de la Sierra 1,2,Pintura,6,Óleo sobre lienzo,7,4200.0,40.0,30.0
+3404,Tótem de Piedra,3,Escultura,40,Modelado en barro,9,10200.0,47.2,35.1
+3405,El Germen de Barro,3,Escultura,41,Talla en madera,14,10050.0,82.0,38.8
+1173,Horizonte Tropical 1,5,Ilustración,44,Ilustración digital,8,2050.0,41.35,28.32
+1096,Horizonte Tropical 8,5,Ilustración,44,Ilustración digital,8,1900.0,36.85,36.88
+1372,Huachichil en el Monte,2,Pintura,6,Óleo sobre lienzo,7,9400.0,75.0,60.0
+1177,Mercado de Huejutla 5,5,Ilustración,44,Ilustración digital,8,1850.0,59.82,59.57
+1099,Milpa en Agosto 11,5,Ilustración,44,Ilustración digital,8,2750.0,58.59,53.39
+1109,Obsidiana y Jade 9,6,Cerámica,50,Talavera,2,4800.0,26.85,16.02
+1179,Vendedora de Naranjas 7,5,Ilustración,44,Ilustración digital,8,1650.0,29.06,17.89
+1189,Palma Tejida 5,6,Cerámica,48,Torno alfarero,2,2550.0,30.91,34.69
+1245,Barro Ritual 1,6,Cerámica,50,Talavera,2,3450.0,21.48,23.88
+1362,Xochicueitl en Fiesta,2,Pintura,6,Óleo sobre lienzo,7,8100.0,80.0,60.0
+968,Cascada de Tamul 12,1,Fotografía,4,Blanco y negro,1,3100.0,26.58,18.96
+1089,Horizonte Tropical 1,5,Ilustración,44,Ilustración digital,8,1750.0,64.65,56.55
+1365,Lluvia de Copal,2,Pintura,6,Óleo sobre lienzo,7,3000.0,100.0,80.0
+1129,Ritmo de Tambor 5,5,Ilustración,44,Ilustración digital,8,2250.0,53.64,42.94
+1381,Procesión Nocturna,2,Pintura,6,Óleo sobre lienzo,7,8600.0,110.0,85.0
+3406,La Montaña,3,Escultura,41,Talla en madera,9,11400.0,56.9,47.4
+3407,Cabeza Huasteca,3,Escultura,40,Modelado en barro,17,8850.0,84.2,40.7
+3408,Tótem de Maíz,3,Escultura,41,Talla en madera,14,10650.0,25.8,58.8
+1426,Ferias de Pueblo,5,Ilustración,44,Ilustración digital,8,1550.0,55.0,45.0
+1182,Paisaje Huasteco 10,5,Ilustración,44,Ilustración digital,8,2800.0,43.58,36.53
+1424,Amate Cósmico,5,Ilustración,44,Ilustración digital,8,2400.0,45.0,35.0
+990,Maíz y Copal 10,3,Escultura,41,Talla en madera,9,10750.0,200.0,150.0
+1416,Leyenda de la Llorona,5,Ilustración,44,Ilustración digital,8,2700.0,55.0,40.0
+1091,Paisaje Huasteco 3,5,Ilustración,44,Ilustración digital,8,2050.0,49.45,32.12
+1430,Atlas de la Huasteca,5,Ilustración,44,Ilustración digital,8,1100.0,60.0,45.0
+3409,El Sacerdote,3,Escultura,42,Talla en piedra,2,9350.0,57.4,15.3
+1175,Paisaje Huasteco 3,5,Ilustración,44,Ilustración digital,8,3700.0,45.2,39.75
+1417,Tianguis Cósmico,5,Ilustración,44,Ilustración digital,8,2150.0,45.0,35.0
+1412,Bestiary Huasteco I,5,Ilustración,44,Ilustración digital,8,2100.0,40.0,30.0
+1420,El Último Chamán,5,Ilustración,44,Ilustración digital,8,1850.0,40.0,30.0
+1248,Cascada de Tamul 4,1,Fotografía,2,Fotografía analógica,1,1550.0,74.13,66.92
+1413,Mapa del Inframundo,5,Ilustración,44,Ilustración digital,8,1350.0,50.0,35.0
+960,Cascada de Tamul 4,1,Fotografía,1,Fotografía digital,1,1650.0,50.91,32.64
+3410,Ojo de Bronce,3,Escultura,43,Fundición en metal,10,7300.0,28.8,15.7
+1422,Mensajero Huasteco,5,Ilustración,44,Ilustración digital,8,1800.0,50.0,40.0
+1428,Vuelo de Teporingo,5,Ilustración,44,Ilustración digital,8,1300.0,40.0,30.0
+3411,Mujer Fecunda,3,Escultura,41,Talla en madera,2,6850.0,73.9,22.4
+4016,Figura de Gato,6,Cerámica,48,Torno alfarero,15,3100.0,22.5,23.6
+3412,La Fuente,3,Escultura,42,Talla en piedra,17,7050.0,23.6,15.4
+3413,La Corteza,3,Escultura,43,Fundición en metal,9,8900.0,57.0,36.1
+1068,Maíz y Copal 4,3,Escultura,41,Talla en madera,9,4350.0,80.0,60.0
+1073,Obsidiana y Jade 9,3,Escultura,41,Talla en madera,9,5250.0,40.0,30.0
+984,Maíz y Copal 4,3,Escultura,41,Talla en madera,9,8950.0,200.0,150.0
+982,Cerámica Negra 2,3,Escultura,41,Talla en madera,9,5300.0,80.0,60.0
+1150,Cerámica Negra 2,3,Escultura,41,Talla en madera,9,8550.0,120.0,100.0
+1156,Cerámica Negra 8,3,Escultura,40,Modelado en barro,2,7800.0,200.0,150.0
+988,Cerámica Negra 8,3,Escultura,41,Talla en madera,9,5500.0,120.0,100.0
+992,Cántaro de la Sierra 12,3,Escultura,41,Talla en madera,9,7300.0,40.0,30.0
+1055,Amanecer en la Huasteca 3,2,Pintura,7,Acuarela,5,8600.0,80.0,60.0
+1082,Telar Ancestral 6,4,Artesanía,10,Bordado tradicional,4,4150.0,50.07,43.76
+1125,Barro Ritual 1,6,Cerámica,51,Raku,2,4000.0,24.62,23.32
+1206,Máscara del Xantolo 10,7,Grabado,56,Linografía,13,3500.0,33.46,20.96
+1218,Maíz y Copal 10,3,Escultura,41,Talla en madera,9,5850.0,120.0,100.0
+3414,Venado Huasteco,3,Escultura,41,Talla en madera,10,10200.0,52.8,36.9
+3415,El Manantial,3,Escultura,42,Talla en piedra,14,11400.0,63.5,29.1
+1318,Tótem Tenek 2,3,Escultura,41,Talla en madera,9,4850.0,80.0,60.0
+1322,Nahual de la Sierra 6,3,Escultura,41,Talla en madera,9,5500.0,80.0,60.0
+1326,Ave Sagrada 10,3,Escultura,41,Talla en madera,9,5000.0,80.0,60.0
+983,Obsidiana y Jade 3,3,Escultura,41,Talla en madera,9,6050.0,120.0,100.0
+1028,Cántaro de la Sierra 12,6,Cerámica,48,Torno alfarero,2,4350.0,22.2,22.07
+3416,El Pozo,3,Escultura,40,Modelado en barro,10,9350.0,45.0,22.9
+1074,Maíz y Copal 10,3,Escultura,41,Talla en madera,9,6350.0,80.0,60.0
+3417,Danzante,3,Escultura,40,Modelado en barro,17,11150.0,82.7,57.7
+1153,Mujer Tenek 5,4,Artesanía,10,Bordado tradicional,4,5000.0,49.98,44.66
+3418,Mujer Serrana,3,Escultura,40,Modelado en barro,17,7750.0,31.7,20.9
+1050,Hilos de la Milpa 10,4,Artesanía,11,Tejido,4,2950.0,41.18,39.79
+1192,Cerámica Negra 8,6,Cerámica,50,Talavera,2,2900.0,19.63,21.04
+1197,Jaguar Mítico 1,7,Grabado,56,Linografía,13,2300.0,28.62,26.74
+1394,Jaguar Dormido,3,Escultura,41,Talla en madera,9,4850.0,35.0,55.0
+1396,Raíz Humana,3,Escultura,41,Talla en madera,9,7750.0,80.0,20.0
+3419,Figura de Curación,3,Escultura,41,Talla en madera,14,11500.0,73.8,15.3
+1330,Danzante Eterno 14,3,Escultura,41,Talla en madera,9,3950.0,80.0,60.0
+3420,Figura con Maíz,3,Escultura,41,Talla en madera,9,7250.0,48.9,35.5
+1387,Torso del Viento,3,Escultura,41,Talla en madera,9,7600.0,70.0,30.0
+1114,Cerámica Negra 2,3,Escultura,42,Talla en piedra,10,6850.0,120.0,100.0
+1083,Barro Ritual 7,3,Escultura,42,Talla en piedra,10,4600.0,40.0,30.0
+1331,Deidad del Maíz 15,3,Escultura,42,Talla en piedra,10,6600.0,120.0,100.0
+962,Cántaro de la Sierra 6,3,Escultura,42,Talla en piedra,10,5650.0,80.0,60.0
+1043,Obsidiana y Jade 3,3,Escultura,42,Talla en piedra,10,7100.0,80.0,60.0
+1069,Palma Tejida 5,3,Escultura,42,Talla en piedra,10,5150.0,120.0,100.0
+1075,Palma Tejida 11,3,Escultura,42,Talla en piedra,10,6550.0,120.0,100.0
+1088,Telar Ancestral 12,4,Artesanía,11,Tejido,4,2900.0,24.92,21.86
+1157,Obsidiana y Jade 9,3,Escultura,42,Talla en piedra,10,6250.0,40.0,30.0
+1239,Barro Ritual 7,3,Escultura,42,Talla en piedra,10,7750.0,80.0,60.0
+1250,Cántaro de la Sierra 6,3,Escultura,42,Talla en piedra,10,10750.0,200.0,150.0
+1319,Torso Ancestral 3,3,Escultura,42,Talla en piedra,10,4950.0,120.0,100.0
+1327,Manos que Crean 11,3,Escultura,42,Talla en piedra,10,5600.0,120.0,100.0
+1384,Árbol de la Vida,3,Escultura,41,Talla en madera,9,4150.0,60.0,25.0
+1334,Torso Ancestral 18,3,Escultura,41,Talla en madera,9,5450.0,80.0,60.0
+3421,La Curandera,3,Escultura,41,Talla en madera,14,11200.0,47.5,16.9
+1335,Ofrenda Ceremonial 19,3,Escultura,42,Talla en piedra,10,9400.0,120.0,100.0
+3422,Jaguar Dormido,3,Escultura,42,Talla en piedra,10,9250.0,20.6,29.0
+1012,Horizonte Tropical 8,5,Ilustración,47,Acuarela ilustrada,5,1550.0,28.06,22.0
+1141,Milpa en Agosto 5,2,Pintura,9,Temple,11,8950.0,120.0,100.0
+1243,Palma Tejida 11,3,Escultura,42,Talla en piedra,10,4350.0,40.0,30.0
+972,Paisaje Huasteco 4,2,Pintura,9,Temple,11,5300.0,40.0,30.0
+973,Milpa en Agosto 5,2,Pintura,9,Temple,11,9850.0,80.0,60.0
+977,Horizonte Tropical 9,2,Pintura,9,Temple,11,5350.0,80.0,60.0
+1024,Cerámica Negra 8,6,Cerámica,49,Barro negro,2,3050.0,11.46,17.25
+1039,Vendedora de Naranjas 11,2,Pintura,9,Temple,11,4300.0,40.0,30.0
+1316,Flores de Cempasúchil 20,2,Pintura,9,Temple,11,15750.0,200.0,150.0
+1382,Tláloc Moderno,3,Escultura,42,Talla en piedra,10,7650.0,45.0,30.0
+3423,Tláloc Moderno,3,Escultura,41,Talla en madera,10,8500.0,22.6,31.7
+3424,El Campesino,3,Escultura,42,Talla en piedra,9,10700.0,70.9,64.3
+1385,Guerrero Jaguar,3,Escultura,42,Talla en piedra,10,3700.0,50.0,35.0
+1323,Ídolo de la Sierra 7,3,Escultura,42,Talla en piedra,10,6250.0,120.0,100.0
+1392,Caracol del Tiempo,3,Escultura,42,Talla en piedra,10,5150.0,40.0,40.0
+3425,Hombre de Piedra II,3,Escultura,43,Fundición en metal,10,11500.0,76.4,64.5
+1304,Naturaleza Viva 8,2,Pintura,9,Temple,11,15500.0,200.0,150.0
+3426,Serpiente Emplumada,3,Escultura,43,Fundición en metal,17,10500.0,27.4,40.8
+1090,Amanecer en la Huasteca 2,5,Ilustración,44,Ilustración digital,8,1250.0,38.71,31.78
+3427,La Espiral de la Vida,3,Escultura,43,Fundición en metal,17,10850.0,81.0,44.2
+1308,Rostro Ancestral 12,2,Pintura,9,Temple,11,16900.0,200.0,150.0
+1312,Retrato de la Sierra 16,2,Pintura,9,Temple,11,10950.0,200.0,150.0
+1032,Maíz y Copal 4,3,Escultura,42,Talla en piedra,10,7200.0,200.0,150.0
+3428,El Sembrador,3,Escultura,40,Modelado en barro,9,7350.0,53.1,52.3
+1112,Cántaro de la Sierra 12,6,Cerámica,49,Barro negro,2,6450.0,43.15,36.6
+1117,Sierra Verde 5,1,Fotografía,3,HDR,1,4550.0,88.15,52.05
+1136,Cascada de Tamul 12,1,Fotografía,3,HDR,1,1850.0,51.42,40.7
+3429,El Árbol Genealógico,3,Escultura,42,Talla en piedra,10,9800.0,54.0,54.6
+1201,Curandero 5,7,Grabado,54,Serigrafía,3,2000.0,46.73,39.0
+1300,Mujer con Rebozo 4,2,Pintura,9,Temple,11,14900.0,200.0,150.0
+3430,Columna de la Selva,3,Escultura,40,Modelado en barro,14,10950.0,60.1,43.3
+3431,Mujer en Espiral,3,Escultura,42,Talla en piedra,2,8800.0,47.1,60.0
+3432,Abstracción Huasteca,3,Escultura,40,Modelado en barro,9,10700.0,87.0,41.1
+1025,Obsidiana y Jade 9,6,Cerámica,48,Torno alfarero,2,5450.0,41.37,39.78
+969,Vendedora de Naranjas 1,2,Pintura,9,Temple,11,7200.0,120.0,100.0
+1178,Ritmo de Tambor 6,2,Pintura,9,Temple,11,8200.0,120.0,100.0
+978,Amanecer en la Huasteca 10,2,Pintura,8,Acrílico,6,9350.0,120.0,100.0
+3433,Madre con Hijo,3,Escultura,40,Modelado en barro,17,7500.0,48.1,17.2
+1204,Milpa en Agosto 8,2,Pintura,9,Temple,11,11250.0,200.0,150.0
+980,Milpa en Agosto 12,2,Pintura,9,Temple,11,14950.0,200.0,150.0
+993,Bordado Nahua 1,4,Artesanía,10,Bordado tradicional,4,4750.0,30.53,23.93
+1224,Paisaje Huasteco 4,2,Pintura,9,Temple,11,5650.0,80.0,60.0
+1226,Mercado de Huejutla 6,2,Pintura,9,Temple,11,19300.0,200.0,150.0
+1368,Cosecha bajo Luna,2,Pintura,9,Temple,11,6550.0,50.0,40.0
+1374,Tláloc en la Milpa,2,Pintura,9,Temple,11,8650.0,70.0,55.0
+1255,Mujer Tenek 11,4,Artesanía,10,Bordado tradicional,4,4950.0,32.33,29.75
+3434,Coyote Sagrado,3,Escultura,41,Talla en madera,10,8150.0,30.8,62.6
+3435,La Diosa del Agua,3,Escultura,43,Fundición en metal,2,7050.0,34.2,52.6
+3436,Corazón de Madera,3,Escultura,41,Talla en madera,2,10200.0,58.8,44.3
+3437,Columna del Sol,3,Escultura,41,Talla en madera,9,9300.0,87.3,42.8
+3438,Piedra y Agua,3,Escultura,42,Talla en piedra,9,10750.0,23.2,52.0
+1030,Danza del Gavilán 2,7,Grabado,54,Serigrafía,3,3400.0,63.94,48.41
+1163,Textura de Henequén 3,4,Artesanía,12,Talabartería,12,2150.0,28.51,29.9
+987,Barro Ritual 7,3,Escultura,40,Modelado en barro,2,4350.0,80.0,60.0
+1169,Textura de Henequén 9,4,Artesanía,12,Talabartería,12,3150.0,13.53,14.46
+1252,Tejido de Luz 8,4,Artesanía,12,Talabartería,12,5000.0,52.58,44.29
+1078,Tejido de Luz 2,4,Artesanía,12,Talabartería,12,3500.0,49.24,33.11
+1084,Tejido de Luz 8,4,Artesanía,12,Talabartería,12,5050.0,52.73,34.99
+1085,Textura de Henequén 9,4,Artesanía,12,Talabartería,12,1700.0,12.34,14.67
+1437,Talabartería Floral,4,Artesanía,12,Talabartería,12,2050.0,14.8,15.52
+1440,Huaraches de Cuero,4,Artesanía,12,Talabartería,12,4400.0,19.83,18.97
+3439,Escultura Serie 100,3,Escultura,42,Talla en piedra,10,8500.0,39.1,48.1
+3440,Escultura Serie 101,3,Escultura,41,Talla en madera,14,11500.0,73.4,41.9
+981,Barro Ritual 1,3,Escultura,42,Talla en piedra,10,5050.0,40.0,30.0
+1444,Cartera de Cuero Floral,4,Artesanía,12,Talabartería,12,1900.0,20.2,23.39
+998,Telar Ancestral 6,4,Artesanía,12,Talabartería,12,3850.0,28.0,23.63
+999,Bordado Nahua 7,4,Artesanía,12,Talabartería,12,2800.0,10.94,17.69
+1004,Telar Ancestral 12,4,Artesanía,12,Talabartería,12,5100.0,33.55,18.01
+3441,Escultura Serie 102,3,Escultura,43,Fundición en metal,9,10750.0,28.7,33.5
+1060,Vendedora de Naranjas 8,2,Pintura,7,Acuarela,5,4850.0,80.0,60.0
+3442,Escultura Serie 103,3,Escultura,41,Talla en madera,9,11050.0,87.7,16.8
+1086,Hilos de la Milpa 10,4,Artesanía,12,Talabartería,12,2300.0,10.55,14.15
+1171,Mujer Tenek 11,4,Artesanía,12,Talabartería,12,1600.0,38.97,36.57
+1010,Ritmo de Tambor 6,5,Ilustración,47,Acuarela ilustrada,5,3050.0,46.5,36.28
+1106,Cántaro de la Sierra 6,6,Cerámica,48,Torno alfarero,2,4400.0,25.36,25.51
+1017,Barro Ritual 1,6,Cerámica,51,Raku,2,4700.0,27.78,27.27
+1174,Amanecer en la Huasteca 2,5,Ilustración,45,Tinta sobre papel,13,2250.0,58.92,43.93
+1005,Horizonte Tropical 1,5,Ilustración,45,Tinta sobre papel,13,3450.0,47.91,28.12
+3443,Escultura Serie 104,3,Escultura,41,Talla en madera,17,10100.0,24.6,21.4
+1057,Milpa en Agosto 5,5,Ilustración,45,Tinta sobre papel,13,3450.0,27.96,23.32
+1027,Mujer Tenek 11,4,Artesanía,12,Talabartería,12,2500.0,47.83,30.02
+3444,Escultura Serie 105,3,Escultura,42,Talla en piedra,17,7450.0,20.1,36.4
+3445,Escultura Serie 106,3,Escultura,42,Talla en piedra,17,9700.0,81.9,26.2
+1170,Serranía en Lluvia 10,1,Fotografía,4,Blanco y negro,1,1900.0,22.08,17.41
+1008,Milpa en Agosto 4,5,Ilustración,44,Ilustración digital,8,3500.0,48.76,34.67
+3446,Escultura Serie 107,3,Escultura,40,Modelado en barro,9,8850.0,31.5,30.5
+3447,Escultura Serie 108,3,Escultura,42,Talla en piedra,2,9100.0,56.4,26.8
+1181,Amanecer en la Huasteca 9,5,Ilustración,46,Lápiz y grafito,13,3050.0,45.05,37.39
+1191,Barro Ritual 7,6,Cerámica,48,Torno alfarero,2,5250.0,41.28,32.87
+1249,Vendedora de Naranjas 5,5,Ilustración,45,Tinta sobre papel,13,2400.0,43.19,35.72
+971,Textura de Henequén 3,4,Artesanía,12,Talabartería,12,3200.0,41.56,32.05
+3448,Escultura Serie 109,3,Escultura,41,Talla en madera,2,9350.0,23.8,45.5
+3449,Escultura Serie 110,3,Escultura,40,Modelado en barro,14,10200.0,52.5,36.4
+3450,Escultura Serie 111,3,Escultura,40,Modelado en barro,17,7650.0,83.3,21.3
+3451,Escultura Serie 112,3,Escultura,42,Talla en piedra,10,8550.0,30.3,30.4
+1026,Maíz y Copal 10,6,Cerámica,50,Talavera,2,3850.0,14.85,10.22
+1053,Vendedora de Naranjas 1,2,Pintura,7,Acuarela,5,15100.0,200.0,150.0
+964,Tejido de Luz 8,4,Artesanía,12,Talabartería,12,4200.0,28.85,27.33
+3452,Escultura Serie 113,3,Escultura,42,Talla en piedra,9,10350.0,64.8,25.1
+1079,Textura de Henequén 3,4,Artesanía,12,Talabartería,12,3700.0,29.71,24.6
+1161,Bordado Nahua 1,4,Artesanía,11,Tejido,4,2900.0,41.68,37.49
+1180,Horizonte Tropical 8,5,Ilustración,46,Lápiz y grafito,13,1350.0,40.21,37.56
+3453,Escultura Serie 114,3,Escultura,42,Talla en piedra,9,11500.0,51.8,54.5
+1188,Cañaveal del Pantepec 4,1,Fotografía,5,Fotografía macro,1,1600.0,67.02,65.82
+1421,Serpientes del Cielo,5,Ilustración,60,Tinta china,13,1350.0,35.0,28.0
+1429,Luna Llena en Milpa,5,Ilustración,60,Tinta china,13,1200.0,28.0,21.0
+3454,Escultura Serie 115,3,Escultura,43,Fundición en metal,9,11300.0,32.9,64.5
+1098,Paisaje Huasteco 10,5,Ilustración,45,Tinta sobre papel,13,1900.0,28.71,22.29
+3455,Escultura Serie 116,3,Escultura,41,Talla en madera,10,9800.0,35.3,28.1
+1212,Cañaveal del Pantepec 4,1,Fotografía,4,Blanco y negro,1,850.0,20.23,18.66
+3456,Escultura Serie 117,3,Escultura,41,Talla en madera,10,8500.0,36.8,55.5
+1113,Jaguar Mítico 1,7,Grabado,52,Aguafuerte,3,3800.0,34.44,25.63
+989,Ritmo de Tambor 9,5,Ilustración,46,Lápiz y grafito,13,1950.0,61.05,53.0
+1087,Mujer Tenek 11,4,Artesanía,12,Talabartería,12,4650.0,33.71,20.84
+1127,Milpa en Agosto 3,5,Ilustración,46,Lápiz y grafito,13,2250.0,37.07,35.8
+1425,Historia de una Semilla,5,Ilustración,60,Tinta china,13,1500.0,60.0,20.0
+3457,Escultura Serie 118,3,Escultura,41,Talla en madera,17,7650.0,68.6,30.9
+1162,Tejido de Luz 2,4,Artesanía,12,Talabartería,12,1550.0,22.91,19.19
+1254,Hilos de la Milpa 10,4,Artesanía,10,Bordado tradicional,4,5100.0,52.29,42.27
+1097,Amanecer en la Huasteca 9,5,Ilustración,45,Tinta sobre papel,13,2000.0,47.36,30.08
+3458,Escultura Serie 119,3,Escultura,40,Modelado en barro,10,9500.0,79.6,63.4
+1320,Ofrenda Ceremonial 4,3,Escultura,43,Fundición en metal,14,10450.0,200.0,150.0
+1452,Olla de Barro Negro,6,Cerámica,48,Torno alfarero,17,4750.0,25.0,20.0
+1466,Platón Barro Negro,6,Cerámica,48,Torno alfarero,17,2250.0,6.0,35.0
+1463,Plato Ritual,6,Cerámica,61,Modelado a mano,15,3600.0,4.0,30.0
+1454,Taza de Raku,6,Cerámica,51,Raku,16,4050.0,10.0,10.0
+1336,Máscara Ceremonial 20,3,Escultura,43,Fundición en metal,14,6650.0,200.0,150.0
+1460,Incensario Prehispánico,6,Cerámica,61,Modelado a mano,15,2250.0,35.0,20.0
+1456,Cántaro Ceremonial,6,Cerámica,61,Modelado a mano,15,5400.0,40.0,25.0
+1155,Barro Ritual 7,3,Escultura,43,Fundición en metal,14,7000.0,120.0,100.0
+1158,Maíz y Copal 10,3,Escultura,43,Fundición en metal,14,7100.0,80.0,60.0
+1235,Obsidiana y Jade 3,3,Escultura,43,Fundición en metal,14,6600.0,120.0,100.0
+1244,Cántaro de la Sierra 12,3,Escultura,43,Fundición en metal,14,7100.0,80.0,60.0
+1462,Jarrón Craquelado,6,Cerámica,48,Torno alfarero,16,3900.0,30.0,15.0
+1448,Cuadro en Papel Amate,4,Artesanía,58,Pintado en amate,18,3100.0,14.52,10.76
+1453,Vasija Tláloc,6,Cerámica,61,Modelado a mano,15,3600.0,30.0,22.0
+1455,Plato Huasteco,6,Cerámica,48,Torno alfarero,16,4350.0,5.0,28.0
+1465,Vasija de Porcelana,6,Cerámica,48,Torno alfarero,19,2350.0,22.0,16.0
+3459,Escultura Serie 120,3,Escultura,43,Fundición en metal,17,8150.0,32.5,50.6
+1459,Maceta Tenek,6,Cerámica,48,Torno alfarero,17,4450.0,20.0,18.0
+1464,Alcancía Armadillo,6,Cerámica,61,Modelado a mano,15,3900.0,18.0,14.0
+3460,Escultura Serie 121,3,Escultura,41,Talla en madera,9,10700.0,80.4,34.8
+3461,Escultura Serie 122,3,Escultura,40,Modelado en barro,14,10550.0,49.8,38.4
+3462,Escultura Serie 123,3,Escultura,40,Modelado en barro,10,9450.0,26.9,18.6
+3463,Escultura Serie 124,3,Escultura,42,Talla en piedra,2,5900.0,39.7,32.3
+3464,Escultura Serie 125,3,Escultura,41,Talla en madera,9,7300.0,36.4,44.4
+3465,Escultura Serie 126,3,Escultura,41,Talla en madera,14,11200.0,79.7,16.5
+3466,Escultura Serie 127,3,Escultura,43,Fundición en metal,17,9800.0,42.8,16.2
+3467,Escultura Serie 128,3,Escultura,41,Talla en madera,14,10300.0,57.4,24.4
+3468,Escultura Serie 129,3,Escultura,40,Modelado en barro,9,9800.0,24.9,63.1
+3469,Escultura Serie 130,3,Escultura,43,Fundición en metal,14,11500.0,47.2,60.2
+3470,Escultura Serie 131,3,Escultura,43,Fundición en metal,10,8500.0,20.5,22.1
+3471,Escultura Serie 132,3,Escultura,40,Modelado en barro,10,6850.0,44.3,57.1
+3472,Escultura Serie 133,3,Escultura,40,Modelado en barro,14,10650.0,36.8,58.5
+3473,Escultura Serie 134,3,Escultura,42,Talla en piedra,2,10700.0,55.3,54.0
+3474,Escultura Serie 135,3,Escultura,41,Talla en madera,14,10600.0,20.8,20.7
+3475,Escultura Serie 136,3,Escultura,41,Talla en madera,2,9250.0,32.4,21.2
+3476,Escultura Serie 137,3,Escultura,40,Modelado en barro,17,6850.0,47.3,30.4
+3477,Escultura Serie 138,3,Escultura,40,Modelado en barro,2,9300.0,77.4,49.0
+3478,Escultura Serie 139,3,Escultura,41,Talla en madera,17,11100.0,85.4,34.8
+3479,Escultura Serie 140,3,Escultura,42,Talla en piedra,2,8050.0,82.0,35.6
+3480,Escultura Serie 141,3,Escultura,42,Talla en piedra,14,9000.0,43.2,46.8
+3481,Escultura Serie 142,3,Escultura,41,Talla en madera,17,8550.0,36.3,45.8
+3482,Escultura Serie 143,3,Escultura,40,Modelado en barro,9,8050.0,71.7,31.4
+3483,Escultura Serie 144,3,Escultura,42,Talla en piedra,10,6650.0,34.4,17.7
+3484,Escultura Serie 145,3,Escultura,40,Modelado en barro,2,8800.0,24.9,24.6
+3485,Escultura Serie 146,3,Escultura,43,Fundición en metal,10,10150.0,70.5,27.2
+3486,Escultura Serie 147,3,Escultura,43,Fundición en metal,14,10200.0,55.4,51.7
+3487,Escultura Serie 148,3,Escultura,41,Talla en madera,10,10100.0,52.5,37.7
+3488,Escultura Serie 149,3,Escultura,42,Talla en piedra,14,11500.0,84.8,62.0
+3489,Escultura Serie 150,3,Escultura,43,Fundición en metal,10,10200.0,55.7,39.4
+3490,Escultura Serie 151,3,Escultura,41,Talla en madera,10,9950.0,86.1,22.4
+3491,Escultura Serie 152,3,Escultura,41,Talla en madera,14,11500.0,78.1,27.6
+3492,Escultura Serie 153,3,Escultura,42,Talla en piedra,9,8550.0,72.4,61.5
+3493,Escultura Serie 154,3,Escultura,43,Fundición en metal,9,9600.0,46.2,50.2
+3494,Escultura Serie 155,3,Escultura,43,Fundición en metal,14,11500.0,80.8,23.3
+3495,Escultura Serie 156,3,Escultura,40,Modelado en barro,17,6700.0,26.8,41.1
+3496,Escultura Serie 157,3,Escultura,42,Talla en piedra,10,11500.0,85.9,48.3
+3497,Escultura Serie 158,3,Escultura,40,Modelado en barro,17,9950.0,86.6,52.6
+3498,Escultura Serie 159,3,Escultura,42,Talla en piedra,14,11500.0,62.5,35.0
+3499,Escultura Serie 160,3,Escultura,41,Talla en madera,9,9900.0,29.0,54.8
+3500,Escultura Serie 161,3,Escultura,40,Modelado en barro,2,8950.0,89.5,16.5
+3501,Escultura Serie 162,3,Escultura,43,Fundición en metal,2,11500.0,81.0,61.6
+3502,Escultura Serie 163,3,Escultura,41,Talla en madera,10,8600.0,40.4,20.6
+3503,Escultura Serie 164,3,Escultura,40,Modelado en barro,17,10100.0,79.3,64.0
+3504,Escultura Serie 165,3,Escultura,41,Talla en madera,10,10050.0,55.0,37.8
+3505,Escultura Serie 166,3,Escultura,43,Fundición en metal,9,11500.0,40.4,63.3
+3506,Escultura Serie 167,3,Escultura,43,Fundición en metal,10,9250.0,89.4,42.4
+3507,Escultura Serie 168,3,Escultura,43,Fundición en metal,2,8250.0,42.6,54.6
+3508,Escultura Serie 169,3,Escultura,41,Talla en madera,9,10550.0,71.5,15.5
+3509,Escultura Serie 170,3,Escultura,42,Talla en piedra,14,11500.0,86.2,20.9
+3510,Escultura Serie 171,3,Escultura,43,Fundición en metal,2,11500.0,80.5,47.5
+3511,Escultura Serie 172,3,Escultura,43,Fundición en metal,10,9700.0,75.6,24.1
+3512,Escultura Serie 173,3,Escultura,40,Modelado en barro,14,10200.0,24.5,56.9
+3513,Escultura Serie 174,3,Escultura,40,Modelado en barro,9,10450.0,65.7,19.4
+3514,Escultura Serie 175,3,Escultura,43,Fundición en metal,9,11500.0,68.7,41.1
+3515,Escultura Serie 176,3,Escultura,41,Talla en madera,17,9400.0,39.4,51.5
+3516,Escultura Serie 177,3,Escultura,41,Talla en madera,2,10200.0,89.7,49.8
+3517,Escultura Serie 178,3,Escultura,40,Modelado en barro,10,8550.0,57.2,49.2
+3518,Escultura Serie 179,3,Escultura,43,Fundición en metal,2,10300.0,32.3,51.4
+3519,Escultura Serie 180,3,Escultura,42,Talla en piedra,14,10800.0,44.2,52.1
+3520,Escultura Serie 181,3,Escultura,42,Talla en piedra,2,9100.0,69.5,27.5
+3521,Escultura Serie 182,3,Escultura,42,Talla en piedra,2,8100.0,48.5,30.6
+3522,Escultura Serie 183,3,Escultura,41,Talla en madera,14,11500.0,56.1,64.9
+3523,Escultura Serie 184,3,Escultura,40,Modelado en barro,17,10400.0,87.5,48.7
+3524,Escultura Serie 185,3,Escultura,40,Modelado en barro,10,11100.0,78.2,57.5
+3525,Escultura Serie 186,3,Escultura,43,Fundición en metal,2,8400.0,20.4,38.0
+3526,Escultura Serie 187,3,Escultura,43,Fundición en metal,2,10300.0,20.5,53.5
+3527,Escultura Serie 188,3,Escultura,41,Talla en madera,10,10000.0,20.4,59.2
+3528,Escultura Serie 189,3,Escultura,43,Fundición en metal,17,9850.0,76.0,50.7
+3529,Escultura Serie 190,3,Escultura,41,Talla en madera,9,10550.0,55.0,53.4
+3530,Escultura Serie 191,3,Escultura,41,Talla en madera,17,9850.0,37.5,53.3
+3531,Escultura Serie 192,3,Escultura,41,Talla en madera,17,7050.0,36.1,21.6
+3532,Escultura Serie 193,3,Escultura,41,Talla en madera,9,10900.0,49.8,18.1
+3533,Escultura Serie 194,3,Escultura,42,Talla en piedra,9,8450.0,53.0,60.4
+3534,Escultura Serie 195,3,Escultura,42,Talla en piedra,10,8600.0,36.7,28.8
+3535,Escultura Serie 196,3,Escultura,43,Fundición en metal,2,8200.0,85.9,46.0
+3536,Escultura Serie 197,3,Escultura,42,Talla en piedra,14,11500.0,83.8,18.4
+3537,Escultura Serie 198,3,Escultura,43,Fundición en metal,14,11500.0,31.6,52.5
+3538,Escultura Serie 199,3,Escultura,42,Talla en piedra,10,11050.0,40.7,28.4
+3539,Escultura Serie 200,3,Escultura,41,Talla en madera,9,9900.0,20.1,32.4
+3540,Escultura Serie 201,3,Escultura,40,Modelado en barro,10,8950.0,71.1,29.0
+3541,Escultura Serie 202,3,Escultura,41,Talla en madera,14,10700.0,42.7,25.2
+3542,Escultura Serie 203,3,Escultura,41,Talla en madera,9,8550.0,86.0,24.0
+3543,Escultura Serie 204,3,Escultura,43,Fundición en metal,2,11050.0,70.9,55.4
+3544,Pulsera de Chaquira,4,Artesanía,41,Talla en madera,4,4350.0,106.4,41.5
+3545,Faja Tradicional,4,Artesanía,10,Bordado tradicional,15,3550.0,78.3,44.1
+3546,Faja con Figuras,4,Artesanía,58,Pintado en amate,2,3650.0,103.3,131.1
+3547,Petate Decorativo,4,Artesanía,12,Talabartería,4,4250.0,76.4,52.6
+3548,Tapete de Palma,4,Artesanía,12,Talabartería,2,5350.0,92.1,158.6
+3549,Cántaro para Agua,4,Artesanía,10,Bordado tradicional,2,3550.0,40.5,84.7
+3550,Vasija Tradicional,4,Artesanía,41,Talla en madera,9,4300.0,57.7,115.0
+3551,Cojín Bordado,4,Artesanía,10,Bordado tradicional,2,4750.0,97.1,159.3
+3552,Cántaro Pintado,4,Artesanía,58,Pintado en amate,12,4750.0,87.3,132.9
+3553,Plato de Barro Pintado,4,Artesanía,41,Talla en madera,9,3950.0,90.1,97.8
+3554,Marco de Espejo Bordado,4,Artesanía,10,Bordado tradicional,18,3850.0,76.4,51.9
+3555,Cuenco Negro,4,Artesanía,11,Tejido,2,4650.0,69.3,176.6
+3556,Bolsa de Palma,4,Artesanía,58,Pintado en amate,18,4050.0,95.3,50.5
+3557,Cubrecama Nahua,4,Artesanía,11,Tejido,15,4300.0,89.3,72.9
+3558,Cartera de Bolsillo,4,Artesanía,10,Bordado tradicional,2,4400.0,106.5,102.5
+3559,Petate de Tule,4,Artesanía,41,Talla en madera,9,5000.0,74.8,157.1
+3560,Mantel Bordado,4,Artesanía,59,Artesanía tradicional,12,4550.0,49.7,121.6
+3561,Almohadón Tejido,4,Artesanía,11,Tejido,2,3400.0,67.4,95.5
+3562,Olla Pintada,4,Artesanía,11,Tejido,4,2600.0,28.4,158.1
+3563,Quechquémitl con Flores,4,Artesanía,40,Modelado en barro,2,3150.0,77.8,124.8
+3564,Cojín de Palma,4,Artesanía,40,Modelado en barro,9,4700.0,54.7,97.6
+3565,Rebozo de Seda II,4,Artesanía,12,Talabartería,15,4100.0,43.1,139.9
+3566,Monedero de Cuero,4,Artesanía,11,Tejido,4,4700.0,98.8,172.7
+3567,Bolso de Palma,4,Artesanía,12,Talabartería,12,5150.0,32.9,164.8
+3568,Figura de Madera 2,4,Artesanía,41,Talla en madera,15,3350.0,31.6,128.5
+3569,Cinturón Artesanal,4,Artesanía,40,Modelado en barro,2,3300.0,92.3,129.5
+3570,Caja Artesanal,4,Artesanía,58,Pintado en amate,15,3650.0,76.1,58.5
+3571,Servilleta de Bautizo,4,Artesanía,40,Modelado en barro,18,2900.0,60.2,79.5
+3572,Arete de Semillas,4,Artesanía,40,Modelado en barro,9,4800.0,96.8,131.7
+3573,Sombrero Artesanal,4,Artesanía,40,Modelado en barro,18,3000.0,78.8,103.0
+3574,Hamaca de Yute,4,Artesanía,59,Artesanía tradicional,9,3550.0,102.2,125.0
+3575,Vasija de Barro Decorada,4,Artesanía,11,Tejido,4,3100.0,27.8,29.1
+3576,Incensario de Barro,4,Artesanía,58,Pintado en amate,9,3900.0,93.1,114.6
+3577,Quechquémitl de Fiesta,4,Artesanía,10,Bordado tradicional,18,3000.0,96.7,122.2
+3578,Sandalia Huasteca,4,Artesanía,58,Pintado en amate,15,3700.0,73.6,28.9
+3579,Cartera de Cuero,4,Artesanía,12,Talabartería,18,4750.0,48.4,169.9
+3580,Quechquémitl Tenek,4,Artesanía,59,Artesanía tradicional,12,4800.0,33.6,148.3
+3581,Amate con Flores,4,Artesanía,11,Tejido,18,3650.0,35.0,78.1
+3582,Canasta Artesanal,4,Artesanía,59,Artesanía tradicional,2,3500.0,101.4,29.6
+3583,Cofre Artesanal,4,Artesanía,40,Modelado en barro,12,3950.0,39.7,131.5
+3584,Amate con Pajaros,4,Artesanía,41,Talla en madera,18,4400.0,94.4,121.6
+3585,Jarro de Barro,4,Artesanía,59,Artesanía tradicional,18,3600.0,58.9,42.8
+3586,Papel Picado de Fiesta,4,Artesanía,12,Talabartería,12,5200.0,73.2,74.8
+3587,Cortina Bordada,4,Artesanía,59,Artesanía tradicional,9,4300.0,94.1,55.7
+3588,Camino de Mesa Bordado,4,Artesanía,10,Bordado tradicional,18,2650.0,102.5,69.1
+3589,Figurilla de Barro,4,Artesanía,12,Talabartería,2,4650.0,89.1,87.1
+3590,Mantel de Fiesta,4,Artesanía,11,Tejido,4,4350.0,36.8,179.0
+3591,Billetera Artesanal,4,Artesanía,59,Artesanía tradicional,4,2550.0,29.1,72.2
+3592,Reboso de Seda,4,Artesanía,59,Artesanía tradicional,15,4150.0,79.1,128.6
+3593,Caja de Madera Pintada,4,Artesanía,41,Talla en madera,12,4450.0,84.1,36.6
+3594,Mochila Nahua,4,Artesanía,12,Talabartería,18,3650.0,80.7,156.4
+3595,Tapete de Boda,4,Artesanía,40,Modelado en barro,12,4900.0,105.9,114.5
+3596,Amate con Peces,4,Artesanía,10,Bordado tradicional,15,3500.0,55.1,57.9
+3631,Huipil de Bodas,4,Artesanía,11,Tejido,12,4650.0,40.7,91.8
+3597,Portarretrato de Palma,4,Artesanía,41,Talla en madera,2,4250.0,69.1,41.9
+3598,Quechquémitl Bordado,4,Artesanía,40,Modelado en barro,4,3000.0,87.4,161.3
+3599,Olla de Barro Rojo,4,Artesanía,12,Talabartería,18,4050.0,39.5,130.6
+3600,Collar Tenek,4,Artesanía,12,Talabartería,9,4550.0,66.5,63.4
+3601,Muñeca de Trapo,4,Artesanía,40,Modelado en barro,18,4300.0,109.1,64.9
+3602,Morral de Palma,4,Artesanía,40,Modelado en barro,12,4600.0,55.4,29.8
+3603,Bolsa de Mercado,4,Artesanía,11,Tejido,2,4100.0,100.5,85.6
+3604,Huipil de Xilitla,4,Artesanía,10,Bordado tradicional,4,3750.0,103.8,47.8
+3605,Figura de Barro Rojo,4,Artesanía,10,Bordado tradicional,4,4400.0,51.0,91.7
+3606,Figurilla Tenek,4,Artesanía,11,Tejido,9,4550.0,49.7,30.0
+3607,Morral de Viaje,4,Artesanía,12,Talabartería,15,4700.0,83.1,55.9
+3608,Hamaca Tejida,4,Artesanía,41,Talla en madera,9,5000.0,67.8,131.2
+3609,Maceta de Barro,4,Artesanía,41,Talla en madera,15,3050.0,35.8,109.2
+3610,Huipil de Flores,4,Artesanía,10,Bordado tradicional,2,4300.0,94.9,112.6
+3611,Canasta de Mimbre,4,Artesanía,11,Tejido,18,3150.0,50.6,73.2
+3612,Rebozo con Figuras,4,Artesanía,40,Modelado en barro,4,3950.0,58.2,168.5
+3613,Camino de Altar,4,Artesanía,11,Tejido,18,3550.0,40.7,151.9
+3614,Jarrón de Flores,4,Artesanía,40,Modelado en barro,18,3800.0,64.4,151.1
+3615,Camino de Maguey,4,Artesanía,40,Modelado en barro,18,4000.0,48.5,177.2
+3616,Camino de Mesa Nahua,4,Artesanía,58,Pintado en amate,12,4150.0,91.7,127.1
+3617,Cuadro de Bordado,4,Artesanía,58,Pintado en amate,2,4400.0,74.7,153.6
+3618,Mochila Tenek,4,Artesanía,11,Tejido,18,4000.0,89.2,90.1
+3619,Piñata Artesanal,4,Artesanía,11,Tejido,18,3800.0,41.6,101.1
+3620,Cántaro de la Sierra,4,Artesanía,10,Bordado tradicional,2,3350.0,73.3,159.0
+3621,Servilleta de Hilo,4,Artesanía,41,Talla en madera,15,4400.0,93.1,93.0
+3622,Jarro con Diseño,4,Artesanía,59,Artesanía tradicional,2,3450.0,58.2,80.5
+3623,Bolso de Cuero,4,Artesanía,40,Modelado en barro,2,3550.0,27.7,90.3
+3624,Morral Nahua,4,Artesanía,10,Bordado tradicional,9,4450.0,100.4,99.2
+3625,Olla para Flores,4,Artesanía,41,Talla en madera,9,4200.0,72.0,33.1
+3626,Taza de Barro,4,Artesanía,10,Bordado tradicional,12,2900.0,32.8,26.6
+3627,Tapete de Fibras,4,Artesanía,10,Bordado tradicional,12,4550.0,40.4,31.8
+3628,Delantal de Cocina,4,Artesanía,58,Pintado en amate,2,3000.0,62.7,71.9
+3629,Cuenco de Barro Blanco,4,Artesanía,58,Pintado en amate,15,3550.0,48.8,56.6
+3630,Petate Huasteco,4,Artesanía,59,Artesanía tradicional,9,4150.0,26.8,154.6
+3632,Faja de Ceremonia,4,Artesanía,10,Bordado tradicional,2,3850.0,98.6,146.3
+3633,Tinaja de Barro,4,Artesanía,58,Pintado en amate,15,4400.0,38.8,84.1
+3634,Chal de Lana,4,Artesanía,41,Talla en madera,2,4450.0,47.8,63.8
+3635,Tapete Tenek,4,Artesanía,10,Bordado tradicional,2,4350.0,79.2,111.3
+3636,Olla Huasteca,4,Artesanía,11,Tejido,12,4300.0,37.5,120.8
+3637,Joyero de Palma,4,Artesanía,59,Artesanía tradicional,2,3800.0,76.0,79.2
+3638,Platón de Barro,4,Artesanía,10,Bordado tradicional,2,2600.0,53.5,88.3
+3639,Repisa Artesanal,4,Artesanía,58,Pintado en amate,18,4200.0,104.9,83.7
+3640,Artesanía Serie 97,4,Artesanía,58,Pintado en amate,4,3800.0,76.6,127.2
+3641,Artesanía Serie 98,4,Artesanía,10,Bordado tradicional,18,4550.0,62.8,173.4
+3642,Artesanía Serie 99,4,Artesanía,11,Tejido,9,4500.0,76.5,148.4
+3643,Artesanía Serie 100,4,Artesanía,11,Tejido,4,4150.0,47.4,111.0
+3644,Artesanía Serie 101,4,Artesanía,12,Talabartería,12,3950.0,84.2,62.4
+3645,Artesanía Serie 102,4,Artesanía,40,Modelado en barro,18,3900.0,88.0,92.5
+3646,Artesanía Serie 103,4,Artesanía,58,Pintado en amate,9,3050.0,52.2,52.4
+3647,Artesanía Serie 104,4,Artesanía,11,Tejido,12,4450.0,94.2,138.9
+3648,Artesanía Serie 105,4,Artesanía,11,Tejido,12,4800.0,104.8,65.2
+3649,Artesanía Serie 106,4,Artesanía,41,Talla en madera,12,3950.0,66.5,152.5
+3650,Artesanía Serie 107,4,Artesanía,40,Modelado en barro,9,3000.0,32.4,46.2
+3651,Artesanía Serie 108,4,Artesanía,40,Modelado en barro,18,2500.0,85.1,73.8
+3652,Artesanía Serie 109,4,Artesanía,58,Pintado en amate,4,4050.0,36.6,83.3
+3653,Artesanía Serie 110,4,Artesanía,59,Artesanía tradicional,18,3100.0,25.3,35.4
+3654,Artesanía Serie 111,4,Artesanía,59,Artesanía tradicional,12,5050.0,81.8,101.0
+3655,Artesanía Serie 112,4,Artesanía,11,Tejido,18,3500.0,34.8,97.0
+3656,Artesanía Serie 113,4,Artesanía,12,Talabartería,2,5050.0,100.6,146.3
+3657,Artesanía Serie 114,4,Artesanía,58,Pintado en amate,4,3000.0,63.0,59.3
+3658,Artesanía Serie 115,4,Artesanía,10,Bordado tradicional,9,4800.0,91.3,76.7
+3659,Artesanía Serie 116,4,Artesanía,59,Artesanía tradicional,12,4050.0,53.2,58.4
+3660,Artesanía Serie 117,4,Artesanía,10,Bordado tradicional,12,4650.0,27.9,141.2
+3661,Artesanía Serie 118,4,Artesanía,58,Pintado en amate,15,3950.0,41.5,118.9
+3662,Artesanía Serie 119,4,Artesanía,40,Modelado en barro,4,4300.0,107.2,112.0
+3663,Artesanía Serie 120,4,Artesanía,11,Tejido,15,4450.0,58.8,61.0
+3664,Artesanía Serie 121,4,Artesanía,11,Tejido,4,3000.0,59.3,154.9
+3665,Artesanía Serie 122,4,Artesanía,12,Talabartería,18,4000.0,99.1,66.6
+3683,Artesanía Serie 140,4,Artesanía,11,Tejido,12,4150.0,100.1,52.5
+3666,Artesanía Serie 123,4,Artesanía,40,Modelado en barro,18,3300.0,56.9,142.3
+3667,Artesanía Serie 124,4,Artesanía,58,Pintado en amate,15,2850.0,58.9,71.0
+3668,Artesanía Serie 125,4,Artesanía,12,Talabartería,15,5550.0,93.2,172.6
+3669,Artesanía Serie 126,4,Artesanía,12,Talabartería,9,4200.0,37.8,35.4
+3670,Artesanía Serie 127,4,Artesanía,41,Talla en madera,12,4050.0,78.4,168.8
+3671,Artesanía Serie 128,4,Artesanía,41,Talla en madera,12,3950.0,87.1,68.4
+3672,Artesanía Serie 129,4,Artesanía,59,Artesanía tradicional,15,2200.0,42.8,25.4
+3673,Artesanía Serie 130,4,Artesanía,41,Talla en madera,9,4850.0,81.5,75.7
+3674,Artesanía Serie 131,4,Artesanía,59,Artesanía tradicional,12,4950.0,105.4,154.2
+3675,Artesanía Serie 132,4,Artesanía,59,Artesanía tradicional,2,2450.0,90.5,78.6
+3676,Artesanía Serie 133,4,Artesanía,41,Talla en madera,12,5100.0,74.8,75.9
+3677,Artesanía Serie 134,4,Artesanía,58,Pintado en amate,4,4550.0,98.4,168.8
+3678,Artesanía Serie 135,4,Artesanía,58,Pintado en amate,12,4450.0,32.0,154.3
+3679,Artesanía Serie 136,4,Artesanía,59,Artesanía tradicional,18,3800.0,101.3,51.2
+3680,Artesanía Serie 137,4,Artesanía,12,Talabartería,4,3650.0,62.7,67.7
+3681,Artesanía Serie 138,4,Artesanía,59,Artesanía tradicional,18,4350.0,73.1,96.8
+3682,Artesanía Serie 139,4,Artesanía,10,Bordado tradicional,18,3800.0,51.2,130.5
+3685,Artesanía Serie 142,4,Artesanía,41,Talla en madera,12,4300.0,43.6,65.4
+3686,Artesanía Serie 143,4,Artesanía,58,Pintado en amate,4,3700.0,98.9,26.2
+3687,Artesanía Serie 144,4,Artesanía,40,Modelado en barro,15,3500.0,87.1,98.4
+3688,Artesanía Serie 145,4,Artesanía,40,Modelado en barro,2,3750.0,75.4,50.4
+3689,Artesanía Serie 146,4,Artesanía,10,Bordado tradicional,2,3700.0,93.1,96.1
+3690,Artesanía Serie 147,4,Artesanía,58,Pintado en amate,15,3850.0,25.4,49.7
+3691,Artesanía Serie 148,4,Artesanía,11,Tejido,2,2700.0,59.0,75.7
+3692,Artesanía Serie 149,4,Artesanía,41,Talla en madera,12,3750.0,56.4,77.7
+3693,Artesanía Serie 150,4,Artesanía,12,Talabartería,9,4250.0,61.2,69.2
+3694,Artesanía Serie 151,4,Artesanía,58,Pintado en amate,18,3400.0,80.7,87.7
+3695,Artesanía Serie 152,4,Artesanía,40,Modelado en barro,2,4150.0,76.3,149.4
+3696,Artesanía Serie 153,4,Artesanía,10,Bordado tradicional,12,3750.0,53.7,169.8
+3697,Artesanía Serie 154,4,Artesanía,12,Talabartería,4,4000.0,46.4,77.3
+3698,Artesanía Serie 155,4,Artesanía,58,Pintado en amate,4,3750.0,46.1,38.0
+3699,Artesanía Serie 156,4,Artesanía,10,Bordado tradicional,2,3550.0,28.3,119.4
+3700,Artesanía Serie 157,4,Artesanía,58,Pintado en amate,2,4500.0,96.1,92.2
+3701,Artesanía Serie 158,4,Artesanía,59,Artesanía tradicional,9,4250.0,88.5,145.6
+3702,Artesanía Serie 159,4,Artesanía,12,Talabartería,9,4350.0,33.3,59.8
+3704,Artesanía Serie 161,4,Artesanía,40,Modelado en barro,15,2650.0,32.1,140.9
+3705,Artesanía Serie 162,4,Artesanía,59,Artesanía tradicional,4,3300.0,72.3,101.1
+3706,Artesanía Serie 163,4,Artesanía,59,Artesanía tradicional,18,3650.0,71.8,79.6
+3707,Artesanía Serie 164,4,Artesanía,41,Talla en madera,15,3400.0,44.1,87.6
+3708,Artesanía Serie 165,4,Artesanía,40,Modelado en barro,18,3500.0,83.1,40.2
+3709,Artesanía Serie 166,4,Artesanía,12,Talabartería,15,4150.0,39.1,122.0
+3710,Artesanía Serie 167,4,Artesanía,12,Talabartería,18,4200.0,39.9,170.3
+3711,Artesanía Serie 168,4,Artesanía,41,Talla en madera,18,4750.0,93.3,154.9
+3712,Artesanía Serie 169,4,Artesanía,10,Bordado tradicional,9,3700.0,100.1,108.3
+3713,Artesanía Serie 170,4,Artesanía,59,Artesanía tradicional,4,3150.0,59.0,168.7
+3714,Artesanía Serie 171,4,Artesanía,11,Tejido,2,3900.0,80.8,47.0
+3715,Artesanía Serie 172,4,Artesanía,12,Talabartería,18,4100.0,53.1,94.8
+3716,Artesanía Serie 173,4,Artesanía,58,Pintado en amate,12,4650.0,65.4,93.2
+3717,Artesanía Serie 174,4,Artesanía,41,Talla en madera,4,4100.0,56.0,103.8
+3718,Artesanía Serie 175,4,Artesanía,59,Artesanía tradicional,9,4400.0,99.0,99.7
+3719,Artesanía Serie 176,4,Artesanía,41,Talla en madera,18,4900.0,96.4,156.1
+3720,Artesanía Serie 177,4,Artesanía,40,Modelado en barro,15,3000.0,45.8,148.6
+3721,Artesanía Serie 178,4,Artesanía,59,Artesanía tradicional,4,3500.0,69.4,34.4
+3722,Artesanía Serie 179,4,Artesanía,40,Modelado en barro,4,3150.0,41.8,109.1
+3723,Artesanía Serie 180,4,Artesanía,12,Talabartería,9,3850.0,66.9,52.4
+3724,Artesanía Serie 181,4,Artesanía,40,Modelado en barro,4,3700.0,66.4,74.5
+3725,Artesanía Serie 182,4,Artesanía,59,Artesanía tradicional,4,3850.0,43.1,102.8
+3726,Artesanía Serie 183,4,Artesanía,41,Talla en madera,18,3800.0,52.7,105.1
+3727,Artesanía Serie 184,4,Artesanía,12,Talabartería,18,3650.0,95.5,73.9
+3728,Artesanía Serie 185,4,Artesanía,59,Artesanía tradicional,2,2550.0,94.6,56.3
+3729,Artesanía Serie 186,4,Artesanía,41,Talla en madera,15,4400.0,97.8,41.6
+3730,Artesanía Serie 187,4,Artesanía,41,Talla en madera,15,4500.0,30.0,33.7
+3731,Artesanía Serie 188,4,Artesanía,12,Talabartería,15,4500.0,72.8,92.9
+3732,Artesanía Serie 189,4,Artesanía,59,Artesanía tradicional,9,4050.0,40.7,97.6
+3733,Artesanía Serie 190,4,Artesanía,59,Artesanía tradicional,4,4050.0,102.6,104.4
+3734,Artesanía Serie 191,4,Artesanía,10,Bordado tradicional,15,4050.0,107.8,146.0
+3735,Artesanía Serie 192,4,Artesanía,40,Modelado en barro,9,3750.0,80.3,36.3
+3736,Artesanía Serie 193,4,Artesanía,10,Bordado tradicional,12,4550.0,61.3,65.1
+3737,Artesanía Serie 194,4,Artesanía,59,Artesanía tradicional,12,3950.0,51.2,40.6
+3738,Artesanía Serie 195,4,Artesanía,11,Tejido,9,3100.0,44.8,167.6
+4396,Grabado Serie 175,7,Grabado,55,Litografía,13,3600.0,44.4,37.2
+3739,Artesanía Serie 196,4,Artesanía,10,Bordado tradicional,9,4700.0,58.9,56.9
+3740,Artesanía Serie 197,4,Artesanía,12,Talabartería,9,4250.0,42.9,39.1
+3741,Artesanía Serie 198,4,Artesanía,59,Artesanía tradicional,4,3600.0,105.4,126.1
+3742,Artesanía Serie 199,4,Artesanía,11,Tejido,12,3500.0,73.0,44.8
+3743,Artesanía Serie 200,4,Artesanía,40,Modelado en barro,12,4700.0,104.6,174.6
+3744,Artesanía Serie 201,4,Artesanía,41,Talla en madera,2,2800.0,91.6,76.4
+3745,Artesanía Serie 202,4,Artesanía,10,Bordado tradicional,4,3750.0,101.3,39.3
+3746,Artesanía Serie 203,4,Artesanía,12,Talabartería,18,3500.0,106.3,128.6
+3747,Artesanía Serie 204,4,Artesanía,10,Bordado tradicional,18,4200.0,49.0,120.3
+3748,Artesanía Serie 205,4,Artesanía,11,Tejido,2,3700.0,56.9,47.5
+3749,Artesanía Serie 206,4,Artesanía,11,Tejido,9,2950.0,26.0,99.5
+3750,Artesanía Serie 207,4,Artesanía,58,Pintado en amate,2,4000.0,53.7,163.3
+3751,Artesanía Serie 208,4,Artesanía,58,Pintado en amate,4,4000.0,33.0,176.1
+3752,Artesanía Serie 209,4,Artesanía,59,Artesanía tradicional,15,3650.0,37.0,130.5
+3753,Artesanía Serie 210,4,Artesanía,11,Tejido,18,3200.0,56.8,40.5
+3754,Artesanía Serie 211,4,Artesanía,10,Bordado tradicional,9,4000.0,58.1,105.9
+3755,Artesanía Serie 212,4,Artesanía,59,Artesanía tradicional,9,3300.0,37.2,152.5
+3756,Artesanía Serie 213,4,Artesanía,10,Bordado tradicional,12,4500.0,36.9,87.2
+3757,Artesanía Serie 214,4,Artesanía,10,Bordado tradicional,18,4300.0,44.7,92.9
+3758,Artesanía Serie 215,4,Artesanía,58,Pintado en amate,9,3350.0,74.7,160.8
+3759,Artesanía Serie 216,4,Artesanía,59,Artesanía tradicional,18,3500.0,96.1,174.3
+3760,El Tótem Ilustrado,5,Ilustración,7,Acuarela,8,1800.0,23.0,29.0
+3761,Imágenes del Mercado,5,Ilustración,60,Tinta china,13,2300.0,21.5,29.3
+3762,Aves del Golfo,5,Ilustración,7,Acuarela,5,1850.0,43.3,42.6
+3763,Plátanos del Trópico,5,Ilustración,44,Ilustración digital,13,2100.0,23.6,61.8
+3764,Estrellas de la Huasteca,5,Ilustración,47,Acuarela ilustrada,13,2050.0,47.7,31.4
+3765,Atole de Elote Digital,5,Ilustración,46,Lápiz y grafito,13,2300.0,31.4,37.2
+3766,Bestiario Huasteco,5,Ilustración,46,Lápiz y grafito,5,1750.0,31.6,29.5
+3767,El Día de Muertos Ilustrado,5,Ilustración,44,Ilustración digital,13,2500.0,50.7,30.8
+3768,Sierra con Lluvia Ilustrada,5,Ilustración,47,Acuarela ilustrada,5,2450.0,39.7,51.7
+3769,Figuras de Carnaval,5,Ilustración,60,Tinta china,8,2550.0,34.9,47.0
+3770,La Abuela Nahua,5,Ilustración,47,Acuarela ilustrada,8,3050.0,52.4,62.5
+3771,Danza del Xantolo Ilustrada,5,Ilustración,7,Acuarela,8,2000.0,23.8,58.1
+3772,El Tlecuil,5,Ilustración,47,Acuarela ilustrada,5,1600.0,20.8,42.9
+3773,El Anciano Tenek,5,Ilustración,7,Acuarela,13,2200.0,35.5,55.6
+3774,El Xantolo Ilustrado,5,Ilustración,60,Tinta china,8,2300.0,55.0,27.1
+3775,Herbario Tropical,5,Ilustración,44,Ilustración digital,13,2200.0,46.2,38.3
+3776,Jaguar en Tinta,5,Ilustración,7,Acuarela,8,2250.0,38.0,32.4
+3777,Paisaje de Jalapa,5,Ilustración,46,Lápiz y grafito,5,2400.0,20.1,64.4
+3778,Sierra en Acuarela,5,Ilustración,45,Tinta sobre papel,8,2450.0,51.4,61.5
+3779,Libélula del Río,5,Ilustración,46,Lápiz y grafito,8,1850.0,32.6,32.2
+3780,El Maestro Alfarero,5,Ilustración,44,Ilustración digital,13,1550.0,32.2,39.6
+3781,Abeja Silvestre,5,Ilustración,60,Tinta china,5,2250.0,43.9,37.8
+3782,La Ceiba Dibujada,5,Ilustración,47,Acuarela ilustrada,8,2400.0,23.0,26.0
+3783,Mariposa Azul,5,Ilustración,46,Lápiz y grafito,13,2450.0,43.1,54.6
+3784,Quetzal Digital,5,Ilustración,46,Lápiz y grafito,13,1600.0,52.8,28.9
+3785,El Toro Pintado,5,Ilustración,46,Lápiz y grafito,5,2700.0,43.7,61.6
+3786,El Copal en Tinta,5,Ilustración,46,Lápiz y grafito,5,2050.0,34.7,25.4
+3787,Axolotl Ilustrado,5,Ilustración,7,Acuarela,5,2250.0,43.0,29.6
+3788,El Sol Nahua,5,Ilustración,46,Lápiz y grafito,5,2200.0,34.2,60.4
+3789,Sahumerio Digital,5,Ilustración,44,Ilustración digital,13,2300.0,28.7,49.6
+3790,Máscaras de Fiesta,5,Ilustración,45,Tinta sobre papel,8,2400.0,53.2,39.0
+3791,Crisantemo Nahua,5,Ilustración,47,Acuarela ilustrada,5,2700.0,41.7,36.5
+3792,La Joven Tejedora,5,Ilustración,45,Tinta sobre papel,5,2100.0,20.1,27.3
+3793,Composición Abstracta I,5,Ilustración,7,Acuarela,5,2150.0,42.1,38.8
+3794,Tortillas en Tinta,5,Ilustración,47,Acuarela ilustrada,8,1850.0,21.5,41.4
+3795,El Búho en Tinta,5,Ilustración,47,Acuarela ilustrada,8,2500.0,33.1,38.0
+3796,Mangos en Tinta,5,Ilustración,47,Acuarela ilustrada,8,2600.0,27.7,30.7
+3797,Visión de la Sierra,5,Ilustración,47,Acuarela ilustrada,5,2350.0,20.9,33.3
+3798,El Venado Nahua,5,Ilustración,45,Tinta sobre papel,13,1650.0,47.5,44.5
+3799,Flora de la Sierra,5,Ilustración,44,Ilustración digital,8,1550.0,27.3,31.0
+3800,Geometría Nahua,5,Ilustración,44,Ilustración digital,13,2200.0,52.4,31.1
+3801,El Árbol de la Vida,5,Ilustración,47,Acuarela ilustrada,5,2800.0,24.9,40.2
+3802,Mariposa Monarca,5,Ilustración,46,Lápiz y grafito,8,2600.0,51.9,27.8
+3803,Insectos del Monte,5,Ilustración,46,Lápiz y grafito,13,2250.0,20.6,60.6
+3804,El Calendario Nahua,5,Ilustración,7,Acuarela,8,2200.0,36.2,42.3
+3805,Zacahuil Ilustrado,5,Ilustración,47,Acuarela ilustrada,8,2350.0,21.3,51.9
+3806,Paisaje de Milpa,5,Ilustración,46,Lápiz y grafito,8,3000.0,52.9,61.8
+3807,Hongos de la Selva,5,Ilustración,45,Tinta sobre papel,13,2400.0,48.0,59.5
+3809,El Centzontle Canta,5,Ilustración,47,Acuarela ilustrada,8,2800.0,37.1,32.9
+3810,Patrón Tenek,5,Ilustración,45,Tinta sobre papel,13,2750.0,45.2,53.1
+3811,Mujer Tenek Digital,5,Ilustración,47,Acuarela ilustrada,8,1850.0,46.5,46.2
+3812,El Café en Acuarela,5,Ilustración,7,Acuarela,13,2200.0,20.4,54.8
+3813,Fauna del Río,5,Ilustración,46,Lápiz y grafito,8,2300.0,47.5,37.5
+3814,Pozol Serrano,5,Ilustración,45,Tinta sobre papel,5,1950.0,35.1,26.0
+3815,El Códice Moderno,5,Ilustración,44,Ilustración digital,5,2250.0,37.0,35.8
+3816,Rana de Árbol,5,Ilustración,47,Acuarela ilustrada,13,2350.0,32.7,29.2
+3817,Paisaje Nahua,5,Ilustración,7,Acuarela,8,2550.0,42.0,49.0
+3818,Guacamaya Ilustrada,5,Ilustración,46,Lápiz y grafito,13,2050.0,52.8,61.1
+3819,Mariposas de la Sierra,5,Ilustración,45,Tinta sobre papel,13,1750.0,49.3,35.0
+3820,Mandala Huasteca,5,Ilustración,46,Lápiz y grafito,5,2300.0,34.0,32.7
+3821,Iguana Digital,5,Ilustración,47,Acuarela ilustrada,8,2750.0,49.7,50.8
+3822,Dalia Serrana,5,Ilustración,44,Ilustración digital,8,2300.0,27.4,36.8
+3823,Los Cuatro Rumbos,5,Ilustración,46,Lápiz y grafito,5,2000.0,36.4,32.9
+3824,El Comal Ilustrado,5,Ilustración,60,Tinta china,5,1900.0,43.3,40.8
+3825,El Río Moctezuma,5,Ilustración,47,Acuarela ilustrada,5,2350.0,25.0,29.1
+3826,Mercado Ilustrado,5,Ilustración,47,Acuarela ilustrada,13,2700.0,45.0,46.9
+3827,Loro del Monte,5,Ilustración,44,Ilustración digital,5,2650.0,47.3,63.0
+3828,Caracol Sagrado 2,5,Ilustración,47,Acuarela ilustrada,13,2550.0,21.4,48.6
+3829,Catrinas Tenek,5,Ilustración,7,Acuarela,13,1450.0,29.6,40.0
+3830,El Niño Bordador,5,Ilustración,47,Acuarela ilustrada,13,2400.0,27.4,29.5
+3831,Cacao Ilustrado,5,Ilustración,46,Lápiz y grafito,8,1500.0,43.3,34.2
+3832,Cocodrilo del Pánuco,5,Ilustración,7,Acuarela,8,2600.0,55.4,49.1
+3833,El Guajolote Dibujado,5,Ilustración,44,Ilustración digital,5,2350.0,53.5,37.1
+3834,Juegos del Pueblo,5,Ilustración,46,Lápiz y grafito,5,1850.0,30.9,35.5
+3835,Jardín Botánico,5,Ilustración,44,Ilustración digital,5,2300.0,46.1,43.2
+3836,Begonias del Monte,5,Ilustración,44,Ilustración digital,8,2400.0,49.9,41.5
+3837,El Maíz Ilustrado,5,Ilustración,46,Lápiz y grafito,5,2600.0,44.8,57.4
+3838,Mapa Imaginario,5,Ilustración,47,Acuarela ilustrada,8,2850.0,33.4,61.1
+3839,El Tucán,5,Ilustración,47,Acuarela ilustrada,13,1900.0,33.0,42.3
+3840,Colores del Tianguis,5,Ilustración,60,Tinta china,8,2150.0,50.6,47.9
+3841,La Lechuza Vuela,5,Ilustración,44,Ilustración digital,8,2800.0,46.6,52.4
+3842,Serpiente de Agua,5,Ilustración,7,Acuarela,5,1850.0,43.1,43.1
+3843,El Sueño del Artista,5,Ilustración,46,Lápiz y grafito,5,1550.0,30.9,33.4
+3844,Orquídeas Silvestres,5,Ilustración,47,Acuarela ilustrada,5,3000.0,54.0,51.5
+3845,Árbol de Aguacate,5,Ilustración,44,Ilustración digital,8,1550.0,32.7,35.2
+3846,Retrato de Doña María,5,Ilustración,47,Acuarela ilustrada,5,1750.0,29.1,28.7
+3847,El Cafetal,5,Ilustración,7,Acuarela,8,1900.0,42.1,28.8
+3848,Anturio Rojo en Tinta,5,Ilustración,7,Acuarela,13,2100.0,29.1,29.7
+3849,Espiral Sagrada,5,Ilustración,45,Tinta sobre papel,5,1950.0,47.9,57.3
+3850,Crónica Visual Huasteca,5,Ilustración,44,Ilustración digital,5,1950.0,25.0,54.6
+3851,Flor de Jamaica,5,Ilustración,47,Acuarela ilustrada,5,2550.0,35.7,53.1
+3852,La Luna Tenek,5,Ilustración,45,Tinta sobre papel,13,2650.0,36.1,64.9
+3853,Vainilla del Monte,5,Ilustración,7,Acuarela,8,2550.0,33.4,45.4
+3854,Colibrí de la Huasteca,5,Ilustración,7,Acuarela,8,1900.0,37.2,29.0
+3855,Reptiles de la Huasteca,5,Ilustración,45,Tinta sobre papel,13,2750.0,50.2,39.5
+3856,Armadillo en Tinta,5,Ilustración,45,Tinta sobre papel,8,2450.0,43.3,55.2
+3857,Ilustración Serie 98,5,Ilustración,47,Acuarela ilustrada,8,2350.0,43.4,64.5
+3858,Ilustración Serie 99,5,Ilustración,7,Acuarela,13,2000.0,36.9,28.6
+3859,Ilustración Serie 100,5,Ilustración,46,Lápiz y grafito,5,2300.0,32.5,37.3
+3860,Ilustración Serie 101,5,Ilustración,46,Lápiz y grafito,5,2300.0,45.7,47.1
+3861,Ilustración Serie 102,5,Ilustración,7,Acuarela,8,2000.0,28.8,44.4
+3862,Ilustración Serie 103,5,Ilustración,45,Tinta sobre papel,8,2400.0,36.4,64.6
+3863,Ilustración Serie 104,5,Ilustración,46,Lápiz y grafito,5,2050.0,26.5,39.5
+3864,Ilustración Serie 105,5,Ilustración,7,Acuarela,13,2050.0,20.4,38.5
+3865,Ilustración Serie 106,5,Ilustración,44,Ilustración digital,13,2200.0,47.4,31.9
+3866,Ilustración Serie 107,5,Ilustración,45,Tinta sobre papel,8,1800.0,28.7,49.4
+3867,Ilustración Serie 108,5,Ilustración,45,Tinta sobre papel,5,2150.0,50.5,41.3
+3868,Ilustración Serie 109,5,Ilustración,46,Lápiz y grafito,8,2650.0,38.0,49.6
+3869,Ilustración Serie 110,5,Ilustración,46,Lápiz y grafito,8,2050.0,29.0,36.6
+3870,Ilustración Serie 111,5,Ilustración,60,Tinta china,8,1700.0,33.7,44.6
+3871,Ilustración Serie 112,5,Ilustración,60,Tinta china,13,2000.0,50.5,64.2
+3872,Ilustración Serie 113,5,Ilustración,47,Acuarela ilustrada,5,2550.0,25.1,42.4
+3873,Ilustración Serie 114,5,Ilustración,45,Tinta sobre papel,8,1900.0,53.9,60.8
+3874,Ilustración Serie 115,5,Ilustración,46,Lápiz y grafito,13,2050.0,25.5,62.3
+3875,Ilustración Serie 116,5,Ilustración,47,Acuarela ilustrada,5,2000.0,28.7,49.4
+3876,Ilustración Serie 117,5,Ilustración,44,Ilustración digital,8,2300.0,20.0,43.4
+3877,Ilustración Serie 118,5,Ilustración,7,Acuarela,13,2350.0,47.1,45.9
+3878,Ilustración Serie 119,5,Ilustración,47,Acuarela ilustrada,8,2400.0,20.9,44.5
+3879,Ilustración Serie 120,5,Ilustración,45,Tinta sobre papel,5,2450.0,52.4,61.1
+3880,Ilustración Serie 121,5,Ilustración,46,Lápiz y grafito,8,2000.0,32.6,61.4
+3881,Ilustración Serie 122,5,Ilustración,46,Lápiz y grafito,8,2250.0,31.2,45.3
+3882,Ilustración Serie 123,5,Ilustración,60,Tinta china,8,2700.0,42.4,36.4
+3883,Ilustración Serie 124,5,Ilustración,7,Acuarela,8,2150.0,25.2,55.5
+3884,Ilustración Serie 125,5,Ilustración,47,Acuarela ilustrada,13,2650.0,55.7,33.4
+3885,Ilustración Serie 126,5,Ilustración,7,Acuarela,8,2050.0,42.2,64.2
+3886,Ilustración Serie 127,5,Ilustración,45,Tinta sobre papel,13,2200.0,49.0,56.1
+3887,Ilustración Serie 128,5,Ilustración,46,Lápiz y grafito,5,1750.0,40.0,58.8
+3888,Ilustración Serie 129,5,Ilustración,60,Tinta china,8,1850.0,22.9,31.5
+3889,Ilustración Serie 130,5,Ilustración,44,Ilustración digital,8,2200.0,24.3,34.4
+3890,Ilustración Serie 131,5,Ilustración,60,Tinta china,8,2800.0,50.7,29.0
+3891,Ilustración Serie 132,5,Ilustración,47,Acuarela ilustrada,5,2250.0,24.8,64.3
+3892,Ilustración Serie 133,5,Ilustración,44,Ilustración digital,13,2250.0,49.6,32.7
+3893,Ilustración Serie 134,5,Ilustración,47,Acuarela ilustrada,13,2600.0,25.7,56.0
+3894,Ilustración Serie 135,5,Ilustración,46,Lápiz y grafito,13,1850.0,35.0,62.2
+3895,Ilustración Serie 136,5,Ilustración,45,Tinta sobre papel,5,2400.0,24.5,53.9
+3896,Ilustración Serie 137,5,Ilustración,46,Lápiz y grafito,13,2900.0,52.2,51.2
+3897,Ilustración Serie 138,5,Ilustración,7,Acuarela,8,2400.0,24.8,38.1
+3898,Ilustración Serie 139,5,Ilustración,45,Tinta sobre papel,5,1850.0,28.6,49.2
+3899,Ilustración Serie 140,5,Ilustración,46,Lápiz y grafito,5,2650.0,37.4,58.0
+3900,Ilustración Serie 141,5,Ilustración,47,Acuarela ilustrada,13,2500.0,36.4,53.8
+3901,Ilustración Serie 142,5,Ilustración,60,Tinta china,13,2800.0,53.2,58.4
+3902,Ilustración Serie 143,5,Ilustración,44,Ilustración digital,5,2200.0,28.6,25.1
+3903,Ilustración Serie 144,5,Ilustración,60,Tinta china,5,2450.0,48.1,59.2
+3904,Ilustración Serie 145,5,Ilustración,44,Ilustración digital,5,2200.0,26.1,36.7
+3905,Ilustración Serie 146,5,Ilustración,44,Ilustración digital,5,1800.0,50.7,25.1
+3906,Ilustración Serie 147,5,Ilustración,60,Tinta china,8,2700.0,37.3,49.6
+3907,Ilustración Serie 148,5,Ilustración,44,Ilustración digital,5,1800.0,25.2,31.4
+3908,Ilustración Serie 149,5,Ilustración,47,Acuarela ilustrada,5,2750.0,26.8,50.5
+3909,Ilustración Serie 150,5,Ilustración,46,Lápiz y grafito,13,2400.0,27.2,26.7
+3910,Ilustración Serie 151,5,Ilustración,45,Tinta sobre papel,5,2450.0,41.3,43.9
+3911,Ilustración Serie 152,5,Ilustración,44,Ilustración digital,5,2600.0,53.8,51.6
+3912,Ilustración Serie 153,5,Ilustración,7,Acuarela,8,2300.0,20.8,64.3
+3913,Ilustración Serie 154,5,Ilustración,44,Ilustración digital,5,1900.0,41.0,28.2
+3914,Ilustración Serie 155,5,Ilustración,60,Tinta china,13,2350.0,23.6,41.1
+3915,Ilustración Serie 156,5,Ilustración,47,Acuarela ilustrada,8,2500.0,39.5,35.6
+3916,Ilustración Serie 157,5,Ilustración,47,Acuarela ilustrada,5,2400.0,26.1,63.3
+3917,Ilustración Serie 158,5,Ilustración,45,Tinta sobre papel,5,2650.0,27.6,51.7
+3918,Ilustración Serie 159,5,Ilustración,47,Acuarela ilustrada,8,2300.0,20.1,29.6
+3919,Ilustración Serie 160,5,Ilustración,45,Tinta sobre papel,13,2550.0,46.3,52.4
+3920,Ilustración Serie 161,5,Ilustración,47,Acuarela ilustrada,5,2650.0,46.1,56.4
+3921,Ilustración Serie 162,5,Ilustración,45,Tinta sobre papel,13,2600.0,37.6,63.0
+3922,Ilustración Serie 163,5,Ilustración,46,Lápiz y grafito,5,1600.0,30.1,42.0
+3923,Ilustración Serie 164,5,Ilustración,47,Acuarela ilustrada,8,2150.0,37.3,42.5
+3924,Ilustración Serie 165,5,Ilustración,46,Lápiz y grafito,13,1800.0,44.8,35.9
+3925,Ilustración Serie 166,5,Ilustración,7,Acuarela,13,1900.0,42.6,64.1
+3926,Ilustración Serie 167,5,Ilustración,7,Acuarela,8,2150.0,29.0,57.2
+3927,Ilustración Serie 168,5,Ilustración,44,Ilustración digital,8,2150.0,37.0,34.6
+3928,Ilustración Serie 169,5,Ilustración,60,Tinta china,13,2400.0,23.7,64.6
+3929,Ilustración Serie 170,5,Ilustración,45,Tinta sobre papel,5,2400.0,53.2,49.5
+3930,Ilustración Serie 171,5,Ilustración,7,Acuarela,13,1850.0,53.3,44.6
+3931,Ilustración Serie 172,5,Ilustración,46,Lápiz y grafito,8,1550.0,40.0,31.6
+3932,Ilustración Serie 173,5,Ilustración,45,Tinta sobre papel,5,2250.0,24.8,43.4
+3933,Ilustración Serie 174,5,Ilustración,45,Tinta sobre papel,13,2500.0,50.0,31.4
+3934,Ilustración Serie 175,5,Ilustración,47,Acuarela ilustrada,5,2600.0,29.6,45.8
+3935,Ilustración Serie 176,5,Ilustración,7,Acuarela,13,1700.0,54.3,42.0
+3936,Ilustración Serie 177,5,Ilustración,46,Lápiz y grafito,8,2850.0,53.4,60.0
+3937,Ilustración Serie 178,5,Ilustración,45,Tinta sobre papel,5,1900.0,39.4,34.3
+3938,Ilustración Serie 179,5,Ilustración,44,Ilustración digital,8,1950.0,32.0,30.4
+3939,Ilustración Serie 180,5,Ilustración,47,Acuarela ilustrada,13,2650.0,46.6,37.9
+3940,Ilustración Serie 181,5,Ilustración,44,Ilustración digital,5,2150.0,25.9,54.7
+3941,Ilustración Serie 182,5,Ilustración,7,Acuarela,13,2400.0,45.9,64.5
+3942,Ilustración Serie 183,5,Ilustración,46,Lápiz y grafito,8,2450.0,25.4,58.0
+3943,Ilustración Serie 184,5,Ilustración,46,Lápiz y grafito,13,2600.0,23.2,54.0
+3944,Ilustración Serie 185,5,Ilustración,46,Lápiz y grafito,5,2450.0,46.3,47.1
+3945,Ilustración Serie 186,5,Ilustración,7,Acuarela,13,1500.0,24.5,27.4
+3946,Ilustración Serie 187,5,Ilustración,7,Acuarela,8,2500.0,39.7,43.9
+3947,Ilustración Serie 188,5,Ilustración,7,Acuarela,8,2700.0,46.1,45.9
+3948,Ilustración Serie 189,5,Ilustración,47,Acuarela ilustrada,5,2200.0,31.1,56.1
+3949,Ilustración Serie 190,5,Ilustración,44,Ilustración digital,5,2750.0,48.4,53.8
+3950,Ilustración Serie 191,5,Ilustración,46,Lápiz y grafito,13,2400.0,47.8,54.2
+3951,Ilustración Serie 192,5,Ilustración,7,Acuarela,13,1450.0,21.4,52.5
+3952,Ilustración Serie 193,5,Ilustración,60,Tinta china,8,2600.0,34.2,33.9
+3953,Ilustración Serie 194,5,Ilustración,60,Tinta china,5,1550.0,37.7,30.4
+3954,Ilustración Serie 195,5,Ilustración,46,Lápiz y grafito,8,2150.0,36.6,45.0
+3955,Ilustración Serie 196,5,Ilustración,47,Acuarela ilustrada,5,2950.0,50.2,46.0
+3956,Ilustración Serie 197,5,Ilustración,44,Ilustración digital,13,1800.0,34.1,49.4
+3957,Ilustración Serie 198,5,Ilustración,60,Tinta china,8,2700.0,28.3,46.2
+3958,Ilustración Serie 199,5,Ilustración,45,Tinta sobre papel,8,1600.0,32.1,41.7
+3959,Ilustración Serie 200,5,Ilustración,44,Ilustración digital,8,1500.0,37.7,40.8
+3960,Ilustración Serie 201,5,Ilustración,45,Tinta sobre papel,8,1600.0,34.3,49.3
+3961,Ilustración Serie 202,5,Ilustración,45,Tinta sobre papel,8,2300.0,32.8,57.7
+3962,Ilustración Serie 203,5,Ilustración,46,Lápiz y grafito,13,1550.0,24.2,37.2
+3964,Ilustración Serie 205,5,Ilustración,7,Acuarela,5,1400.0,30.3,32.3
+3965,Ilustración Serie 206,5,Ilustración,60,Tinta china,13,2700.0,51.3,51.3
+3966,Ilustración Serie 207,5,Ilustración,46,Lápiz y grafito,13,2650.0,42.9,47.8
+3967,Ilustración Serie 208,5,Ilustración,44,Ilustración digital,5,2150.0,30.6,30.7
+3968,Ilustración Serie 209,5,Ilustración,47,Acuarela ilustrada,8,2350.0,43.1,32.0
+3969,Ilustración Serie 210,5,Ilustración,7,Acuarela,13,1850.0,50.1,64.2
+3970,Ilustración Serie 211,5,Ilustración,47,Acuarela ilustrada,13,2450.0,39.6,30.9
+3971,Ilustración Serie 212,5,Ilustración,44,Ilustración digital,13,2550.0,47.6,57.3
+3972,Ilustración Serie 213,5,Ilustración,46,Lápiz y grafito,13,1450.0,42.5,26.6
+3973,Ilustración Serie 214,5,Ilustración,44,Ilustración digital,5,1700.0,38.1,28.0
+3974,Ilustración Serie 215,5,Ilustración,46,Lápiz y grafito,5,2050.0,42.7,27.9
+3975,Ilustración Serie 216,5,Ilustración,44,Ilustración digital,13,2150.0,27.9,36.2
+3976,Ilustración Serie 217,5,Ilustración,7,Acuarela,5,1850.0,32.4,47.2
+3977,Ilustración Serie 218,5,Ilustración,46,Lápiz y grafito,5,1800.0,53.7,52.0
+3978,Ilustración Serie 219,5,Ilustración,46,Lápiz y grafito,8,2250.0,36.8,62.1
+3979,Ilustración Serie 220,5,Ilustración,60,Tinta china,13,2600.0,24.8,44.8
+3980,Ilustración Serie 221,5,Ilustración,60,Tinta china,8,1950.0,25.1,40.8
+3982,Ilustración Serie 223,5,Ilustración,44,Ilustración digital,13,2550.0,29.4,62.2
+3983,Ilustración Serie 224,5,Ilustración,45,Tinta sobre papel,5,2500.0,39.6,64.8
+3984,Ilustración Serie 225,5,Ilustración,7,Acuarela,5,2250.0,37.2,27.4
+3985,Ilustración Serie 226,5,Ilustración,45,Tinta sobre papel,5,1550.0,42.7,38.1
+3986,Ilustración Serie 227,5,Ilustración,60,Tinta china,5,2200.0,38.8,55.8
+3987,Ilustración Serie 228,5,Ilustración,7,Acuarela,8,2250.0,35.5,49.4
+3988,Florero de Barro Blanco,6,Cerámica,61,Modelado a mano,17,4050.0,32.8,23.1
+3989,Lámpara de Barro,6,Cerámica,51,Raku,2,4850.0,14.1,51.6
+3990,Vaso Raku,6,Cerámica,48,Torno alfarero,20,5000.0,32.3,33.9
+3991,Plato Decorativo II,6,Cerámica,48,Torno alfarero,20,3700.0,40.7,10.0
+3992,Figura de Gallina,6,Cerámica,61,Modelado a mano,16,3850.0,35.6,11.4
+3993,Jarro Tradicional,6,Cerámica,49,Barro negro,16,4600.0,18.4,21.1
+3994,Vasija Ceremonial,6,Cerámica,51,Raku,15,4900.0,13.6,40.6
+3995,Olla de Gres,6,Cerámica,49,Barro negro,16,5000.0,14.6,48.7
+3996,Cuenco Raku,6,Cerámica,50,Talavera,17,4800.0,47.1,20.1
+3997,Taza de Barro Negro,6,Cerámica,49,Barro negro,19,5600.0,36.2,22.1
+3998,Platón de Gres,6,Cerámica,61,Modelado a mano,15,4700.0,31.4,48.1
+3999,Figura de Gallo,6,Cerámica,48,Torno alfarero,2,3900.0,18.0,27.2
+4000,Azulejo de Talavera,6,Cerámica,61,Modelado a mano,19,4100.0,28.1,50.1
+4001,Jarra de Cuello Alto,6,Cerámica,51,Raku,16,3700.0,48.8,16.2
+4002,Vasija Tenek,6,Cerámica,61,Modelado a mano,16,3750.0,32.6,23.7
+4003,Jarra Raku,6,Cerámica,49,Barro negro,19,3850.0,13.3,20.6
+4004,Figura de Tortuga,6,Cerámica,61,Modelado a mano,15,2800.0,35.0,18.2
+4005,Olla de Barro Blanco,6,Cerámica,51,Raku,20,5450.0,42.4,23.2
+4006,Plato Talavera,6,Cerámica,61,Modelado a mano,2,2400.0,18.6,12.8
+4007,Cántaro de Talavera,6,Cerámica,51,Raku,15,4850.0,42.3,30.8
+4008,Figura de Rana,6,Cerámica,50,Talavera,19,5800.0,31.8,27.1
+4009,Taza de Barro Rojo,6,Cerámica,48,Torno alfarero,17,4250.0,34.7,18.2
+4010,Jarro Pintado,6,Cerámica,50,Talavera,15,5100.0,17.0,53.0
+4011,Cántaro de Barro Blanco,6,Cerámica,49,Barro negro,15,3100.0,24.6,26.4
+4012,Florero Raku,6,Cerámica,51,Raku,15,5450.0,46.4,23.0
+4013,Cuenco de Barro Blanco 2,6,Cerámica,48,Torno alfarero,15,4200.0,29.8,17.3
+4014,Taza Gres,6,Cerámica,49,Barro negro,15,3800.0,11.3,40.4
+4015,Platón de Barro Negro,6,Cerámica,61,Modelado a mano,20,4550.0,33.3,32.8
+4017,Cafetera de Gres,6,Cerámica,61,Modelado a mano,2,3400.0,45.1,38.9
+4018,Cántaro de la Sierra 2,6,Cerámica,48,Torno alfarero,19,5200.0,51.0,35.9
+4019,Cazuela de Barro,6,Cerámica,48,Torno alfarero,20,3600.0,28.5,43.9
+4020,Jarra de Barro Negro,6,Cerámica,48,Torno alfarero,17,3700.0,42.5,39.8
+4021,Botella de Cerámica,6,Cerámica,50,Talavera,15,4100.0,39.7,30.5
+4022,Botella Nahua,6,Cerámica,51,Raku,20,5600.0,51.5,48.7
+4023,Plato Modelado,6,Cerámica,51,Raku,2,4150.0,46.2,19.7
+4024,Florero de Porcelana,6,Cerámica,61,Modelado a mano,16,4450.0,27.4,44.3
+4025,Taza de Talavera,6,Cerámica,51,Raku,15,5000.0,22.5,17.5
+4026,Cántaro Pintado 2,6,Cerámica,48,Torno alfarero,16,4700.0,21.7,48.9
+4027,Florero de Barro,6,Cerámica,61,Modelado a mano,20,4650.0,26.6,50.2
+4028,Maceta Redonda,6,Cerámica,50,Talavera,17,3150.0,10.1,12.0
+4029,Platón Pintado,6,Cerámica,51,Raku,17,4750.0,44.4,14.0
+4030,Platón Modelado,6,Cerámica,48,Torno alfarero,17,3900.0,18.8,11.9
+4031,Botella de Talavera,6,Cerámica,51,Raku,15,4450.0,41.7,11.1
+4032,Vasija de Barro Rojo,6,Cerámica,48,Torno alfarero,16,5500.0,55.0,46.2
+4033,Jarra de Barro Blanco,6,Cerámica,61,Modelado a mano,2,3300.0,47.4,41.5
+4034,Candelero de Barro,6,Cerámica,48,Torno alfarero,17,4450.0,40.0,15.6
+4035,Aplique de Cerámica,6,Cerámica,48,Torno alfarero,16,4500.0,11.9,37.5
+4036,Figura de Toro,6,Cerámica,48,Torno alfarero,15,4800.0,36.6,40.8
+4037,Cuenco de Gres,6,Cerámica,50,Talavera,15,5100.0,47.4,44.3
+4038,Platón Huasteco,6,Cerámica,50,Talavera,15,5800.0,48.2,53.0
+4039,Alcancía de Barro,6,Cerámica,48,Torno alfarero,20,3800.0,14.3,51.9
+4040,Vaso de Barro Blanco,6,Cerámica,49,Barro negro,2,5100.0,53.9,53.3
+4041,Figura de Caballo,6,Cerámica,61,Modelado a mano,15,4150.0,44.1,30.3
+4042,Olla Huasteca 2,6,Cerámica,50,Talavera,19,5750.0,28.8,24.4
+4043,Olla de Tres Patas,6,Cerámica,61,Modelado a mano,16,4850.0,37.0,29.1
+4044,Tazón de Cereal,6,Cerámica,48,Torno alfarero,16,3300.0,45.6,29.1
+4045,Vaso de Talavera,6,Cerámica,48,Torno alfarero,17,4450.0,18.2,38.8
+4046,Figura de Pez,6,Cerámica,61,Modelado a mano,16,4050.0,12.9,10.5
+4047,Cuenco de Porcelana,6,Cerámica,61,Modelado a mano,19,4700.0,22.0,28.0
+4048,Candelabro de Cerámica,6,Cerámica,50,Talavera,2,4650.0,54.9,15.1
+4049,Figura de Burro,6,Cerámica,51,Raku,2,4500.0,18.4,21.2
+4050,Ensaladera de Barro,6,Cerámica,50,Talavera,2,4950.0,29.3,39.3
+4051,Taza Nahua,6,Cerámica,50,Talavera,19,5700.0,34.6,53.0
+4052,Vaso de Porcelana,6,Cerámica,61,Modelado a mano,15,4950.0,38.2,52.6
+4053,Tetera Raku,6,Cerámica,61,Modelado a mano,16,4700.0,24.7,36.5
+4054,Olla de Porcelana,6,Cerámica,51,Raku,20,5200.0,25.8,13.2
+4055,Olla Pintada 2,6,Cerámica,49,Barro negro,2,4450.0,24.7,37.0
+4056,Jarro de Porcelana,6,Cerámica,51,Raku,20,5950.0,45.3,43.3
+4057,Cuenco de Barro Rojo,6,Cerámica,51,Raku,16,4850.0,35.7,45.2
+4058,Cuenco Talavera,6,Cerámica,49,Barro negro,17,4800.0,41.5,12.4
+4059,Florero de Gres,6,Cerámica,50,Talavera,15,4900.0,29.3,49.7
+4060,Portavelas de Gres,6,Cerámica,50,Talavera,19,5400.0,54.7,10.3
+4061,Cuenco Modelado,6,Cerámica,61,Modelado a mano,19,4900.0,30.0,45.4
+4062,Vasija Pintada,6,Cerámica,49,Barro negro,19,5450.0,20.3,44.2
+4063,Florero Pintado,6,Cerámica,50,Talavera,15,4900.0,40.2,41.3
+4064,Maceta Colgante,6,Cerámica,51,Raku,16,5400.0,49.1,48.0
+4065,Platón de Barro Rojo,6,Cerámica,51,Raku,17,5000.0,20.9,23.2
+4066,Figura de Serpiente,6,Cerámica,48,Torno alfarero,20,3800.0,46.1,13.0
+4067,Cántaro Nahua,6,Cerámica,61,Modelado a mano,19,5600.0,22.0,50.2
+4068,Olla Raku,6,Cerámica,51,Raku,19,5700.0,33.1,13.0
+4069,Vasija de Barro Blanco,6,Cerámica,48,Torno alfarero,17,4250.0,30.3,45.3
+4070,Figura de Perro,6,Cerámica,50,Talavera,19,6500.0,46.2,35.6
+4071,Vasija de Gres,6,Cerámica,50,Talavera,17,3900.0,21.4,20.5
+4072,Figura de Guajolote,6,Cerámica,49,Barro negro,19,4150.0,17.3,20.6
+4073,Sopera de Talavera,6,Cerámica,49,Barro negro,19,5650.0,42.0,35.1
+4074,Jarro Modelado,6,Cerámica,48,Torno alfarero,2,3950.0,42.2,15.5
+4075,Cuenco Nahua,6,Cerámica,61,Modelado a mano,19,5300.0,45.4,22.4
+4076,Platón Raku,6,Cerámica,48,Torno alfarero,15,3300.0,30.6,43.8
+4077,Cántaro Gres,6,Cerámica,48,Torno alfarero,17,4600.0,53.8,40.1
+4078,Mosaico de Cerámica,6,Cerámica,50,Talavera,2,5250.0,37.6,51.5
+4079,Farol de Talavera,6,Cerámica,49,Barro negro,17,4350.0,17.2,37.3
+4080,Botella de Barro,6,Cerámica,51,Raku,15,4550.0,30.4,13.5
+4081,Olla de Barro Rojo 2,6,Cerámica,61,Modelado a mano,19,3850.0,27.1,23.6
+4082,Cerámica Serie 95,6,Cerámica,50,Talavera,2,4550.0,31.9,23.1
+4083,Cerámica Serie 96,6,Cerámica,50,Talavera,2,3950.0,52.3,29.6
+4084,Cerámica Serie 97,6,Cerámica,50,Talavera,16,3700.0,14.7,34.9
+4085,Cerámica Serie 98,6,Cerámica,50,Talavera,17,4450.0,42.0,10.8
+4086,Cerámica Serie 99,6,Cerámica,51,Raku,15,5750.0,51.4,37.5
+4087,Cerámica Serie 100,6,Cerámica,51,Raku,15,3450.0,16.1,28.9
+4088,Cerámica Serie 101,6,Cerámica,48,Torno alfarero,2,3800.0,35.8,53.9
+4089,Cerámica Serie 102,6,Cerámica,50,Talavera,15,4100.0,12.4,35.6
+4090,Cerámica Serie 103,6,Cerámica,61,Modelado a mano,19,4950.0,35.3,24.7
+4091,Cerámica Serie 104,6,Cerámica,61,Modelado a mano,16,3900.0,53.0,44.5
+4092,Cerámica Serie 105,6,Cerámica,49,Barro negro,20,4250.0,11.6,25.0
+4093,Cerámica Serie 106,6,Cerámica,50,Talavera,19,4750.0,25.2,51.3
+4094,Cerámica Serie 107,6,Cerámica,50,Talavera,16,4450.0,34.6,53.5
+4095,Cerámica Serie 108,6,Cerámica,50,Talavera,2,6050.0,46.7,51.7
+4096,Cerámica Serie 109,6,Cerámica,61,Modelado a mano,16,3650.0,14.8,32.2
+4097,Cerámica Serie 110,6,Cerámica,61,Modelado a mano,20,4600.0,16.4,46.2
+4098,Cerámica Serie 111,6,Cerámica,50,Talavera,20,6200.0,40.7,54.9
+4099,Cerámica Serie 112,6,Cerámica,48,Torno alfarero,2,2900.0,15.0,19.7
+4100,Cerámica Serie 113,6,Cerámica,48,Torno alfarero,17,4100.0,12.0,47.6
+4101,Cerámica Serie 114,6,Cerámica,48,Torno alfarero,15,4250.0,12.2,54.2
+4102,Cerámica Serie 115,6,Cerámica,48,Torno alfarero,15,4050.0,12.1,37.5
+4103,Cerámica Serie 116,6,Cerámica,49,Barro negro,19,5400.0,25.6,43.8
+4104,Cerámica Serie 117,6,Cerámica,48,Torno alfarero,17,5250.0,52.4,50.9
+4105,Cerámica Serie 118,6,Cerámica,49,Barro negro,20,5250.0,35.7,23.0
+4106,Cerámica Serie 119,6,Cerámica,48,Torno alfarero,15,4800.0,38.5,47.3
+4107,Cerámica Serie 120,6,Cerámica,61,Modelado a mano,20,4450.0,19.8,20.0
+4108,Cerámica Serie 121,6,Cerámica,48,Torno alfarero,20,4750.0,33.0,20.9
+4109,Cerámica Serie 122,6,Cerámica,61,Modelado a mano,19,4800.0,24.5,35.5
+4110,Cerámica Serie 123,6,Cerámica,48,Torno alfarero,20,3850.0,30.6,25.9
+4111,Cerámica Serie 124,6,Cerámica,49,Barro negro,20,3450.0,18.1,29.4
+4112,Cerámica Serie 125,6,Cerámica,51,Raku,20,5950.0,40.9,35.4
+4113,Cerámica Serie 126,6,Cerámica,48,Torno alfarero,17,4950.0,41.9,43.8
+4114,Cerámica Serie 127,6,Cerámica,49,Barro negro,19,4600.0,24.9,49.7
+4115,Cerámica Serie 128,6,Cerámica,61,Modelado a mano,16,5050.0,38.1,47.7
+4116,Cerámica Serie 129,6,Cerámica,48,Torno alfarero,2,5100.0,53.8,53.0
+4117,Cerámica Serie 130,6,Cerámica,49,Barro negro,15,4900.0,32.4,48.3
+4118,Cerámica Serie 131,6,Cerámica,50,Talavera,17,4500.0,10.1,54.3
+4119,Cerámica Serie 132,6,Cerámica,49,Barro negro,2,3450.0,39.3,54.6
+4120,Cerámica Serie 133,6,Cerámica,61,Modelado a mano,15,4200.0,52.5,11.3
+4121,Cerámica Serie 134,6,Cerámica,51,Raku,2,3550.0,26.5,35.1
+4122,Cerámica Serie 135,6,Cerámica,48,Torno alfarero,19,3450.0,26.3,12.7
+4123,Cerámica Serie 136,6,Cerámica,49,Barro negro,20,5200.0,35.5,25.5
+4124,Cerámica Serie 137,6,Cerámica,50,Talavera,15,5350.0,39.9,51.4
+4125,Cerámica Serie 138,6,Cerámica,51,Raku,19,6300.0,43.3,51.9
+4126,Cerámica Serie 139,6,Cerámica,49,Barro negro,15,5050.0,52.6,53.8
+4127,Cerámica Serie 140,6,Cerámica,48,Torno alfarero,20,5650.0,48.2,33.8
+4128,Cerámica Serie 141,6,Cerámica,51,Raku,17,5400.0,42.5,52.4
+4129,Cerámica Serie 142,6,Cerámica,61,Modelado a mano,17,4300.0,29.4,50.8
+4130,Cerámica Serie 143,6,Cerámica,48,Torno alfarero,16,4850.0,44.2,36.8
+4131,Cerámica Serie 144,6,Cerámica,49,Barro negro,16,3550.0,22.0,27.3
+4132,Cerámica Serie 145,6,Cerámica,48,Torno alfarero,16,4100.0,49.9,19.6
+4133,Cerámica Serie 146,6,Cerámica,48,Torno alfarero,17,4400.0,51.4,16.4
+4134,Cerámica Serie 147,6,Cerámica,61,Modelado a mano,17,4750.0,22.0,40.6
+4135,Cerámica Serie 148,6,Cerámica,50,Talavera,20,5500.0,20.0,30.0
+4136,Cerámica Serie 149,6,Cerámica,50,Talavera,15,4200.0,52.0,12.8
+4137,Cerámica Serie 150,6,Cerámica,50,Talavera,17,5050.0,15.4,11.2
+4138,Cerámica Serie 151,6,Cerámica,48,Torno alfarero,15,3300.0,18.9,38.0
+4139,Cerámica Serie 152,6,Cerámica,49,Barro negro,16,5300.0,42.4,53.5
+4140,Cerámica Serie 153,6,Cerámica,61,Modelado a mano,15,3000.0,10.1,26.4
+4141,Cerámica Serie 154,6,Cerámica,50,Talavera,2,5600.0,27.9,50.8
+4142,Cerámica Serie 155,6,Cerámica,48,Torno alfarero,2,2650.0,32.1,17.0
+4143,Cerámica Serie 156,6,Cerámica,48,Torno alfarero,17,5050.0,51.5,44.3
+4144,Cerámica Serie 157,6,Cerámica,61,Modelado a mano,2,2950.0,43.9,23.1
+4145,Cerámica Serie 158,6,Cerámica,50,Talavera,17,4650.0,27.0,46.9
+4146,Cerámica Serie 159,6,Cerámica,48,Torno alfarero,19,5350.0,22.2,40.8
+4147,Cerámica Serie 160,6,Cerámica,49,Barro negro,2,2800.0,19.9,27.3
+4148,Cerámica Serie 161,6,Cerámica,50,Talavera,20,4250.0,45.6,12.0
+4149,Cerámica Serie 162,6,Cerámica,61,Modelado a mano,20,4900.0,24.8,22.2
+4150,Cerámica Serie 163,6,Cerámica,51,Raku,2,3900.0,10.8,17.6
+4151,Cerámica Serie 164,6,Cerámica,49,Barro negro,20,5750.0,50.8,37.9
+4152,Cerámica Serie 165,6,Cerámica,49,Barro negro,15,4650.0,39.3,40.4
+4153,Cerámica Serie 166,6,Cerámica,61,Modelado a mano,20,5050.0,19.1,37.1
+4154,Cerámica Serie 167,6,Cerámica,48,Torno alfarero,15,3050.0,36.4,25.8
+4155,Cerámica Serie 168,6,Cerámica,48,Torno alfarero,2,4150.0,28.9,35.3
+4156,Cerámica Serie 169,6,Cerámica,50,Talavera,17,5050.0,21.6,24.9
+4157,Cerámica Serie 170,6,Cerámica,51,Raku,17,5150.0,14.9,38.6
+4158,Cerámica Serie 171,6,Cerámica,48,Torno alfarero,15,4800.0,30.8,40.3
+4159,Cerámica Serie 172,6,Cerámica,51,Raku,16,5100.0,28.6,29.6
+4160,Cerámica Serie 173,6,Cerámica,48,Torno alfarero,17,4500.0,43.9,20.9
+4161,Cerámica Serie 174,6,Cerámica,61,Modelado a mano,15,4000.0,20.1,36.7
+4162,Cerámica Serie 175,6,Cerámica,50,Talavera,2,5300.0,17.1,53.5
+4163,Cerámica Serie 176,6,Cerámica,49,Barro negro,16,4750.0,26.7,31.3
+4164,Cerámica Serie 177,6,Cerámica,61,Modelado a mano,15,4350.0,47.0,16.4
+4165,Cerámica Serie 178,6,Cerámica,49,Barro negro,16,5050.0,38.3,47.8
+4166,Cerámica Serie 179,6,Cerámica,49,Barro negro,16,5150.0,27.8,20.0
+4167,Cerámica Serie 180,6,Cerámica,49,Barro negro,2,4400.0,18.8,30.6
+4168,Cerámica Serie 181,6,Cerámica,51,Raku,19,5250.0,11.5,45.6
+4169,Cerámica Serie 182,6,Cerámica,51,Raku,17,3250.0,12.9,21.9
+4170,Cerámica Serie 183,6,Cerámica,49,Barro negro,19,3900.0,29.0,25.2
+4171,Cerámica Serie 184,6,Cerámica,49,Barro negro,2,4550.0,24.9,35.8
+4172,Cerámica Serie 185,6,Cerámica,51,Raku,16,5100.0,29.7,29.2
+4173,Cerámica Serie 186,6,Cerámica,61,Modelado a mano,19,3500.0,46.7,17.7
+4174,Cerámica Serie 187,6,Cerámica,48,Torno alfarero,2,5400.0,42.3,53.1
+4175,Cerámica Serie 188,6,Cerámica,48,Torno alfarero,17,3650.0,24.5,21.7
+4176,Cerámica Serie 189,6,Cerámica,51,Raku,20,5550.0,25.3,49.2
+4177,Cerámica Serie 190,6,Cerámica,49,Barro negro,15,2800.0,21.2,18.4
+4178,Cerámica Serie 191,6,Cerámica,49,Barro negro,20,5000.0,54.2,34.9
+4179,Cerámica Serie 192,6,Cerámica,48,Torno alfarero,20,5350.0,36.9,25.9
+4180,Cerámica Serie 193,6,Cerámica,49,Barro negro,17,4050.0,43.7,21.2
+4181,Cerámica Serie 194,6,Cerámica,51,Raku,15,3500.0,43.3,10.1
+4182,Cerámica Serie 195,6,Cerámica,61,Modelado a mano,19,4800.0,10.5,30.9
+4183,Cerámica Serie 196,6,Cerámica,50,Talavera,19,5850.0,27.9,38.6
+4184,Cerámica Serie 197,6,Cerámica,50,Talavera,19,5150.0,10.8,13.6
+4185,Cerámica Serie 198,6,Cerámica,48,Torno alfarero,16,4100.0,19.8,16.8
+4186,Cerámica Serie 199,6,Cerámica,50,Talavera,20,4650.0,11.9,27.0
+4187,Cerámica Serie 200,6,Cerámica,48,Torno alfarero,2,4100.0,35.8,48.3
+4188,Cerámica Serie 201,6,Cerámica,50,Talavera,19,5450.0,42.0,34.2
+4189,Cerámica Serie 202,6,Cerámica,61,Modelado a mano,2,4050.0,23.9,23.8
+4190,Cerámica Serie 203,6,Cerámica,49,Barro negro,16,4500.0,44.9,53.2
+4191,Cerámica Serie 204,6,Cerámica,49,Barro negro,2,4600.0,42.2,29.6
+4192,Cerámica Serie 205,6,Cerámica,51,Raku,19,5300.0,14.1,48.8
+4193,Cerámica Serie 206,6,Cerámica,49,Barro negro,2,4050.0,12.6,49.4
+4194,Cerámica Serie 207,6,Cerámica,61,Modelado a mano,17,4050.0,49.3,10.2
+4195,Cerámica Serie 208,6,Cerámica,61,Modelado a mano,15,3550.0,12.7,27.9
+4196,Cerámica Serie 209,6,Cerámica,49,Barro negro,15,3900.0,28.3,43.6
+4197,Cerámica Serie 210,6,Cerámica,48,Torno alfarero,15,4400.0,34.8,53.4
+4198,Cerámica Serie 211,6,Cerámica,61,Modelado a mano,20,4550.0,25.7,18.4
+4199,Cerámica Serie 212,6,Cerámica,51,Raku,2,4300.0,29.0,38.3
+4200,Cerámica Serie 213,6,Cerámica,49,Barro negro,17,4350.0,53.0,15.3
+4201,Cerámica Serie 214,6,Cerámica,49,Barro negro,20,5550.0,54.6,47.0
+4202,Cerámica Serie 215,6,Cerámica,51,Raku,15,5050.0,37.8,36.7
+4203,Cerámica Serie 216,6,Cerámica,61,Modelado a mano,2,3700.0,22.1,31.4
+4204,Cerámica Serie 217,6,Cerámica,61,Modelado a mano,17,3050.0,40.9,32.4
+4205,Cerámica Serie 218,6,Cerámica,48,Torno alfarero,17,4250.0,20.9,47.8
+4206,Cerámica Serie 219,6,Cerámica,50,Talavera,16,4750.0,10.4,37.2
+4207,Cerámica Serie 220,6,Cerámica,48,Torno alfarero,17,4200.0,23.0,37.1
+4208,Cerámica Serie 221,6,Cerámica,61,Modelado a mano,15,4150.0,24.8,23.7
+4209,Cerámica Serie 222,6,Cerámica,49,Barro negro,17,4300.0,51.2,12.1
+4210,Cerámica Serie 223,6,Cerámica,50,Talavera,17,3800.0,14.4,21.7
+4211,Cerámica Serie 224,6,Cerámica,51,Raku,20,4600.0,39.4,33.9
+4212,Cerámica Serie 225,6,Cerámica,50,Talavera,16,5350.0,52.7,21.3
+4213,Cerámica Serie 226,6,Cerámica,50,Talavera,2,4300.0,16.4,45.0
+4214,Cerámica Serie 227,6,Cerámica,61,Modelado a mano,2,2800.0,20.6,51.9
+4215,Cerámica Serie 228,6,Cerámica,50,Talavera,19,6300.0,37.0,24.7
+4216,Cerámica Serie 229,6,Cerámica,48,Torno alfarero,15,4100.0,10.1,21.2
+4217,Cerámica Serie 230,6,Cerámica,51,Raku,15,5500.0,44.8,34.1
+4218,Cerámica Serie 231,6,Cerámica,50,Talavera,2,4800.0,15.2,32.6
+4219,Cerámica Serie 232,6,Cerámica,51,Raku,17,3850.0,22.1,20.4
+4220,Cerámica Serie 233,6,Cerámica,48,Torno alfarero,16,3650.0,41.6,54.1
+4221,Cerámica Serie 234,6,Cerámica,48,Torno alfarero,19,4400.0,29.0,49.3
+4222,El Tlacolol Grabado,7,Grabado,53,Xilografía,3,3750.0,55.7,49.0
+4223,La Plaza en Litografía,7,Grabado,53,Xilografía,13,3900.0,41.7,65.3
+4224,El Ranchero en Aguafuerte,7,Grabado,55,Litografía,3,4350.0,46.5,28.3
+4225,El Maestro Grabado,7,Grabado,52,Aguafuerte,3,4250.0,44.0,52.7
+4226,El Charro en Serigrafía,7,Grabado,53,Xilografía,13,4000.0,32.5,71.9
+4227,La Joven en Linografía,7,Grabado,55,Litografía,13,3850.0,53.9,31.3
+4228,Flores en Serigrafía,7,Grabado,54,Serigrafía,3,2800.0,60.4,48.1
+4229,Milpa en Aguafuerte,7,Grabado,55,Litografía,3,4200.0,64.2,30.2
+4230,Catrinas en Litografía,7,Grabado,52,Aguafuerte,13,3600.0,45.9,69.4
+4231,El Filósofo en Serigrafía,7,Grabado,52,Aguafuerte,13,4450.0,26.7,68.1
+4232,La Luna Grabada,7,Grabado,52,Aguafuerte,13,3500.0,25.7,44.7
+4233,La Canoa en Serigrafía,7,Grabado,54,Serigrafía,13,3650.0,31.0,46.3
+4234,El Quetzal Grabado,7,Grabado,55,Litografía,3,2700.0,23.1,42.2
+4235,El Sembrador en Aguafuerte,7,Grabado,53,Xilografía,3,4050.0,30.9,55.9
+4236,Mujer Nahua en Litografía,7,Grabado,54,Serigrafía,13,3250.0,30.8,49.4
+4237,La Cocina en Aguafuerte,7,Grabado,55,Litografía,3,2600.0,21.3,32.9
+4238,El Pescador en Linografía,7,Grabado,52,Aguafuerte,13,3600.0,21.6,30.2
+4239,Huasteca al Atardecer Grabado,7,Grabado,52,Aguafuerte,3,3300.0,50.1,52.3
+4240,La Tejedora en Aguafuerte,7,Grabado,54,Serigrafía,13,2750.0,43.8,54.0
+4241,La Ofrenda en Litografía,7,Grabado,53,Xilografía,3,3600.0,62.2,50.5
+4242,La Hacienda en Serigrafía,7,Grabado,55,Litografía,3,3400.0,32.0,34.8
+4243,La Milpa Grabada II,7,Grabado,54,Serigrafía,3,3600.0,42.8,35.3
+4244,El Rodeo Grabado,7,Grabado,53,Xilografía,3,3550.0,48.0,30.6
+4245,El Molino en Linografía,7,Grabado,52,Aguafuerte,3,4050.0,60.2,55.6
+4246,El Tianguis en Xilografía,7,Grabado,54,Serigrafía,3,3400.0,22.7,49.1
+4247,El Vaquero en Litografía,7,Grabado,55,Litografía,13,3650.0,29.2,33.9
+4248,El Venado en Xilografía,7,Grabado,52,Aguafuerte,3,4150.0,28.7,44.1
+4249,La Familia en Serigrafía,7,Grabado,56,Linografía,13,3700.0,37.6,65.1
+4250,Jaguar en Aguafuerte,7,Grabado,55,Litografía,3,4150.0,35.0,64.9
+4251,La Comunidad en Linografía,7,Grabado,55,Litografía,3,4900.0,59.8,57.8
+4252,Río en Serigrafía,7,Grabado,56,Linografía,3,4050.0,41.3,25.3
+4253,La Milpa en Serigrafía,7,Grabado,55,Litografía,3,3200.0,35.4,35.7
+4254,Nocturno en Xilografía,7,Grabado,53,Xilografía,13,3550.0,29.4,34.1
+4255,La Feria en Serigrafía,7,Grabado,53,Xilografía,13,3900.0,57.2,43.0
+4256,Fiesta en Aguafuerte,7,Grabado,56,Linografía,13,3950.0,53.0,65.1
+4257,La Alfarera en Xilografía,7,Grabado,56,Linografía,13,3050.0,40.5,26.2
+4258,Lluvia en Linografía,7,Grabado,54,Serigrafía,3,2600.0,38.2,61.8
+4259,El Sol en Xilografía,7,Grabado,53,Xilografía,13,3950.0,42.9,38.5
+4260,Sierra en Aguafuerte,7,Grabado,52,Aguafuerte,3,4350.0,53.5,49.6
+4261,Paisaje de Monte en Linografía,7,Grabado,54,Serigrafía,13,2900.0,30.8,30.6
+4262,El Malabarista Grabado,7,Grabado,56,Linografía,3,3700.0,26.2,49.7
+4263,El Tlecuil Grabado,7,Grabado,56,Linografía,3,3650.0,41.6,37.9
+4264,Danza en Serigrafía,7,Grabado,53,Xilografía,13,3900.0,61.8,51.2
+4265,El Guajolote en Serigrafía,7,Grabado,52,Aguafuerte,3,4050.0,29.2,63.1
+4266,Mañana en Litografía,7,Grabado,52,Aguafuerte,3,4450.0,44.8,38.3
+4267,Altar en Xilografía,7,Grabado,53,Xilografía,13,3650.0,21.5,42.3
+4268,El Panteón en Aguafuerte,7,Grabado,55,Litografía,3,2700.0,33.3,33.0
+4269,Serpiente en Serigrafía,7,Grabado,56,Linografía,3,4050.0,50.0,69.6
+4270,El Puerto en Aguafuerte,7,Grabado,52,Aguafuerte,3,3800.0,52.6,62.3
+4271,La Cosecha en Litografía,7,Grabado,54,Serigrafía,3,3200.0,53.1,46.8
+4272,El Maíz en Xilografía,7,Grabado,53,Xilografía,3,3550.0,38.9,35.9
+4273,Ofrenda en Litografía,7,Grabado,53,Xilografía,13,4250.0,23.7,75.0
+4274,Pueblo Serrano,7,Grabado,55,Litografía,13,4200.0,62.9,67.8
+4275,La Catedral en Litografía,7,Grabado,55,Litografía,3,4050.0,46.0,57.0
+4276,El Escritor en Litografía,7,Grabado,53,Xilografía,13,4200.0,33.8,46.0
+4277,Tarde Serrana,7,Grabado,54,Serigrafía,13,2050.0,20.8,45.0
+4278,El Sastre Grabado,7,Grabado,53,Xilografía,13,3800.0,20.1,58.4
+4279,Máscaras en Xilografía,7,Grabado,55,Litografía,3,2950.0,38.2,68.3
+4280,Mercado de Huejutla Grabado,7,Grabado,53,Xilografía,3,3650.0,25.3,45.1
+4281,El Zócalo en Aguafuerte,7,Grabado,53,Xilografía,3,2800.0,44.8,54.6
+4282,El Toro Grabado,7,Grabado,55,Litografía,3,3850.0,54.3,52.7
+4283,El Café Litografiado,7,Grabado,56,Linografía,13,3650.0,46.2,39.2
+4284,Campo en Aguafuerte,7,Grabado,52,Aguafuerte,3,3250.0,61.5,52.9
+4285,El Músico Grabado,7,Grabado,55,Litografía,3,3850.0,21.2,59.5
+4286,El Maíz II en Xilografía,7,Grabado,52,Aguafuerte,3,4050.0,35.2,36.3
+4287,El Río Grabado,7,Grabado,55,Litografía,3,3400.0,27.6,37.8
+4288,Sahumerio en Serigrafía,7,Grabado,55,Litografía,13,2800.0,31.7,58.3
+4289,Danza Tenek en Xilografía,7,Grabado,53,Xilografía,3,3550.0,22.5,30.8
+4290,El Carpintero en Xilografía,7,Grabado,54,Serigrafía,3,3550.0,47.9,68.3
+4291,Caballo en Litografía,7,Grabado,54,Serigrafía,3,3650.0,26.6,43.4
+4292,La Ceiba en Xilografía,7,Grabado,54,Serigrafía,3,2550.0,20.1,25.9
+4293,El Barco en Xilografía,7,Grabado,52,Aguafuerte,3,4950.0,60.8,70.4
+4294,El Poeta en Aguafuerte,7,Grabado,56,Linografía,13,2950.0,30.2,44.2
+4295,El Violinista en Aguafuerte,7,Grabado,54,Serigrafía,3,3850.0,24.6,48.0
+4296,El Mercado en Aguafuerte,7,Grabado,52,Aguafuerte,13,3700.0,33.8,36.4
+4297,El Constructor en Aguafuerte,7,Grabado,56,Linografía,3,4350.0,31.7,62.6
+4298,Colibrí en Serigrafía,7,Grabado,55,Litografía,13,4000.0,26.5,72.3
+4299,El Niño en Aguafuerte,7,Grabado,55,Litografía,13,3900.0,38.3,58.6
+4300,El Herrero en Serigrafía,7,Grabado,52,Aguafuerte,3,3350.0,29.0,45.9
+4301,La Palma en Litografía,7,Grabado,55,Litografía,3,4600.0,42.5,69.1
+4302,El Metate en Linografía,7,Grabado,53,Xilografía,13,3650.0,28.1,60.3
+4303,Xantolo en Serigrafía,7,Grabado,55,Litografía,3,4250.0,55.1,32.9
+4304,El Danzante en Serigrafía,7,Grabado,56,Linografía,3,2300.0,21.3,34.0
+4305,Sierra Huasteca en Grabado,7,Grabado,52,Aguafuerte,3,3650.0,44.6,68.4
+4306,Carnaval en Linografía,7,Grabado,52,Aguafuerte,3,4550.0,46.2,35.4
+4307,El Copal en Linografía,7,Grabado,53,Xilografía,3,2850.0,63.1,26.6
+4308,El Maíz Serigráfico,7,Grabado,56,Linografía,3,3800.0,40.8,32.9
+4309,Grabado Serie 88,7,Grabado,53,Xilografía,13,3950.0,40.4,57.3
+4310,Grabado Serie 89,7,Grabado,55,Litografía,3,2400.0,33.6,25.1
+4311,Grabado Serie 90,7,Grabado,53,Xilografía,3,2850.0,28.4,28.9
+4312,Grabado Serie 91,7,Grabado,53,Xilografía,3,4300.0,35.7,34.6
+4313,Grabado Serie 92,7,Grabado,56,Linografía,3,4000.0,32.8,64.8
+4314,Grabado Serie 93,7,Grabado,53,Xilografía,3,4100.0,33.3,37.3
+4315,Grabado Serie 94,7,Grabado,54,Serigrafía,3,2750.0,59.6,27.9
+4316,Grabado Serie 95,7,Grabado,55,Litografía,3,4050.0,41.7,40.4
+4317,Grabado Serie 96,7,Grabado,56,Linografía,3,3850.0,28.1,47.3
+4318,Grabado Serie 97,7,Grabado,55,Litografía,3,4050.0,51.6,69.5
+4319,Grabado Serie 98,7,Grabado,52,Aguafuerte,3,2900.0,51.7,28.1
+4320,Grabado Serie 99,7,Grabado,53,Xilografía,3,3750.0,41.8,54.6
+4321,Grabado Serie 100,7,Grabado,54,Serigrafía,3,4300.0,53.1,73.5
+4322,Grabado Serie 101,7,Grabado,56,Linografía,13,3450.0,24.3,68.6
+4323,Grabado Serie 102,7,Grabado,56,Linografía,3,2700.0,63.8,41.0
+4324,Grabado Serie 103,7,Grabado,54,Serigrafía,3,4000.0,53.2,29.0
+4325,Grabado Serie 104,7,Grabado,54,Serigrafía,13,2800.0,44.9,34.4
+4326,Grabado Serie 105,7,Grabado,56,Linografía,3,3900.0,55.5,55.3
+4327,Grabado Serie 106,7,Grabado,54,Serigrafía,13,3450.0,28.3,48.9
+4328,Grabado Serie 107,7,Grabado,56,Linografía,3,3000.0,27.2,66.8
+4329,Grabado Serie 108,7,Grabado,52,Aguafuerte,13,3350.0,32.6,30.5
+4330,Grabado Serie 109,7,Grabado,52,Aguafuerte,13,3450.0,40.8,35.0
+4331,Grabado Serie 110,7,Grabado,56,Linografía,13,3050.0,52.1,73.2
+4332,Grabado Serie 111,7,Grabado,55,Litografía,13,2700.0,43.6,48.8
+4333,Grabado Serie 112,7,Grabado,55,Litografía,3,3850.0,34.8,42.0
+4334,Grabado Serie 113,7,Grabado,54,Serigrafía,3,4200.0,33.8,63.6
+4335,Grabado Serie 114,7,Grabado,52,Aguafuerte,3,4150.0,59.3,63.6
+4336,Grabado Serie 115,7,Grabado,54,Serigrafía,3,4150.0,64.1,25.2
+4337,Grabado Serie 116,7,Grabado,56,Linografía,3,3750.0,46.2,36.0
+4338,Grabado Serie 117,7,Grabado,53,Xilografía,13,3450.0,37.8,43.8
+4339,Grabado Serie 118,7,Grabado,53,Xilografía,13,3900.0,36.5,39.8
+4340,Grabado Serie 119,7,Grabado,56,Linografía,13,3900.0,21.8,47.7
+4341,Grabado Serie 120,7,Grabado,54,Serigrafía,13,3900.0,29.5,44.8
+4342,Grabado Serie 121,7,Grabado,55,Litografía,13,4100.0,47.6,63.6
+4343,Grabado Serie 122,7,Grabado,55,Litografía,3,3450.0,50.6,33.5
+4344,Grabado Serie 123,7,Grabado,54,Serigrafía,3,3950.0,57.3,59.7
+4345,Grabado Serie 124,7,Grabado,53,Xilografía,3,3150.0,54.3,45.1
+4346,Grabado Serie 125,7,Grabado,56,Linografía,3,2400.0,25.4,32.7
+4347,Grabado Serie 126,7,Grabado,54,Serigrafía,3,3750.0,46.4,32.9
+4348,Grabado Serie 127,7,Grabado,54,Serigrafía,13,3950.0,40.2,74.7
+4349,Grabado Serie 128,7,Grabado,56,Linografía,13,3650.0,56.5,59.9
+4350,Grabado Serie 129,7,Grabado,54,Serigrafía,3,2650.0,35.5,57.3
+4351,Grabado Serie 130,7,Grabado,56,Linografía,3,4050.0,20.1,72.0
+4352,Grabado Serie 131,7,Grabado,52,Aguafuerte,13,4100.0,38.1,51.4
+4353,Grabado Serie 132,7,Grabado,53,Xilografía,13,3550.0,48.9,48.3
+4354,Grabado Serie 133,7,Grabado,55,Litografía,13,3600.0,20.7,26.7
+4355,Grabado Serie 134,7,Grabado,54,Serigrafía,3,4050.0,56.1,44.1
+4356,Grabado Serie 135,7,Grabado,53,Xilografía,13,4100.0,49.6,43.7
+4357,Grabado Serie 136,7,Grabado,55,Litografía,13,3300.0,31.2,43.8
+4358,Grabado Serie 137,7,Grabado,53,Xilografía,13,4250.0,42.6,29.0
+4359,Grabado Serie 138,7,Grabado,54,Serigrafía,13,3600.0,31.2,43.5
+4360,Grabado Serie 139,7,Grabado,56,Linografía,3,2550.0,36.8,40.5
+4361,Grabado Serie 140,7,Grabado,53,Xilografía,13,3750.0,20.5,45.8
+4362,Grabado Serie 141,7,Grabado,56,Linografía,3,2850.0,34.4,52.6
+4363,Grabado Serie 142,7,Grabado,52,Aguafuerte,3,2700.0,43.6,27.4
+4364,Grabado Serie 143,7,Grabado,53,Xilografía,13,3350.0,21.3,69.8
+4365,Grabado Serie 144,7,Grabado,53,Xilografía,3,4200.0,52.9,53.2
+4366,Grabado Serie 145,7,Grabado,56,Linografía,13,3150.0,57.5,44.2
+4367,Grabado Serie 146,7,Grabado,53,Xilografía,3,2650.0,57.4,26.5
+4368,Grabado Serie 147,7,Grabado,56,Linografía,3,4000.0,38.1,31.6
+4369,Grabado Serie 148,7,Grabado,53,Xilografía,13,3900.0,33.9,64.8
+4370,Grabado Serie 149,7,Grabado,52,Aguafuerte,3,4100.0,42.1,34.8
+4371,Grabado Serie 150,7,Grabado,56,Linografía,3,3450.0,43.2,34.7
+4372,Grabado Serie 151,7,Grabado,54,Serigrafía,13,2100.0,21.2,62.5
+4373,Grabado Serie 152,7,Grabado,54,Serigrafía,3,4000.0,55.4,56.5
+4374,Grabado Serie 153,7,Grabado,54,Serigrafía,13,3250.0,28.7,37.8
+4375,Grabado Serie 154,7,Grabado,56,Linografía,13,3200.0,31.2,58.3
+4376,Grabado Serie 155,7,Grabado,54,Serigrafía,3,3150.0,64.3,74.7
+4377,Grabado Serie 156,7,Grabado,53,Xilografía,3,3800.0,43.1,70.8
+4378,Grabado Serie 157,7,Grabado,53,Xilografía,13,4450.0,63.7,44.1
+4379,Grabado Serie 158,7,Grabado,52,Aguafuerte,3,4400.0,41.9,50.3
+4380,Grabado Serie 159,7,Grabado,54,Serigrafía,3,2650.0,24.1,59.0
+4381,Grabado Serie 160,7,Grabado,53,Xilografía,3,2650.0,25.0,57.8
+4382,Grabado Serie 161,7,Grabado,55,Litografía,13,3200.0,52.0,39.8
+4383,Grabado Serie 162,7,Grabado,52,Aguafuerte,13,4500.0,53.6,66.1
+4384,Grabado Serie 163,7,Grabado,54,Serigrafía,13,3600.0,36.3,73.8
+4385,Grabado Serie 164,7,Grabado,55,Litografía,3,3900.0,61.8,27.6
+4386,Grabado Serie 165,7,Grabado,52,Aguafuerte,3,3600.0,58.7,54.3
+4387,Grabado Serie 166,7,Grabado,53,Xilografía,13,3400.0,45.6,59.8
+4388,Grabado Serie 167,7,Grabado,55,Litografía,13,2750.0,31.6,38.7
+4389,Grabado Serie 168,7,Grabado,56,Linografía,3,4050.0,45.1,56.5
+4390,Grabado Serie 169,7,Grabado,53,Xilografía,3,3650.0,26.7,49.7
+4391,Grabado Serie 170,7,Grabado,55,Litografía,3,3000.0,40.2,57.0
+4392,Grabado Serie 171,7,Grabado,54,Serigrafía,3,2350.0,23.1,36.5
+4393,Grabado Serie 172,7,Grabado,54,Serigrafía,13,3850.0,29.4,54.5
+4394,Grabado Serie 173,7,Grabado,52,Aguafuerte,13,4150.0,25.5,71.7
+4395,Grabado Serie 174,7,Grabado,54,Serigrafía,13,3700.0,44.9,34.7
+4397,Grabado Serie 176,7,Grabado,56,Linografía,13,2950.0,55.4,31.7
+4398,Grabado Serie 177,7,Grabado,55,Litografía,13,3500.0,31.6,47.0
+4399,Grabado Serie 178,7,Grabado,52,Aguafuerte,13,2650.0,22.9,55.8
+4400,Grabado Serie 179,7,Grabado,52,Aguafuerte,13,5000.0,56.9,68.1
+4401,Grabado Serie 180,7,Grabado,56,Linografía,3,4100.0,21.3,60.8
+4402,Grabado Serie 181,7,Grabado,55,Litografía,13,4100.0,29.8,72.0
+4403,Grabado Serie 182,7,Grabado,56,Linografía,13,3450.0,30.7,64.9
+4404,Grabado Serie 183,7,Grabado,52,Aguafuerte,3,3950.0,32.2,58.8
+4405,Grabado Serie 184,7,Grabado,52,Aguafuerte,3,3450.0,51.8,34.5
+4406,Grabado Serie 185,7,Grabado,52,Aguafuerte,13,4000.0,32.0,54.8
+4407,Grabado Serie 186,7,Grabado,52,Aguafuerte,13,3000.0,21.5,62.0
+4408,Grabado Serie 187,7,Grabado,53,Xilografía,3,4850.0,53.5,73.8
+4409,Grabado Serie 188,7,Grabado,56,Linografía,13,3550.0,30.3,25.8
+4410,Grabado Serie 189,7,Grabado,54,Serigrafía,3,3700.0,35.3,60.8
+4411,Grabado Serie 190,7,Grabado,54,Serigrafía,13,2400.0,37.5,27.5
+4412,Grabado Serie 191,7,Grabado,52,Aguafuerte,13,3050.0,50.9,56.2
+4413,Grabado Serie 192,7,Grabado,56,Linografía,3,4150.0,38.8,44.2
+4414,Grabado Serie 193,7,Grabado,54,Serigrafía,13,3900.0,35.8,74.6
+4415,Grabado Serie 194,7,Grabado,52,Aguafuerte,13,4000.0,38.7,42.6
+4416,Grabado Serie 195,7,Grabado,53,Xilografía,13,2700.0,20.8,63.8
+4417,Grabado Serie 196,7,Grabado,53,Xilografía,3,3900.0,22.7,27.3
+4418,Grabado Serie 197,7,Grabado,56,Linografía,3,4000.0,48.7,66.2
+4419,Grabado Serie 198,7,Grabado,53,Xilografía,13,3200.0,47.4,51.3
+4420,Grabado Serie 199,7,Grabado,54,Serigrafía,13,3950.0,45.8,58.8
+4421,Grabado Serie 200,7,Grabado,52,Aguafuerte,13,3800.0,34.9,39.0
+4422,Grabado Serie 201,7,Grabado,55,Litografía,13,4400.0,47.4,72.8
+4423,Grabado Serie 202,7,Grabado,54,Serigrafía,13,2050.0,24.8,46.0
+4424,Grabado Serie 203,7,Grabado,55,Litografía,13,2750.0,33.2,50.8
+4425,Grabado Serie 204,7,Grabado,52,Aguafuerte,3,3100.0,44.3,32.5
+4426,Grabado Serie 205,7,Grabado,53,Xilografía,3,3450.0,40.7,32.2
+4427,Grabado Serie 206,7,Grabado,55,Litografía,13,4450.0,59.3,60.7
+4428,Grabado Serie 207,7,Grabado,55,Litografía,13,2450.0,29.1,51.2
+4429,Grabado Serie 208,7,Grabado,56,Linografía,3,3300.0,42.2,27.9
+4430,Grabado Serie 209,7,Grabado,53,Xilografía,3,4650.0,63.2,59.3
+4431,Grabado Serie 210,7,Grabado,52,Aguafuerte,3,4600.0,61.8,57.4
+4432,Grabado Serie 211,7,Grabado,55,Litografía,13,3700.0,59.3,27.4
+4433,Grabado Serie 212,7,Grabado,54,Serigrafía,13,3400.0,30.9,40.8
+4434,Grabado Serie 213,7,Grabado,55,Litografía,13,4150.0,53.3,63.3
+4435,Grabado Serie 214,7,Grabado,53,Xilografía,3,4000.0,47.8,58.8
+4436,Grabado Serie 215,7,Grabado,54,Serigrafía,13,3100.0,49.3,60.1
+4437,Grabado Serie 216,7,Grabado,55,Litografía,3,4000.0,46.2,46.9
+4438,Grabado Serie 217,7,Grabado,56,Linografía,13,3700.0,38.5,48.7
+4439,Grabado Serie 218,7,Grabado,53,Xilografía,3,4350.0,41.6,62.9
+4440,Grabado Serie 219,7,Grabado,55,Litografía,3,4550.0,42.9,73.1
+4441,Grabado Serie 220,7,Grabado,53,Xilografía,3,4200.0,24.1,67.7
+4442,Grabado Serie 221,7,Grabado,54,Serigrafía,13,3200.0,51.9,44.4
+4443,Grabado Serie 222,7,Grabado,52,Aguafuerte,13,4100.0,35.2,72.4
+4444,Grabado Serie 223,7,Grabado,55,Litografía,13,3450.0,51.7,37.8
+4445,Grabado Serie 224,7,Grabado,53,Xilografía,3,4100.0,56.5,46.2
+4446,Grabado Serie 225,7,Grabado,55,Litografía,13,3800.0,25.5,62.3
+4447,Grabado Serie 226,7,Grabado,53,Xilografía,3,2900.0,32.1,54.4
+4448,Grabado Serie 227,7,Grabado,55,Litografía,13,3900.0,34.7,56.8
+4449,Grabado Serie 228,7,Grabado,55,Litografía,13,3950.0,59.1,43.8
+4450,Grabado Serie 229,7,Grabado,54,Serigrafía,13,2750.0,48.8,49.3
+4451,Grabado Serie 230,7,Grabado,52,Aguafuerte,3,4300.0,55.1,71.3
