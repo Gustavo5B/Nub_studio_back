@@ -98,9 +98,12 @@ export const listarObras = async (req, res) => {
     queryParams.push(parseInt(limit), parseInt(offset));
     const result = await db.query(query, queryParams);
 
+    // Mismos JOIN que la consulta principal: el filtro "buscar" usa columnas de artistas (a.*).
     const countResult = await db.query(
       `SELECT COUNT(DISTINCT o.id_obra) AS total
        FROM obras o
+       INNER JOIN artistas a ON o.id_artista = a.id_artista
+       INNER JOIN categorias c ON o.id_categoria = c.id_categoria
        LEFT JOIN obras_tamaños ot ON o.id_obra = ot.id_obra AND ot.activo = TRUE
        WHERE ${whereClause}`,
       queryParams.slice(0, -2)
