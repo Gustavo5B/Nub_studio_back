@@ -13,6 +13,7 @@ import {
 } from '../controllers/authController.js';
 import { register, verifyEmail, resendVerificationCode } from '../controllers/registerController.js';
 import { authenticateToken } from '../middlewares/authMiddleware.js';
+import { eliminarMiCuenta } from '../controllers/cuentaController.js';
 
 const router = express.Router();
 
@@ -41,5 +42,8 @@ router.post("/verify-login-code", verifyLoginCode);
 router.post("/logout",               authenticateToken, logout);
 router.post("/close-other-sessions", authenticateToken, closeOtherSessions);
 router.get("/check-session",         authenticateToken, checkSession);
+
+// ── Cuenta del cliente (ARCO: Cancelación, requisito de Google Play) ──
+router.delete("/cuenta",             authenticateToken, eliminarMiCuenta);
 
 export default router;

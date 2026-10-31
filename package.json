@@ -7,7 +7,9 @@
     "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "migrate": "node migrate/migrate.js",
-    "migrate:catalogo": "node migrate/migrate.js"
+    "migrate:catalogo": "node migrate/migrate.js",
+    "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js",
+    "test:coverage": "node --experimental-vm-modules node_modules/jest/bin/jest.js --coverage"
   },
   "keywords": [],
   "author": "NU-B Studio",
@@ -39,5 +41,23 @@
   },
   "engines": {
     "node": ">=18.x"
+  },
+  "devDependencies": {
+    "jest": "^29.7.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {},
+    "testMatch": [
+      "**/tests/**/*.test.js"
+    ],
+    "coverageProvider": "v8",
+    "collectCoverageFrom": [
+      "src/**/*.js"
+    ],
+    "coverageReporters": [
+      "lcov",
+      "text-summary"
+    ]
   }
 }

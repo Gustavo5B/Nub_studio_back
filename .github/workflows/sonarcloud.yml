@@ -26,6 +26,10 @@ jobs:
       - name: Instalar dependencias
         run: npm install
 
+      # Sin este paso SonarCloud ve 0 % de cobertura en todo el código nuevo
+      - name: Pruebas unitarias con cobertura
+        run: npm run test:coverage
+
       - name: Análisis SonarCloud
         uses: SonarSource/sonarqube-scan-action@v5
         env:
