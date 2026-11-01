@@ -2,6 +2,7 @@ import express from 'express';
 import { upload } from '../config/cloudinaryConfig.js';
 import { authenticateToken, requireRole, optionalAuth } from '../middlewares/authMiddleware.js';
 import { rateLimit } from '../middlewares/rateLimit.middleware.js';
+import { reportarComentario } from '../controllers/reporteComentarioController.js';
 import {
   // Admin
   listarTodosPostsAdmin,
@@ -45,6 +46,12 @@ const limiteComentarios = rateLimit({
   windowMs: 60_000,
   max: 5,
   mensaje: 'Estás comentando muy rápido. Espera un momento e intenta de nuevo.',
+});
+const limiteReportes = rateLimit({
+  nombre: 'blog-reportes',
+  windowMs: 60_000,
+  max: 10,
+  mensaje: 'Demasiados reportes seguidos. Espera un momento.',
 });
 const limiteReacciones = rateLimit({
   nombre: 'blog-reacciones',
@@ -177,6 +184,12 @@ router.delete(
   '/comentarios/:id',
   authenticateToken, requireRole('cliente', 'artista'),
   eliminarComentario
+);
+router.post(
+  '/comentarios/:id/reportar',
+  authenticateToken, requireRole('cliente', 'artista'),
+  limiteReportes,
+  reportarComentario
 );
 
 export default router;
