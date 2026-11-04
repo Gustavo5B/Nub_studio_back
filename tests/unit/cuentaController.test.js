@@ -6,7 +6,7 @@ const client = { query: jest.fn(), release: jest.fn() };
 const pool = { connect: jest.fn(async () => client) };
 const compare = jest.fn();
 
-jest.unstable_mockModule('../../src/config/db.js', () => ({ pool }));
+jest.unstable_mockModule('../../src/config/db.js', () => ({ pool, pools: {} }));
 jest.unstable_mockModule('bcrypt', () => ({ default: { compare } }));
 jest.unstable_mockModule('../../src/config/logger.js', () => ({
   default: { info: jest.fn(), error: jest.fn(), warn: jest.fn() },
@@ -128,6 +128,7 @@ describe('eliminarMiCuenta (ARCO, Cancelación)', () => {
     expect(anonimiza).toContain("nombre_completo = 'Usuario eliminado'");
     expect(anonimiza).toContain('"contraseña_hash" = NULL');
     expect(anonimiza).toContain('eliminado = TRUE');
+    expect(anonimiza).toContain('acepta_marketing = FALSE');
 
     expect(res.json).toHaveBeenCalledWith({ message: 'Tu cuenta se eliminó correctamente' });
     expect(res.status).not.toHaveBeenCalled();

@@ -12,8 +12,9 @@ import {
   reenviarActivacion,
 } from '../controllers/authController.js';
 import { register, verifyEmail, resendVerificationCode } from '../controllers/registerController.js';
-import { authenticateToken } from '../middlewares/authMiddleware.js';
-import { eliminarMiCuenta } from '../controllers/cuentaController.js';
+import { authenticateToken, requireRole } from '../middlewares/authMiddleware.js';
+import { actualizarMiPerfil, eliminarMiCuenta, obtenerMiPerfil } from '../controllers/cuentaController.js';
+import { validarActualizarPerfil } from '../validators/validators.js';
 
 const router = express.Router();
 
@@ -43,7 +44,9 @@ router.post("/logout",               authenticateToken, logout);
 router.post("/close-other-sessions", authenticateToken, closeOtherSessions);
 router.get("/check-session",         authenticateToken, checkSession);
 
-// ── Cuenta del cliente (ARCO: Cancelación, requisito de Google Play) ──
+// ── Cuenta del cliente (ARCO; Cancelación es requisito de Google Play) ──
+router.get("/perfil",                authenticateToken, requireRole("cliente"), obtenerMiPerfil);
+router.put("/perfil",                authenticateToken, requireRole("cliente"), validarActualizarPerfil, actualizarMiPerfil);
 router.delete("/cuenta",             authenticateToken, eliminarMiCuenta);
 
 export default router;

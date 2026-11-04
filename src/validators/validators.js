@@ -75,6 +75,28 @@ export const validarLogin = [
   handleValidationErrors
 ];
 
+export const validarActualizarPerfil = [
+  body('nombre')
+    .optional()
+    .isString().withMessage('El nombre no es válido')
+    .trim()
+    .isLength({ min: 3, max: 100 }).withMessage('El nombre debe tener entre 3 y 100 caracteres')
+    .matches(/^[a-zA-ZáéíóúüÁÉÍÓÚÜñÑ\s]+$/).withMessage('El nombre solo puede contener letras y espacios'),
+
+  // Vacío o null borra el teléfono.
+  body('telefono')
+    .optional({ nullable: true, checkFalsy: true })
+    .isString().withMessage('El teléfono no es válido')
+    .trim()
+    .matches(/^[0-9]{10}$/).withMessage('El teléfono debe tener exactamente 10 números'),
+
+  body('acepta_marketing')
+    .optional()
+    .custom((valor) => typeof valor === 'boolean').withMessage('La preferencia de marketing no es válida'),
+
+  handleValidationErrors
+];
+
 // =========================================================
 // 🎨 VALIDACIONES DE OBRAS
 // =========================================================

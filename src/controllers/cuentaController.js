@@ -1,8 +1,12 @@
 // =========================================================
-// CUENTA DEL CLIENTE — Derecho ARCO de Cancelación
-// DELETE /api/auth/cuenta   (requisito de Google Play)
+// CUENTA DEL CLIENTE — Derechos ARCO
+// GET    /api/auth/perfil   Acceso
+// PUT    /api/auth/perfil   Rectificación y Oposición (marketing)
+// DELETE /api/auth/cuenta   Cancelación (requisito de Google Play)
 //
-// No borra la fila de usuarios: muchas tablas la referencian (pedidos,
+// El correo no se cambia desde el perfil: exige verificarlo otra vez.
+//
+// Eliminar la cuenta no borra la fila de usuarios: muchas tablas la referencian (pedidos,
 // ventas, comentarios). En su lugar ANONIMIZA la cuenta:
 //   - nombre, correo, teléfono y secretos se reemplazan o se vacían;
 //   - la contraseña se invalida y se cierran todas las sesiones;
@@ -14,10 +18,63 @@
 // borrar hasta que termine o se cancele.
 // =========================================================
 import bcrypt from "bcrypt";
-import { pool } from "../config/db.js";
+import { pool, pools } from "../config/db.js";
 import logger from "../config/logger.js";
 
 const VENTAS_EN_CURSO = ["pagado", "procesando", "enviado"];
+const COLUMNAS_PERFIL =
+  "nombre_completo AS nombre, correo, telefono, fecha_registro, acepta_marketing";
+
+export const obtenerMiPerfil = async (req, res) => {
+  try {
+    const { rows } = await pools.cliente.query(
+      `SELECT ${COLUMNAS_PERFIL} FROM usuarios WHERE id_usuario = $1 AND eliminado IS NOT TRUE`,
+      [req.user.id_usuario],
+    );
+    if (!rows[0]) {
+      return res.status(404).json({ success: false, message: "La cuenta ya no existe" });
+    }
+    return res.json({ success: true, data: rows[0] });
+  } catch (error) {
+    logger.error(`Error en obtenerMiPerfil: ${error.message}`);
+    return res.status(500).json({ success: false, message: "No se pudo obtener tu perfil" });
+  }
+};
+
+export const actualizarMiPerfil = async (req, res) => {
+  const { nombre, telefono, acepta_marketing: aceptaMarketing } = req.body ?? {};
+
+  const cambios = [];
+  const valores = [req.user.id_usuario];
+  const agregar = (columna, valor) => {
+    valores.push(valor);
+    cambios.push(`${columna} = $${valores.length}`);
+  };
+  if (nombre !== undefined) agregar("nombre_completo", nombre);
+  if (telefono !== undefined) agregar("telefono", telefono || null);
+  if (aceptaMarketing !== undefined) agregar("acepta_marketing", aceptaMarketing);
+
+  if (cambios.length === 0) {
+    return res.status(400).json({ success: false, message: "No hay datos para actualizar" });
+  }
+
+  try {
+    const { rows } = await pools.cliente.query(
+      `UPDATE usuarios
+          SET ${cambios.join(", ")}, fecha_actualizacion = NOW()
+        WHERE id_usuario = $1 AND eliminado IS NOT TRUE
+        RETURNING ${COLUMNAS_PERFIL}`,
+      valores,
+    );
+    if (!rows[0]) {
+      return res.status(404).json({ success: false, message: "La cuenta ya no existe" });
+    }
+    return res.json({ success: true, data: rows[0] });
+  } catch (error) {
+    logger.error(`Error en actualizarMiPerfil: ${error.message}`);
+    return res.status(500).json({ success: false, message: "No se pudo actualizar tu perfil" });
+  }
+};
 
 export const eliminarMiCuenta = async (req, res) => {
   const idUsuario = req.user?.id_usuario;
@@ -92,6 +149,7 @@ export const eliminarMiCuenta = async (req, res) => {
               correo = 'eliminado-' || id_usuario || '@nubstudio.invalid',
               "contraseña_hash" = NULL,
               telefono = NULL,
+              acepta_marketing = FALSE,
               token_verificacion = NULL,
               token_recuperacion = NULL,
               token_expiracion = NULL,
