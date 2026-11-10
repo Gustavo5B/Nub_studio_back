@@ -3,6 +3,7 @@ import { pool }         from "../config/db.js";
 import { createClient } from "@supabase/supabase-js";
 import crypto           from "crypto";
 import cron             from "node-cron";
+import logger           from "../config/logger.js";
 
 const supabase    = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_KEY);
 const BUCKET      = "backups";
@@ -542,14 +543,30 @@ async function obtenerConfigCron(req, res) {
 //   tablas: null | [] → cron hará backup completo
 //   tablas: ["obras","artistas"] → cron hará backup selectivo
 // ══════════════════════════════════════════════════════════════════════════════
+// Acepta un entero o un texto con solo dígitos ("3"); cualquier otra cosa da NaN.
+const comoEntero = (valor) => {
+  if (typeof valor === "number") return valor;
+  if (typeof valor === "string" && /^\d+$/.test(valor)) return Number(valor);
+  return Number.NaN;
+};
+
 async function guardarConfigCron(req, res) {
   const adminId = req.user?.id_usuario ?? null;
-  const { activo, frecuencia, hora, dia_semana, tablas } = req.body || {};
+  const { activo, frecuencia, tablas } = req.body || {};
+  // hora y dia_semana van dentro de la expresión del cron: deben ser enteros en rango.
+  // Antes un texto como "1 * * * *" pasaba la validación (las comparaciones con un texto
+  // dan false) y terminaba dentro de la expresión.
+  const hora = comoEntero(req.body?.hora);
+  const dia_semana = req.body?.dia_semana === undefined || req.body?.dia_semana === null
+    ? undefined
+    : comoEntero(req.body.dia_semana);
 
   if (!["diario","semanal","mensual"].includes(frecuencia))
     return res.status(400).json({ success: false, message: "Frecuencia inválida" });
-  if (hora < 0 || hora > 23)
+  if (!Number.isInteger(hora) || hora < 0 || hora > 23)
     return res.status(400).json({ success: false, message: "Hora inválida (0-23)" });
+  if (dia_semana !== undefined && (!Number.isInteger(dia_semana) || dia_semana < 0 || dia_semana > 6))
+    return res.status(400).json({ success: false, message: "Día de la semana inválido (0-6)" });
 
   // Array vacío equivale a "backup completo" → guardar null
   const tablasAGuardar = Array.isArray(tablas) && tablas.length > 0 ? tablas : null;
@@ -572,7 +589,7 @@ async function guardarConfigCron(req, res) {
     if (activo) {
       const expr = buildCronExpression(frecuencia, hora, dia_semana ?? 1);
       cronJob    = cron.schedule(expr, ejecutarBackupAutomatico, { timezone: "America/Mexico_City" });
-      console.log(`[cron] Programado: ${expr} — ${tablasAGuardar ? `${tablasAGuardar.length} tablas` : "completo"}`);
+      logger.info(`[cron] Programado: ${expr} — ${tablasAGuardar ? `${tablasAGuardar.length} tablas` : "completo"}`);
     }
 
     const proximo = activo ? calcularProximoCron(frecuencia, hora, dia_semana ?? 1) : null;
@@ -582,7 +599,7 @@ async function guardarConfigCron(req, res) {
       data: { activo, frecuencia, hora, dia_semana, tablas: tablasAGuardar, proxima_ejecucion: proximo },
     });
   } catch (err) {
-    console.error("Error guardar config cron:", err);
+    logger.error("Error guardar config cron:", err);
     return res.status(500).json({ success: false, message: "Error al guardar configuración" });
   }
 }
