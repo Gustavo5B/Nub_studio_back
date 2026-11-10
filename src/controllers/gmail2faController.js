@@ -203,7 +203,7 @@ export const verificarCodigoLoginGmail = async (req, res) => {
       return res.status(400).json({ success: false, message: "El codigo debe tener formato XXXX-XXXX" });
 
     const result = await pool.query(
-      `SELECT id_usuario, nombre_completo, correo, estado FROM usuarios WHERE correo = $1 AND secret_2fa = $2`,
+      `SELECT id_usuario, nombre_completo, correo, estado, rol FROM usuarios WHERE correo = $1 AND secret_2fa = $2`,
       [correo, codigo]
     );
 
@@ -224,10 +224,12 @@ export const verificarCodigoLoginGmail = async (req, res) => {
     const jwt = (await import("jsonwebtoken")).default;
     const crypto = (await import("crypto")).default;
 
+    const { duracionSesion } = await import('../config/sesion.js');
+
     const token = jwt.sign(
       { sub: user.id_usuario.toString(), jti: crypto.randomUUID() },
       process.env.JWT_SECRET,
-      { algorithm: 'HS256', expiresIn: "24h", issuer: 'nub-studio', audience: 'nub-users' }
+      { algorithm: 'HS256', expiresIn: duracionSesion(user.rol), issuer: 'nub-studio', audience: 'nub-users' }
     );
 
     try {

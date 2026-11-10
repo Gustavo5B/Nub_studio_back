@@ -1,4 +1,5 @@
 import crypto from 'crypto';
+import jwt from 'jsonwebtoken';
 import { pool } from '../config/db.js';
 import logger from '../config/logger.js';
 
@@ -20,12 +21,15 @@ export const saveActiveSession = async (userId, token, req) => {
                req.connection.remoteAddress ||
                'unknown';
     const userAgent = req.headers['user-agent'] || 'Desconocido';
+    // La sesión vence junto con el token (7 días el cliente, 24 h los demás roles)
+    const { exp } = jwt.decode(token) ?? {};
+    const expiraEn = exp ?? Math.floor(Date.now() / 1000) + 24 * 60 * 60;
 
     await pool.query(
       `INSERT INTO sesiones_activas 
        (id_usuario, token, token_hash, fecha_expiracion, ip_address, user_agent, activa) 
-       VALUES ($1, $2, $3, NOW() + INTERVAL '24 hours', $4, $5, TRUE)`,
-      [userId, token, tokenHash, ip, userAgent]
+       VALUES ($1, $2, $3, to_timestamp($6), $4, $5, TRUE)`,
+      [userId, token, tokenHash, ip, userAgent, expiraEn]
     );
 
     logger.info(`Sesion guardada: usuario ${userId}`);
@@ -53,8 +57,11 @@ export const isSessionValid = async (token) => {
     logger.info(`Sesion valida: ${isValid ? 'SI' : 'NO'}`);
     return isValid;
   } catch (error) {
+    // No es lo mismo "la sesión no existe" que "no se pudo revisar" (por ejemplo, mientras
+    // Neon despierta). Se lanza el error para que el middleware responda 503 y la app no
+    // cierre una sesión que sigue siendo válida.
     logger.error(`Error al verificar sesion: ${error.message}`);
-    return false;
+    throw error;
   }
 };
 
