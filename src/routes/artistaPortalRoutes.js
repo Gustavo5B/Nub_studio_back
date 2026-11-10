@@ -45,7 +45,7 @@ const sanitizeMultipart = (req, res, next) => {
     const valor = req.body[campo];
     if (typeof valor !== 'string') continue;
     if (detectXSS(valor)) {
-      logger.warn(`XSS detectado en multipart.${campo}: ${valor.substring(0, 100)}`);
+      logger.warn(`XSS detectado en multipart.${campo}`);
       return res.status(400).json({
         error: 'Solicitud rechazada',
         message: 'Se detecto contenido potencialmente malicioso en la solicitud',

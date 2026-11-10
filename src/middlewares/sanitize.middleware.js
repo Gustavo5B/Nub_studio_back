@@ -2,6 +2,7 @@
 // MIDDLEWARE DE SANITIZACION CONTRA XSS
 // =========================================================
 import logger from '../config/logger.js';
+import { esCampoContrasena } from './camposSensibles.js';
 
 const detectXSS = (value) => {
   if (typeof value !== 'string') return false;
@@ -59,8 +60,10 @@ export const sanitizeInput = (req, res, next) => {
   try {
     if (req.body) {
       for (const key in req.body) {
+        if (esCampoContrasena(key)) continue;
         if (detectXSS(req.body[key])) {
-          logger.warn(`XSS detectado en body.${key}: ${req.body[key].substring(0, 100)}`);
+          // Solo el nombre del campo: el valor puede traer datos personales
+          logger.warn(`XSS detectado en body.${key}`);
           return res.status(400).json({
             error: 'Solicitud rechazada',
             message: 'Se detecto contenido potencialmente malicioso en la solicitud',
