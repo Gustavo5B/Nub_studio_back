@@ -2,6 +2,7 @@
 // MIDDLEWARE DE PROTECCION CONTRA SQL INJECTION
 // =========================================================
 import logger from '../config/logger.js';
+import { esCampoContrasena } from './camposSensibles.js';
 
 const detectSQLInjection = (value) => {
   if (typeof value !== 'string') return false;
@@ -36,8 +37,10 @@ export const preventSQLInjection = (req, res, next) => {
   try {
     if (req.body) {
       for (const key in req.body) {
+        if (esCampoContrasena(key)) continue;
         if (detectSQLInjection(req.body[key])) {
-          logger.warn(`SQL Injection detectado en body.${key}: ${req.body[key]}`);
+          // Solo el nombre del campo: el valor puede traer datos personales
+          logger.warn(`SQL Injection detectado en body.${key}`);
           return res.status(400).json({
             error: 'Solicitud rechazada',
             message: 'Se detectaron patrones sospechosos en la solicitud',
