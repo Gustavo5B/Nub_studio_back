@@ -13,6 +13,7 @@ import {
 import { saveActiveSession, revokeOtherSessions, removeSession } from '../services/sessionService.js';
 import crypto from 'crypto';
 import logger from '../config/logger.js';
+import { duracionSesion } from '../config/sesion.js';
 dotenv.config();
 
 // =========================================================
@@ -46,10 +47,11 @@ const generarMatricula = async () => {
 };
 
 const generateToken = (user) => {
+  const rol = user.rol || 'cliente';
   return jwt.sign(
-    { sub: user.id_usuario.toString(), jti: crypto.randomUUID(), rol: user.rol || 'cliente' },
+    { sub: user.id_usuario.toString(), jti: crypto.randomUUID(), rol },
     process.env.JWT_SECRET,
-    { algorithm: 'HS256', expiresIn: "24h", issuer: 'nub-studio', audience: 'nub-users' }
+    { algorithm: 'HS256', expiresIn: duracionSesion(rol), issuer: 'nub-studio', audience: 'nub-users' }
   );
 };
 

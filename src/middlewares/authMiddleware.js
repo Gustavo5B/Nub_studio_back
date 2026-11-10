@@ -35,7 +35,15 @@ export const authenticateToken = async (req, res, next) => {
       return res.status(401).json({ message: "Error al verificar token", code: "VERIFICATION_ERROR" });
     }
 
-    const sessionExists = await isSessionValid(token);
+    let sessionExists;
+    try {
+      sessionExists = await isSessionValid(token);
+    } catch {
+      return res.status(503).json({
+        message: "No pudimos comprobar tu sesion. Intentalo de nuevo en unos segundos.",
+        code: "SESSION_CHECK_FAILED"
+      });
+    }
     if (!sessionExists) {
       logger.warn(`Auth: sesion revocada usuario ${decoded.sub}`);
       return res.status(401).json({ message: "Tu sesion ya no es valida. Por favor inicia sesion nuevamente.", code: "SESSION_REVOKED" });

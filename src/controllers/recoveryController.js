@@ -371,6 +371,12 @@ export const resetPassword = async (req, res) => {
       [user.id_usuario],
     );
 
+    // Con la contraseña nueva se cierran todas las sesiones abiertas: si alguien más
+    // tenía acceso a la cuenta, pierde la sesión en ese momento.
+    await client.query("DELETE FROM sesiones_activas WHERE id_usuario = $1", [
+      user.id_usuario,
+    ]);
+
     await client.query("COMMIT");
 
     logger.info(`Contrasena restablecida: usuario ${user.id_usuario}`);
