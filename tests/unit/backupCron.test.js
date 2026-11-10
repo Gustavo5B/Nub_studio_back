@@ -57,4 +57,10 @@ describe('guardarConfigCron: validación de hora y día', () => {
     await guardar({ activo: true, frecuencia: 'semanal', hora: 2 });
     expect(schedule).toHaveBeenCalledWith('0 2 * * 1', expect.any(Function), expect.any(Object));
   });
+
+  it('si la base falla responde 500 y lo registra en el log', async () => {
+    pool.query.mockRejectedValueOnce(new Error('sin conexión'));
+    const res = await guardar({ activo: false, frecuencia: 'diario', hora: 2 });
+    expect(res.status).toHaveBeenCalledWith(500);
+  });
 });

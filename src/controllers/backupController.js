@@ -194,12 +194,12 @@ async function limpiarBackupsAntiguos(client) {
     const archivos = antiguos.map(r => r.nombre_archivo).filter(Boolean);
     if (archivos.length) {
       const { error } = await supabase.storage.from(BUCKET).remove(archivos);
-      if (error) logger.warn("Storage remove warning:", error.message);
+      if (error) console.warn("Storage remove warning:", error.message);
     }
     await client.query(`DELETE FROM backups_historial WHERE id = ANY($1::int[])`, [antiguos.map(r => r.id)]);
-    logger.info(`[backup] Limpieza: ${antiguos.length} backup(s) eliminado(s)`);
+    console.log(`[backup] Limpieza: ${antiguos.length} backup(s) eliminado(s)`);
   } catch (err) {
-    logger.warn("[backup] Error en limpieza:", err.message);
+    console.warn("[backup] Error en limpieza:", err.message);
   }
 }
 
@@ -221,7 +221,7 @@ async function guardarHistorial(client, adminId, stats) {
         (id_admin, tablas, filas_total, tamanio_bytes, duracion_ms, checksum_md5, nombre_archivo, url_archivo)
       VALUES ($1,$2,$3,$4,$5,$6,$7,$8)
     `, [adminId, stats.tablas, stats.filas, stats.bytes, stats.ms, stats.md5, stats.archivo, stats.url]);
-  } catch (err) { logger.warn("Historial backup no guardado:", err.message); }
+  } catch (err) { console.warn("Historial backup no guardado:", err.message); }
 }
 
 // ── Core: construir SQL para un set de tablas ─────────────────────────────────
@@ -319,9 +319,9 @@ async function generarBackup(req, res) {
     let urlArchivo = null;
     try {
       urlArchivo = await subirAStorage(archivo, buf);
-      logger.info(`[backup] Subido a Storage: ${archivo}`);
+      console.log(`[backup] Subido a Storage: ${archivo}`);
     } catch (err) {
-      logger.error("[backup] Error al subir a Storage:", err.message);
+      console.error("[backup] Error al subir a Storage:", err.message);
       return res.status(500).json({
         success: false,
         message: "El backup se generó pero no se pudo subir a Storage",
@@ -356,7 +356,7 @@ async function generarBackup(req, res) {
     });
 
   } catch (err) {
-    logger.error("Error backup:", err);
+    console.error("Error backup:", err);
     return res.status(500).json({
       success: false,
       message: "Error al generar el respaldo",
@@ -475,7 +475,7 @@ function buildCronExpression(frecuencia, hora, diaSemana) {
 // ── Ejecutar backup automático ────────────────────────────────────────────────
 // Lee la columna `tablas` del config para decidir completo vs selectivo
 async function ejecutarBackupAutomatico() {
-  logger.info("[cron] Iniciando backup automático...");
+  console.log("[cron] Iniciando backup automático...");
   const client = await pool.connect();
   try {
     const { rows } = await pool.query(`SELECT tablas FROM backup_config_cron LIMIT 1`);
@@ -498,14 +498,14 @@ async function ejecutarBackupAutomatico() {
 
     let urlArchivo = null;
     try { urlArchivo = await subirAStorage(archivo, buf); }
-    catch (err) { logger.warn("[cron] Storage:", err.message); }
+    catch (err) { console.warn("[cron] Storage:", err.message); }
 
     await guardarHistorial(client, null, { tablas: tablasOk, filas: filasTotal, bytes, ms, md5, archivo, url: urlArchivo });
     await limpiarBackupsAntiguos(client);
     await pool.query(`UPDATE backup_config_cron SET ultimo_cron = NOW() WHERE id = 1`);
-    logger.info(`[cron] OK: ${archivo} | ${tablasOk} tablas | ${filasTotal} filas | ${ms}ms`);
+    console.log(`[cron] OK: ${archivo} | ${tablasOk} tablas | ${filasTotal} filas | ${ms}ms`);
   } catch (err) {
-    logger.error("[cron] Error:", err.message);
+    console.error("[cron] Error:", err.message);
   } finally { client.release(); }
 }
 
@@ -638,7 +638,7 @@ async function eliminarBackup(req, res) {
     const { nombre_archivo } = rows[0];
     if (nombre_archivo) {
       const { error } = await supabase.storage.from(BUCKET).remove([nombre_archivo]);
-      if (error) logger.warn(`[backup] Storage remove:`, error.message);
+      if (error) console.warn(`[backup] Storage remove:`, error.message);
     }
     await client.query(`DELETE FROM backups_historial WHERE id = $1`, [id]);
     return res.json({ success: true, message: "Backup eliminado correctamente" });
@@ -658,9 +658,9 @@ async function iniciarCron() {
     if (!config?.activo) return;
     const expr = buildCronExpression(config.frecuencia, config.hora, config.dia_semana);
     cronJob    = cron.schedule(expr, ejecutarBackupAutomatico, { timezone: "America/Mexico_City" });
-    logger.info(`[cron] Restaurado: ${expr} — ${config.tablas ? `${config.tablas.length} tablas selectivas` : "backup completo"}`);
+    console.log(`[cron] Restaurado: ${expr} — ${config.tablas ? `${config.tablas.length} tablas selectivas` : "backup completo"}`);
   } catch (err) {
-    logger.warn("[cron] No se pudo restaurar:", err.message);
+    console.warn("[cron] No se pudo restaurar:", err.message);
   }
 }
 
