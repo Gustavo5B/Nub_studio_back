@@ -3,6 +3,38 @@ import logger from "../config/logger.js";
 import { sendObraAprobadaEmail, sendObraRechazadaEmail } from '../services/emailService.js';
 
 // =========================================================
+// FILTRO DE PRECIO DEL LISTADO
+// =========================================================
+// El precio que se muestra es el de los tamaños activos de la obra o, si no tiene tamaños,
+// su precio_base (ver precio_minimo en listarObras). El filtro usa la misma regla:
+//   - con tamaños: entra si alguno de sus tamaños está dentro del rango;
+//   - sin tamaños: entra si su precio_base está dentro del rango.
+// Antes solo se revisaban los tamaños y las obras sin tamaños nunca pasaban el filtro.
+// Regresa el SQL (con alias "o" para obras) y los valores, numerados desde primerParam.
+export const condicionPrecio = (precioMin, precioMax, primerParam) => {
+  const params = [];
+  const marcador = (valor) => {
+    params.push(valor);
+    return `$${primerParam + params.length - 1}`;
+  };
+  const min = precioMin ? marcador(precioMin) : null;
+  const max = precioMax ? marcador(precioMax) : null;
+  const enRango = (columna) =>
+    [min && `${columna} >= ${min}`, max && `${columna} <= ${max}`].filter(Boolean).join(' AND ');
+
+  const sql = `(
+    EXISTS (SELECT 1 FROM obras_tamaños tam
+            WHERE tam.id_obra = o.id_obra AND tam.activo = TRUE AND ${enRango('tam.precio_base')})
+    OR (
+      NOT EXISTS (SELECT 1 FROM obras_tamaños tam
+                  WHERE tam.id_obra = o.id_obra AND tam.activo = TRUE)
+      AND ${enRango('o.precio_base')}
+    )
+  )`;
+  return { sql, params };
+};
+
+// =========================================================
 // LISTAR TODAS LAS OBRAS
 // =========================================================
 export const listarObras = async (req, res) => {
@@ -35,12 +67,10 @@ export const listarObras = async (req, res) => {
     if (destacadas === 'true') { whereConditions.push('o.destacada = TRUE'); }
 
     if (precio_min || precio_max) {
-      let precioConditions = [];
-      if (precio_min) { precioConditions.push(`ot.precio_base >= $${paramCount}`); queryParams.push(precio_min); paramCount++; }
-      if (precio_max) { precioConditions.push(`ot.precio_base <= $${paramCount}`); queryParams.push(precio_max); paramCount++; }
-      whereConditions.push(
-        `EXISTS (SELECT 1 FROM obras_tamaños ot WHERE ot.id_obra = o.id_obra AND ot.activo = TRUE ${precioConditions.length > 0 ? 'AND ' + precioConditions.join(' AND ') : ''})`
-      );
+      const precio = condicionPrecio(precio_min, precio_max, paramCount);
+      whereConditions.push(precio.sql);
+      queryParams.push(...precio.params);
+      paramCount += precio.params.length;
     }
 
     const whereClause = whereConditions.join(' AND ');
