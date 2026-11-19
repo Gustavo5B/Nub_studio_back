@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "../services/bcryptLimitado.js";
 import crypto from "crypto";
 import dotenv from "dotenv";
 import { pool } from "../config/db.js";

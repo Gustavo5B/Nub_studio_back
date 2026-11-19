@@ -1,5 +1,5 @@
 import jwt from "jsonwebtoken";
-import bcrypt from "bcrypt";
+import bcrypt from "../services/bcryptLimitado.js";
 import dotenv from "dotenv";
 import { pool, pools } from "../config/db.js";
 import {
