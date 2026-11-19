@@ -93,8 +93,8 @@ describe('crearLimitador', () => {
 });
 
 describe('bcrypt con límite', () => {
-  it('deja 2 de los 4 hilos de Node libres para abrir conexiones a la base', () => {
-    expect(MAXIMO_BCRYPT).toBe(2);
+  it('deja 1 de los 4 hilos de Node libre para abrir conexiones a la base', () => {
+    expect(MAXIMO_BCRYPT).toBe(3);
   });
 
   it('compare y hash llaman a bcrypt con los mismos datos y regresan su resultado', async () => {
@@ -107,14 +107,14 @@ describe('bcrypt con límite', () => {
     expect(hash).toHaveBeenCalledWith('Clave#1', 12);
   });
 
-  it('con 6 logins a la vez, solo 2 comparan contraseña al mismo tiempo', async () => {
+  it('con 6 logins a la vez, solo 3 comparan contraseña al mismo tiempo', async () => {
     const tareas = Array.from({ length: 6 }, pendiente);
     let i = 0;
     compare.mockImplementation(() => tareas[i++].promesa);
 
     const logins = tareas.map(() => bcryptLimitado.compare('Clave#1', '$2b$12$x'));
     await avanzar();
-    expect(compare).toHaveBeenCalledTimes(2);
+    expect(compare).toHaveBeenCalledTimes(3);
 
     tareas.forEach((t) => t.terminar(true));
     await expect(Promise.all(logins)).resolves.toEqual([true, true, true, true, true, true]);

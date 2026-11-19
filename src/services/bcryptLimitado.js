@@ -7,15 +7,18 @@ import bcrypt from 'bcrypt';
 // pasos para abrir una conexión nueva a PostgreSQL (buscar el host y la autenticación SCRAM).
 // Con 50 logins a la vez, los 4 hilos se llenan de bcrypt y abrir una conexión espera más de
 // 5 s en la fila; el pool corta a los 10 s y fallan también catálogo y pedidos.
-// Aquí solo se deja usar a bcrypt una parte de los hilos; el resto espera en una fila de
-// JavaScript, así siempre queda un hilo libre para abrir conexiones. La seguridad no cambia:
-// el costo de bcrypt (12) es el mismo, solo se ordena el turno.
+// Aquí bcrypt puede usar todos los hilos menos uno; el resto espera en una fila de
+// JavaScript, así siempre queda un hilo libre para abrir conexiones. Abrir una conexión tarda
+// milisegundos, así que con un hilo basta. Dejar más hilos libres hace más lento el login: en
+// la prueba de esfuerzo, con solo 2 hilos para bcrypt, el p95 del login pasó de 1.8 s a 5.4 s.
+// La seguridad no cambia: el costo de bcrypt (12) es el mismo, solo se ordena el turno.
 // =========================================================
 
 const HILOS = Number.parseInt(process.env.UV_THREADPOOL_SIZE, 10) || 4;
 
-// Siempre se dejan 2 hilos libres (mínimo 1 para bcrypt).
-export const MAXIMO_BCRYPT = Math.max(1, HILOS - 2);
+// Siempre se deja 1 hilo libre (mínimo 1 para bcrypt). Si en el servidor se sube
+// UV_THREADPOOL_SIZE, el límite crece con él.
+export const MAXIMO_BCRYPT = Math.max(1, HILOS - 1);
 
 // Devuelve una función que corre tareas asíncronas con, como máximo, `maximo` a la vez.
 // Las demás esperan su turno en el orden en que llegaron.
