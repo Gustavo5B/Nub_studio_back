@@ -15,6 +15,7 @@ import { register, verifyEmail, resendVerificationCode } from '../controllers/re
 import { authenticateToken, requireRole } from '../middlewares/authMiddleware.js';
 import { actualizarMiPerfil, eliminarMiCuenta, obtenerMiPerfil } from '../controllers/cuentaController.js';
 import { validarActualizarPerfil } from '../validators/validators.js';
+import limiteLogin from '../middlewares/limiteLogin.middleware.js';
 
 const router = express.Router();
 
@@ -35,9 +36,9 @@ router.post("/verificar-email",      verificarEmailArtista);
 router.post("/reenviar-activacion",  reenviarActivacion);
 
 // ── Login ────────────────────────────────────────────────────
-router.post("/login",             login);
-router.post("/login-2fa",         loginWith2FA);
-router.post("/verify-login-code", verifyLoginCode);
+router.post("/login",             limiteLogin, login);
+router.post("/login-2fa",         limiteLogin, loginWith2FA);
+router.post("/verify-login-code", limiteLogin, verifyLoginCode);
 
 // ── Sesiones (requieren autenticación) ──────────────────────
 router.post("/logout",               authenticateToken, logout);
