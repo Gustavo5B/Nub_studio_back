@@ -1,4 +1,4 @@
-import bcrypt from "bcrypt";
+import bcrypt from "../services/bcryptLimitado.js";
 import dotenv from "dotenv";
 import { pool } from "../config/db.js";
 import { generateCode, sendRecoveryCode } from "../services/emailService.js";

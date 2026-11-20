@@ -17,7 +17,7 @@
 // Si hay una venta en curso (pagada, en proceso o enviada) no se permite
 // borrar hasta que termine o se cancele.
 // =========================================================
-import bcrypt from "bcrypt";
+import bcrypt from "../services/bcryptLimitado.js";
 import { pool, pools } from "../config/db.js";
 import logger from "../config/logger.js";
 
